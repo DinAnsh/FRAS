@@ -1,3 +1,5 @@
+#Here we store the application's data models
+
 from django.db import models
 
 
