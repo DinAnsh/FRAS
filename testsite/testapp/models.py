@@ -15,6 +15,13 @@ class System_Admin(models.Model):
 class Student(models.Model):
     name = models.CharField(max_length=50)
     enroll = models.CharField(primary_key=True, max_length=20)
-    img = models.ImageField(upload_to='testapp/students/')
+    img = models.ImageField(upload_to='students/')   #here media is our base dir 
+    def __str__(self):
+        return self.name
+    
+class Team(models.Model):
+    name = models.CharField(max_length=50)
+    designation = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='team/')
     def __str__(self):
         return self.name
