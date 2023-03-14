@@ -75,3 +75,7 @@ html {
   html {
     scroll-behavior: smooth;
   }
+
+  header{
+    top: 0;
+  }
