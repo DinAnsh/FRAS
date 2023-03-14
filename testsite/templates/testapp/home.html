@@ -1,9 +1,12 @@
-{% extends 'testapp/base.html' %} {% block content %}
-{% load static %}
+{% extends 'testapp/base.html' %} {% block content %} {% load static %}
 <div class="home-container">
   <header data-thq="thq-navbar" class="home-navbar-interactive">
     <div class="home-container01">
-      <a href="{% url 'testapp:home' %}" class=""><img src="{% static 'testapp/images/main.png' %}" alt="fras" width="80vw"></a>
+      <a href="{% url 'testapp:home' %}" 
+        ><img
+          src="{% static 'testapp/images/header-logo.png' %}"
+          alt="logo" class="main_logo"
+      /></a>
     </div>
     <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
       <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
@@ -83,7 +86,13 @@
       <span class="home-text01">
         <span>
           <span>
-            Automatic face recognition technologies have made many improvements in the changing world. Smart Attendance using Real-Time Face Recognition is a real-world solution which comes with day to day activities of handling student attendance system. Face recognition-based attendance system is a process of recognizing the students face for taking attendance by using face biometrics based on high - definition monitor video and other information technology
+            Automatic face recognition technologies have made many improvements
+            in the changing world. Smart Attendance using Real-Time Face
+            Recognition is a real-world solution which comes with day to day
+            activities of handling student attendance system. Face
+            recognition-based attendance system is a process of recognizing the
+            students face for taking attendance by using face biometrics based
+            on high - definition monitor video and other information technology
           </span>
           <span></span>
         </span>
@@ -102,10 +111,15 @@
     <div class="home-container05">
       <div class="feature-card2-feature-card feature-card2-root-class-name">
         <div class="feature-card2-container">
-          <h2 class="feature-card2-text"><span>Automated Attendance Tracking</span></h2>
+          <h2 class="feature-card2-text">
+            <span>Automated Attendance Tracking</span>
+          </h2>
           <span>
             <span>
-              This system uses facial recognition technology to track attendance without the need for any manual intervention. The attendance is recorded automatically in real-time, thus reducing the chances of errors.
+              This system uses facial recognition technology to track attendance
+              without the need for any manual intervention. The attendance is
+              recorded automatically in real-time, thus reducing the chances of
+              errors.
             </span>
           </span>
         </div>
@@ -115,7 +129,10 @@
           <h2 class="feature-card2-text"><span>Customizable Reports</span></h2>
           <span>
             <span>
-              The system generates detailed reports that can be customized as per the specific needs of the institution. These reports provide valuable insights into student attendance patterns, helping faculty make data-driven decisions.
+              The system generates detailed reports that can be customized as
+              per the specific needs of the institution. These reports provide
+              valuable insights into student attendance patterns, helping
+              faculty make data-driven decisions.
             </span>
           </span>
         </div>
@@ -125,17 +142,24 @@
           <h2 class="feature-card2-text"><span>Time-Saving</span></h2>
           <span>
             <span>
-              With this system, valuable time of both faculty and students is saved as it eliminates the need for taking attendance manually. This means that more time can be devoted to teaching and learning activities.
+              With this system, valuable time of both faculty and students is
+              saved as it eliminates the need for taking attendance manually.
+              This means that more time can be devoted to teaching and learning
+              activities.
             </span>
           </span>
         </div>
       </div>
       <div class="feature-card2-feature-card feature-card2-root-class-name1">
         <div class="feature-card2-container">
-          <h2 class="feature-card2-text"><span>User-Friendly Interface</span></h2>
+          <h2 class="feature-card2-text">
+            <span>User-Friendly Interface</span>
+          </h2>
           <span>
             <span>
-              Face recognition based attendance systems come with user-friendly interfaces that are easy to use and navigate. They are accessible to everyone, regardless of their tech skills.
+              Face recognition based attendance systems come with user-friendly
+              interfaces that are easy to use and navigate. They are accessible
+              to everyone, regardless of their tech skills.
             </span>
           </span>
         </div>
@@ -239,9 +263,9 @@
     <span class="home-text35">
       <span>
         We are a group of passionate and innovative new developers looking to
-        make our mark on the tech industry. we are a team of recent
-        graduates with degrees in computer science and related fields. As a
-        team, we bring a diverse set of skills and experiences to the table.
+        make our mark on the tech industry. we are a team of recent graduates
+        with degrees in computer science and related fields. As a team, we bring
+        a diverse set of skills and experiences to the table.
       </span>
       <br />
     </span>

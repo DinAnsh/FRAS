@@ -1,3 +1,10 @@
+.main_logo{
+  width: auto;
+  height: 7vh;
+}
+
+
+
 .feature-card2-feature-card {
   width: 100%;
   display: flex;
@@ -70,13 +77,17 @@
   text-decoration: none;
 }
 .home-desktop-menu {
+  margin: 0 0 0 5vw;
   display: flex;
+  justify-content: center;
+  width: 30vw;
 }
 .home-nav {
-  flex: 0 0 auto;
+  flex: 1 0 auto;
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   flex-direction: row;
+  font-size: 1.3vw;
 }
 .home-link {
   font-style: normal;
@@ -112,6 +123,7 @@
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
+  width:12vw;
 }
 .home-login {
   font-style: normal;
@@ -1048,18 +1060,29 @@
 }
 @media(max-width: 991px) {
   .home-desktop-menu {
-    margin-top: var(--dl-space-space-halfunit);
+    /* margin-top: var(--dl-space-space-halfunit); */
     align-items: center;
-    margin-left: var(--dl-space-space-oneandhalfunits);
-    margin-right: var(--dl-space-space-oneandhalfunits);
-    margin-bottom: var(--dl-space-space-halfunit);
+    /* margin-left: var(--dl-space-space-oneandhalfunits);
+    margin-right: var(--dl-space-space-oneandhalfunits); */
+    /* margin-bottom: var(--dl-space-space-halfunit); */
     justify-content: center;
+    width: 45vw;
+  }
+  .main_logo{
+    width: auto;
+    height: 6vh;
+  }
+  .home-nav{
+    font-size: 2.2vw;
   }
   .home-login {
     border-style: solid;
   }
   .home-register {
     border-style: solid;
+  }
+  .home-btn-group{
+    width: 175px;
   }
   .home-login1 {
     border-style: solid;
@@ -1172,10 +1195,6 @@
   }
 }
 @media(max-width: 767px) {
-  .home-navbar-interactive {
-    padding-left: var(--dl-space-space-twounits);
-    padding-right: var(--dl-space-space-twounits);
-  }
   .home-desktop-menu {
     display: none;
   }
@@ -1514,5 +1533,11 @@
   }
   .home-text58 {
     text-align: center;
+  }
+}
+
+@media(max-width: 1280px){
+  .home-btn-group{
+    width: 173px;
   }
 }
