@@ -2,10 +2,11 @@
 <div class="home-container">
   <header data-thq="thq-navbar" class="home-navbar-interactive">
     <div class="home-container01">
-      <a href="{% url 'testapp:home' %}" 
+      <a href="{% url 'testapp:home' %}"
         ><img
           src="{% static 'testapp/images/header-logo.png' %}"
-          alt="logo" class="main_logo"
+          alt="logo"
+          class="main_logo"
       /></a>
     </div>
     <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
@@ -33,7 +34,13 @@
     <div data-thq="thq-mobile-menu" class="home-mobile-menu">
       <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
         <div class="home-container02">
-          <a href="#" class="home-navlink1">FRAS</a>
+          {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %}
+          <a href="{% url 'testapp:home' %}"
+            ><img
+              src="{% static 'testapp/images/header-logo.png' %}"
+              alt="logo"
+              class="main_logo"
+          /></a>
           <div data-thq="thq-close-menu" class="home-menu-close">
             <svg viewBox="0 0 1024 1024" class="home-icon02">
               <path
@@ -62,6 +69,7 @@
           >
         </div>
       </div>
+      {% comment %}
       <div class="home-icon-group">
         <svg viewBox="0 0 950.8571428571428 1024" class="home-icon04">
           <path
@@ -77,6 +85,7 @@
           ></path>
         </svg>
       </div>
+      {% endcomment %}
     </div>
   </header>
   <div class="home-separator"></div>
@@ -355,6 +364,7 @@
       {% endcomment %}
     </div>
   </section>
+  <div class="home-separator1"></div>
   <footer id="contact" class="home-footer">
     <div class="home-container41">
       <div class="home-container42">
@@ -387,8 +397,7 @@
         </div>
       </div>
     </div>
-    <div class="home-separator1"></div>
-    <span class="home-text58">© 2023 FRAS, Made with 💕</span>
+    <span class="home-text58">&copy; FRAS All Rights Reserved.</span>
   </footer>
 </div>
 
