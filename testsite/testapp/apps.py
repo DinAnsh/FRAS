@@ -1,3 +1,5 @@
+#Here we can place application specific configurations
+
 from django.apps import AppConfig
 
 
