@@ -1,14 +1,20 @@
+#This is where we have functions that handle requests and return responses
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
-from .models import System_Admin, Student
+from .models import System_Admin, Student, Team
 
 
 def home(request):
-    return render(request, 'testapp/home.html')
+    student_data = Student.objects.all()
+    team_data = Team.objects.all()
+    for i in team_data:
+        print(i.image)
+    return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data})
 
 
 def user_register(request):
@@ -28,7 +34,7 @@ def user_register(request):
                 names = name.split()
                 username = names[0]+'@'+dept[:3]
                 username = username.lower()
-                User.objects.create_user(username, email, password)
+                User.objects.create_user(username, email, password, first_name=names[0], last_name=" ".join(names[1:]) )
 
                 # database entry - Admin model
                 admin = System_Admin(dept, name, email, password)
