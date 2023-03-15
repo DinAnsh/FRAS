@@ -142,12 +142,14 @@
   border-width: 0.5px;
   margin-right: var(--dl-space-space-twounits);
   text-decoration: none;
+  cursor: pointer;
 }
 .home-login:hover{
   background-color: rgba(228, 212, 200,0.5);
 }
 
 .home-register {
+  cursor: pointer;
   font-style: normal;
   font-weight: 500;
   border-color: #201a1e;
@@ -1598,4 +1600,119 @@
   .home-btn-group{
     width: 170px;
   }
+}
+
+
+
+/* popup register */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  display: flex;
+  min-height: 100%;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; */
+}
+
+.popup{
+  max-width: 400px;
+  border-radius: 5px;
+  width: 100%;
+  background-color: #c1bebe;
+  height: 60vh;
+}
+
+.popup_title{
+  text-align: center;
+  margin: 26px;
+  position: relative;
+  font-weight: 300;
+  font-size: 38px;
+}
+
+.popup_body{
+  max-width: 350px;
+  padding: 0 10px 10px;
+  margin: auto;
+}
+
+.close {
+  margin: 0 5px;
+  color: #8f8f8f;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.popup_form{
+  display: flex;
+  flex-direction: column;
+
+}
+
+.in_div{
+  width: 100%;
+  margin-bottom: 10px;
+  position: relative;
+}
+.in_div2{
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.in_div2 a {
+  margin-top: 10px;
+  color: #00816d !important;
+}
+
+.input_label{
+  font-size: 14px;
+  line-height: 18px;
+  margin-top: 3px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.in_field{
+  width: 100%;
+  height: 30px;
+  border-radius: 5px;
+  padding: 0 12px;
+}
+
+.register_btn{
+  margin-top: 20px;
+  padding: 12px 5px;
+  border-radius: 5px;
+  background-color: #343333;
+  color: white;
+}
+
+.register_btn:hover{
+  background-color: rgb(23, 23, 23);
 }

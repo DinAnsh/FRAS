@@ -19,10 +19,11 @@
       </nav>
     </div>
     <div data-thq="thq-navbar-btn-group" class="home-btn-group">
-      <a href="/testapp/login" class="home-login button">Login</a>
-      <a href="{% url 'testapp:register' %}" class="home-register button"
+      <a class="home-login button">Login</a>
+      {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button"
         >Register</a
-      >
+      > {% endcomment %}
+      <button class="home-register button" onclick="openModal()">Register</button>
     </div>
     <div data-thq="thq-burger-menu" class="home-burger-menu">
       <svg viewBox="0 0 1024 1024" class="home-icon">
@@ -65,8 +66,7 @@
             >Login</a
           >
           <a href="{% url 'testapp:register' %}" class="home-register1 button"
-            >Register</a
-          >
+            >Register</a>
         </div>
       </div>
       {% comment %}
@@ -89,6 +89,7 @@
     </div>
   </header>
   <div class="home-separator"></div>
+
   <div id="about" class="home-hero">
     <div class="home-container04">
       <h1 class="home-text">Face Recognition Based Attendance System</h1>
@@ -399,6 +400,56 @@
     </div>
     <span class="home-text58">&copy; FRAS All Rights Reserved.</span>
   </footer>
+
+  <div id="myModal" class="modal">
+    <div class="modal-content" id="content">
+      <div class="popup">
+        <span class="close" id="cbtn">&times;</span>
+        <div class="popup_title">
+          Create Account
+        </div>
+        <div class="popup_body">
+          <form class="popup_form" action="#">
+            {% csrf_token %}
+            <div class="in_div">
+              <span class="input_label">Department</span>
+              <select name="department" disabled class="in_field">
+                <option value="cse" >Computer science and engineering</option>
+              </select>
+            </div>
+
+            <div class="in_div">
+              <label for="name" class="input_label">Name:</label>
+              <input type="text" id="name" name="name" required class="in_field" placeholder="Your full name">
+            </div>
+            
+            <div class="in_div">
+              <label for="email" class="input_label">Email:</label>
+              <input type="email" id="email" name="email"  class="in_field" required placeholder="Ex. email@org.com">
+            </div>
+              
+            <div class="in_div">
+              <label for="password" class="input_label">Password:</label>
+              <input type="password" id="password" name="password" class="in_field" required>
+            </div>
+
+            <div class="in_div">
+              <label for="cpassword" class="input_label">Confirm Password:</label>
+              <input type="password" id="cpassword" name="password" class="in_field" required>
+            </div>
+            
+            
+            <input type="submit" value="Register" class="register_btn">
+            <div class="in_div2">
+              Already have an account?
+                <a href="#">Log in</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 {% endblock %}
