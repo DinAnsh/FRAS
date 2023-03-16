@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="adminrights-container">
+  <header data-thq="thq-navbar" class="home-navbar-interactive">
+    <div class="home-container01">
+      <a href="{% url 'testapp:home' %}" class="home-navlink">FRAS</a>
+    </div>
+    <div
+      data-thq="thq-navbar-nav"
+      data-role="Nav"
+      class="home-desktop-menu"
+    >
+      <nav
+        data-thq="thq-navbar-nav-links"
+        data-role="Nav"
+        class="home-nav"
+      >
+      </nav>
+    </div>
+    <div data-thq="thq-navbar-btn-group" class="home-btn-group">
+      <form method="post" action="{% url 'testapp:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="adminrights-button2 button">
+          <span class="adminrights-text28">
+            <span>Logout</span>
+            <br />
+          </span>
+        </button>
+      </form>
+    </div>
+  </header>
+  <div class="home-separator"></div>
+  <div class="adminrights-testimonial">
+    <div class="adminrights-container01">
+      <div class="adminrights-container02">
+        <div class="adminrights-container03">
+          <h1 class="adminrights-text">
+            <span>Student&nbsp;</span>
+            <span>Registration</span>
+          </h1>
+          <form method="post" class="adminrights-form" enctype='multipart/form-data'>
+            {% csrf_token %}
+            <div class="adminrights-container04">
+              <div class="adminrights-container05">
+                <input
+                  type="text"
+                  required=""
+                  placeholder="Full Name"
+                  class="adminrights-textinput input"
+                  name="student_name"
+                />
+              </div>
+              <div class="adminrights-container06">
+                <input
+                  type="text"
+                  required=""
+                  placeholder="Enrollment No."
+                  class="adminrights-textinput01 input"
+                  name="enroll"
+                />
+              </div>
+              <div class="adminrights-container07">
+                <input
+                  type="file"
+                  accept="image/*"
+                  required=""
+                  placeholder="capture"
+                  class="adminrights-textinput02 input"
+                  name="img"
+                />
+              </div>
+            </div>
+            <div class="adminrights-container08">
+              <button type="submit" class="adminrights-button button">
+                <span class="adminrights-text03">
+                  <span>Submit</span>
+                  <br />
+                </span>
+              </button>
+            </div>
+          </form>
+<!--            {% if s_submit %}-->
+<!--            <form method="post">-->
+<!--              {% csrf_token %}-->
+<!--                <div class="order-list">-->
+<!--                    <table class="myTable">-->
+<!--                        <colgroup span="8"></colgroup>-->
+<!--                        <tr>-->
+<!--                            <th>Name</th>-->
+<!--                            <th>Enrollment No.</th>-->
+<!--                            <th>Modify</th>-->
+<!--                        </tr>-->
+<!--                        <tr id="order_values">-->
+
+<!--                            <td data-model-name="edit_name">{{ table.0 }}</td>-->
+<!--                            <td data-model-name="edit_enroll">{{ table.1 }}</td>-->
+
+<!--                            <td>-->
+<!--                                <div class="box-button">-->
+<!--                                    <input formaction="{ url 'testapp:edit_student' table %}" type="submit" value="Edit">-->
+<!--                                    <br>-->
+<!--                                    <input formaction="{ url 'testapp:remove_student' %}" type="submit" value="Remove">-->
+<!--                                </div>-->
+<!--                            </td>-->
+<!--                        </tr>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--            {% endif %}-->
+
+          {% if messages %}
+          {% for message in messages %}
+              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+          {% endfor %}
+          {% endif %}
+        </div>
+        <div class="adminrights-container09">
+          <h1 class="adminrights-text06">
+            <span>Teacher&nbsp;</span>
+            <span>Registration</span>
+          </h1>
+          <form class="adminrights-form1">
+            <div class="adminrights-container10">
+              <div class="adminrights-container11">
+                <input
+                  type="text"
+                  required=""
+                  placeholder="Full Name"
+                  class="adminrights-textinput03 input"
+                />
+              </div>
+              <div class="adminrights-container12">
+                <input
+                  type="email"
+                  required=""
+                  placeholder="Mail"
+                  class="adminrights-textinput04 input"
+                />
+              </div>
+              <div class="adminrights-container13">
+                <input
+                  type="tel"
+                  pattern="[0-9]{10}"
+                  required=""
+                  maxlength="10"
+                  placeholder="Mobile No."
+                  class="adminrights-textinput05 input"
+                />
+              </div>
+              <div class="adminrights-container14">
+                <div
+                  data-thq="thq-dropdown"
+                  class="adminrights-thq-dropdown list-item"
+                >
+                  <div
+                    data-thq="thq-dropdown-toggle"
+                    class="adminrights-dropdown-toggle"
+                  >
+                    <span class="adminrights-text09">
+                      Choose Subjects
+                    </span>
+                    <div
+                      data-thq="thq-dropdown-arrow"
+                      class="adminrights-dropdown-arrow"
+                    >
+                      <svg
+                        viewBox="0 0 1024 1024"
+                        class="adminrights-icon"
+                      >
+                        <path d="M426 726v-428l214 214z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <ul
+                    data-thq="thq-dropdown-list"
+                    class="adminrights-dropdown-list"
+                  >
+                    <li
+                      data-thq="thq-dropdown"
+                      class="adminrights-dropdown list-item"
+                    >
+                      <div
+                        data-thq="thq-dropdown-toggle"
+                        class="adminrights-dropdown-toggle01"
+                      >
+                        <span class="adminrights-text10">
+                          Operating System
+                        </span>
+                      </div>
+                    </li>
+                    <li
+                      data-thq="thq-dropdown"
+                      class="adminrights-dropdown01 list-item"
+                    >
+                      <div
+                        data-thq="thq-dropdown-toggle"
+                        class="adminrights-dropdown-toggle02"
+                      >
+                        <span class="adminrights-text11">DBMS</span>
+                      </div>
+                    </li>
+                    <li
+                      data-thq="thq-dropdown"
+                      class="adminrights-dropdown02 list-item"
+                    >
+                      <div
+                        data-thq="thq-dropdown-toggle"
+                        class="adminrights-dropdown-toggle03"
+                      >
+                        <span class="adminrights-text12">
+                          Computer Networks
+                        </span>
+                      </div>
+                    </li>
+                    <li
+                      data-thq="thq-dropdown"
+                      class="adminrights-dropdown03 list-item"
+                    >
+                      <div
+                        data-thq="thq-dropdown-toggle"
+                        class="adminrights-dropdown-toggle04"
+                      >
+                        <span class="adminrights-text13">
+                          Theory of Computing
+                        </span>
+                      </div>
+                    </li>
+                    <li
+                      data-thq="thq-dropdown"
+                      class="adminrights-dropdown04 list-item"
+                    >
+                      <div
+                        data-thq="thq-dropdown-toggle"
+                        class="adminrights-dropdown-toggle05"
+                      >
+                        <span class="adminrights-text14">
+                          Compiler Design
+                        </span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="adminrights-container15">
+              <button type="submit" class="adminrights-button1 button">
+                <span class="adminrights-text15">
+                  <span>Submit</span>
+                  <br />
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="adminrights-container16">
+        <div class="adminrights-stats">
+          <h1 class="adminrights-text18">A Glimpse</h1>
+          <div class="adminrights-stat">
+            <svg viewBox="0 0 1024 1024" class="adminrights-icon02">
+              <path
+                d="M854 896v-554h-684v554h684zM854 128q34 0 59 26t25 60v682q0 34-25 60t-59 26h-684q-34 0-59-26t-25-60v-682q0-34 25-60t59-26h44v-86h84v86h428v-86h84v86h44z"
+              ></path>
+            </svg>
+            <span class="adminrights-text19">
+              <span class="adminrights-text20">Month</span>
+              <br />
+            </span>
+            <h1 class="adminrights-text22">February</h1>
+          </div>
+          <div class="adminrights-stat1">
+            <svg viewBox="0 0 1024 1024" class="adminrights-icon04">
+              <path
+                d="M785.143 375.429c-4.571-19.429-24-31.429-44-26.857-81.714 19.429-156 35.429-229.143 35.429s-147.429-16-229.143-35.429c-20-4.571-39.429 7.429-44 26.857-4.571 20 7.429 39.429 26.857 44 60.571 14.286 117.143 26.857 173.143 33.143-2.286 193.143-23.429 246.857-47.429 308.571l-5.143 12c-7.429 18.857 2.286 40 21.143 47.429 4 1.714 8.571 2.286 13.143 2.286 14.857 0 28.571-8.571 34.286-23.429l4.571-11.429c16-41.143 30.857-79.429 40.571-148h24c9.714 68.571 24.571 106.857 40.571 148l4.571 11.429c5.714 14.857 19.429 23.429 34.286 23.429 4.571 0 9.143-0.571 13.143-2.286 18.857-7.429 28.571-28.571 21.143-47.429l-5.143-12c-24-61.714-45.143-115.429-47.429-308.571 56-6.286 112.571-18.857 173.143-33.143 19.429-4.571 31.429-24 26.857-44zM585.143 292.571c0-40.571-32.571-73.143-73.143-73.143s-73.143 32.571-73.143 73.143 32.571 73.143 73.143 73.143 73.143-32.571 73.143-73.143zM914.286 512c0 222.286-180 402.286-402.286 402.286s-402.286-180-402.286-402.286 180-402.286 402.286-402.286 402.286 180 402.286 402.286zM512 73.143c-241.714 0-438.857 197.143-438.857 438.857s197.143 438.857 438.857 438.857 438.857-197.143 438.857-438.857-197.143-438.857-438.857-438.857zM1024 512c0 282.857-229.143 512-512 512s-512-229.143-512-512 229.143-512 512-512v0c282.857 0 512 229.143 512 512z"
+              ></path>
+            </svg>
+            <span class="adminrights-text23">Most Attentive Class</span>
+            <h1 class="adminrights-text24">VIII</h1>
+          </div>
+          <div class="adminrights-stat2">
+            <svg viewBox="0 0 1024 1024" class="adminrights-icon06">
+              <path
+                d="M170 214h684v84h-684v-84zM170 640v-86h684v86h-684zM854 384v86h-684v-86h684zM598 726v84h-428v-84h428z"
+              ></path>
+            </svg>
+            <span class="adminrights-text25">Favorite Subject</span>
+            <h1 class="adminrights-text26">CS471</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="adminrights-separator"></div>
+    <div class="adminrights-container17">
+      <div class="adminrights-container18">
+        <h1 class="adminrights-text27">Camera Setup</h1>
+        <form method="post" class="adminrights-form2">
+          {% csrf_token %}
+          <div class="adminrights-container19">
+            <div class="adminrights-container20">
+
+              <input
+                type="text"
+                disabled=""
+                required=""
+                value= "{{ user.dpt_name }}"
+                class="adminrights-textinput06 input"
+              />
+            </div>
+            <div class="adminrights-container21">
+              <input
+                type="number"
+                required=""
+                placeholder="Room No."
+                class="adminrights-textinput07 input"
+              />
+            </div>
+            <div class="adminrights-container22">
+              <input
+                type="number"
+                required=""
+                placeholder="Class"
+                class="adminrights-textinput08 input"
+              />
+            </div>
+          </div>
+          <div class="adminrights-container23">
+            <button type="submit" class="adminrights-button2 button">
+              <span class="adminrights-text28">
+                <span>Submit</span>
+                <br />
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="adminrights-container24">
+        <h1 class="adminrights-text31">
+          <span>Schedule Classes</span>
+          <br />
+        </h1>
+        <form class="adminrights-form3">
+          <div class="adminrights-container25">
+            <div class="adminrights-container26">
+              <div
+                data-thq="thq-dropdown"
+                class="adminrights-thq-dropdown1 list-item"
+              >
+                <div
+                  data-thq="thq-dropdown-toggle"
+                  class="adminrights-dropdown-toggle06"
+                >
+                  <span class="adminrights-text34">Class</span>
+                  <div
+                    data-thq="thq-dropdown-arrow"
+                    class="adminrights-dropdown-arrow1"
+                  >
+                    <svg
+                      viewBox="0 0 1024 1024"
+                      class="adminrights-icon08"
+                    >
+                      <path d="M426 726v-428l214 214z"></path>
+                    </svg>
+                  </div>
+                </div>
+                <ul
+                  data-thq="thq-dropdown-list"
+                  class="adminrights-dropdown-list1"
+                >
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown05 list-item"
+                  >
+                    <div
+                      data-thq="thq-dropdown-toggle"
+                      class="adminrights-dropdown-toggle07"
+                    >
+                      <span class="adminrights-text35">Second Year</span>
+                    </div>
+                  </li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown06 list-item"
+                  >
+                    <div
+                      data-thq="thq-dropdown-toggle"
+                      class="adminrights-dropdown-toggle08"
+                    >
+                      <span class="adminrights-text36">Third Year</span>
+                    </div>
+                  </li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown07 list-item"
+                  >
+                    <div
+                      data-thq="thq-dropdown-toggle"
+                      class="adminrights-dropdown-toggle09"
+                    >
+                      <span class="adminrights-text37">Final Year</span>
+                    </div>
+                  </li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown08 list-item"
+                  ></li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown09 list-item"
+                  ></li>
+                </ul>
+              </div>
+              <div
+                data-thq="thq-dropdown"
+                class="adminrights-thq-dropdown2 list-item"
+              >
+                <div
+                  data-thq="thq-dropdown-toggle"
+                  class="adminrights-dropdown-toggle10"
+                >
+                  <span class="adminrights-text38">Semester</span>
+                  <div
+                    data-thq="thq-dropdown-arrow"
+                    class="adminrights-dropdown-arrow2"
+                  >
+                    <svg
+                      viewBox="0 0 1024 1024"
+                      class="adminrights-icon10"
+                    >
+                      <path d="M426 726v-428l214 214z"></path>
+                    </svg>
+                  </div>
+                </div>
+                <ul
+                  data-thq="thq-dropdown-list"
+                  class="adminrights-dropdown-list2"
+                >
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown10 list-item"
+                  >
+                    <div
+                      data-thq="thq-dropdown-toggle"
+                      class="adminrights-dropdown-toggle11"
+                    >
+                      <span class="adminrights-text39">SEM I</span>
+                    </div>
+                  </li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown11 list-item"
+                  >
+                    <div
+                      data-thq="thq-dropdown-toggle"
+                      class="adminrights-dropdown-toggle12"
+                    >
+                      <span class="adminrights-text40">SEM II</span>
+                    </div>
+                  </li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown12 list-item"
+                  ></li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown13 list-item"
+                  ></li>
+                  <li
+                    data-thq="thq-dropdown"
+                    class="adminrights-dropdown14 list-item"
+                  ></li>
+                </ul>
+              </div>
+            </div>
+            <div class="adminrights-container27">
+              <input
+                type="time"
+                required=""
+                placeholder="Period"
+                class="adminrights-textinput09 input"
+              />
+              <input
+                type="text"
+                required=""
+                placeholder="Subject"
+                class="adminrights-textinput10 input"
+              />
+            </div>
+          </div>
+          <div class="adminrights-container28">
+            <button type="submit" class="adminrights-button3 button">
+              <span class="adminrights-text41">
+                <span>Submit</span>
+                <br />
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<footer id="contact" class="home-footer">
+  <div class="home-separator1"></div>
+  <span class="home-text58">© 2023 FRAS, Made with 💕</span>
+</footer>
+
+{% endblock %}
