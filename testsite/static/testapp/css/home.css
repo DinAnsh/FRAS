@@ -1111,6 +1111,265 @@
   font-size: 11px;
   font-size: 11px;
 }
+
+
+/* popup register */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  display: flex;
+  min-height: 100%;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; */
+}
+
+.popup{
+  max-width: 400px;
+  border-radius: 5px;
+  width: 100%;
+  background-color: #c1bebe;
+  height: 60vh;
+}
+
+.popup_title{
+  text-align: center;
+  margin: 26px;
+  position: relative;
+  font-weight: 300;
+  font-size: 38px;
+}
+
+.popup_body{
+  max-width: 350px;
+  padding: 0 10px 10px;
+  margin: auto;
+}
+
+.close {
+  margin: 0 5px;
+  color: #8f8f8f;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.popup_form{
+  display: flex;
+  flex-direction: column;
+
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  display: flex;
+  min-height: 100%;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; */
+}
+
+.popup{
+  max-width: 400px;
+  border-radius: 5px;
+  width: 100%;
+  background-color: #c1bebe;
+  height: 545px;
+}
+
+.popup_title{
+  text-align: center;
+  margin: 26px;
+  position: relative;
+  font-weight: 300;
+  font-size: 38px;
+}
+
+.popup_body{
+  max-width: 350px;
+  padding: 0 10px 10px;
+  margin: auto;
+}
+
+.close {
+  margin: 0 5px;
+  color: #8f8f8f;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.popup_form{
+  display: flex;
+  flex-direction: column;
+
+}
+
+.in_div{
+  width: 100%;
+  margin-bottom: 10px;
+  position: relative;
+}
+.in_div2{
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.in_div2 a {
+  margin-top: 10px;
+  color: #00816d !important;
+}
+
+.input_label{
+  font-size: 14px;
+  line-height: 18px;
+  margin-top: 3px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.in_field{
+  width: 100%;
+  height: 30px;
+  border-radius: 5px;
+  padding: 0 12px;
+}
+
+.register_btn{
+  margin-top: 20px;
+  padding: 12px 5px;
+  border-radius: 5px;
+  background-color: #343333;
+  color: white;
+}
+
+.register_btn:hover{
+  background-color: rgb(23, 23, 23);
+}
+
+
+/* for Login */
+.modal2 {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content2 {
+  display: flex;
+  min-height: 100%;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; */
+}
+
+.popup_title2{
+  text-align: center;
+  margin: 26px;
+  position: relative;
+  font-weight: 300;
+  font-size: 38px;
+}
+
+.popup_body2{
+  max-width: 350px;
+  padding: 0 10px 10px;
+  margin: auto;
+}
+
+.close2 {
+  margin: 0 5px;
+  color: #8f8f8f;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close2:hover,
+.close2:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.popup_form2{
+  display: flex;
+  flex-direction: column;
+
+}
+
+
+.popup2{
+  max-width: 400px;
+  border-radius: 5px;
+  width: 100%;
+  background-color: #c1bebe;
+  height: 345px;
+}
+
+.in_div2 span{
+  margin:0 5px;
+}
+
 @media(max-width: 991px) {
   .home-container01{
     height: 52px;
@@ -1696,6 +1955,38 @@
     padding: 10px 0 0 0;
     text-align: center;
   }
+  .popup2{
+    max-width: 345px;
+    border-radius: 10px;
+    height: 328px;
+  }
+  .popup_title2{
+    font-size: 32px;
+  }
+  .in_div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .input_label{
+    width: 90%;
+  }
+  .in_field{
+    width: 90%;
+    height: 34px;
+  }
+  .register_btn{
+    margin: auto;
+    width: 90%;
+  }
+  .popup{
+    max-width: 345px;
+    height: 528px;
+  }
+  .popup_title{
+    font-size: 32px;
+  }
 }
 
 @media(max-width: 1280px){
@@ -1705,116 +1996,3 @@
 }
 
 
-
-/* popup register */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.modal-content {
-  display: flex;
-  min-height: 100%;
-  justify-content: center;
-  align-items: center;
-  /* background-color: white;
-  margin: 10% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 50%; */
-}
-
-.popup{
-  max-width: 400px;
-  border-radius: 5px;
-  width: 100%;
-  background-color: #c1bebe;
-  height: 60vh;
-}
-
-.popup_title{
-  text-align: center;
-  margin: 26px;
-  position: relative;
-  font-weight: 300;
-  font-size: 38px;
-}
-
-.popup_body{
-  max-width: 350px;
-  padding: 0 10px 10px;
-  margin: auto;
-}
-
-.close {
-  margin: 0 5px;
-  color: #8f8f8f;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.popup_form{
-  display: flex;
-  flex-direction: column;
-
-}
-
-.in_div{
-  width: 100%;
-  margin-bottom: 10px;
-  position: relative;
-}
-.in_div2{
-  margin-top: 15px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.in_div2 a {
-  margin-top: 10px;
-  color: #00816d !important;
-}
-
-.input_label{
-  font-size: 14px;
-  line-height: 18px;
-  margin-top: 3px;
-  margin-bottom: 5px;
-  display: block;
-}
-
-.in_field{
-  width: 100%;
-  height: 30px;
-  border-radius: 5px;
-  padding: 0 12px;
-}
-
-.register_btn{
-  margin-top: 20px;
-  padding: 12px 5px;
-  border-radius: 5px;
-  background-color: #343333;
-  color: white;
-}
-
-.register_btn:hover{
-  background-color: rgb(23, 23, 23);
-}

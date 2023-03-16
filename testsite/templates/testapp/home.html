@@ -19,7 +19,8 @@
       </nav>
     </div>
     <div data-thq="thq-navbar-btn-group" class="home-btn-group">
-      <a class="home-login button">Login</a>
+      {% comment %} <a class="home-login button">Login</a> {% endcomment %}
+      <button class="home-login button" onclick="openModal2()">Login</button>
       {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button"
         >Register</a
       > {% endcomment %}
@@ -62,11 +63,13 @@
           <a href="#contact" class="home-link09">Contact</a>
         </nav>
         <div class="home-container03">
-          <a href="{% url 'testapp:login' %}" class="home-login1 button"
+          {% comment %} <a href="{% url 'testapp:login' %}" class="home-login1 button"
             >Login</a
-          >
-          <a href="{% url 'testapp:register' %}" class="home-register1 button"
-            >Register</a>
+          > {% endcomment %}
+          <button class="home-login1 button" onclick="openModal2()">Log in</button>
+          {% comment %} <a href="{% url 'testapp:register' %}" class="home-register1 button"
+            >Register</a> {% endcomment %}
+          <button class="home-register1 button" onclick="openModal()">Register</button>
         </div>
       </div>
     </div>
@@ -323,6 +326,44 @@
     <span class="home-text58">&copy; FRAS All Rights Reserved.</span>
   </footer>
 
+  {% comment %} Login form  {% endcomment %}
+  <div id="myModal2" class="modal2">
+    <div class="modal-content2" id="content2">
+      <div class="popup2">
+        <span class="close2" id="cbtn2">&times;</span>
+        <div class="popup_title2">
+          Log in
+        </div>
+        <div class="popup_body2">
+          <form class="popup_form2" action="#">
+            {% csrf_token %}
+
+            <div class="in_div">
+              <label for="username" class="input_label">Username:</label>
+              <input type="text" id="username" name="username" required class="in_field" placeholder="name@com" autofocus>
+            </div>
+
+            <div class="in_div">
+              <label for="lpassword" class="input_label">Password:</label>
+              <input type="password" id="lpassword" name="password" class="in_field" required>
+            </div>
+            
+            <input type="submit" value="Log in" class="register_btn">
+            <div class="in_div2">
+                <a href="#">Forgot your password</a>
+                <span>or</span>
+                <a href="#">Don't have an account?</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+  {% comment %} register Form {% endcomment %}
   <div id="myModal" class="modal">
     <div class="modal-content" id="content">
       <div class="popup">
