@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>FRAS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"
+    data-tag="font" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display:wght@400&amp;display=swap"
+    data-tag="font" />
+
+  <style data-section-id="dropdown">
+    [data-thq="thq-dropdown"]:hover>[data-thq="thq-dropdown-list"] {
+      display: flex;
+    }
+
+    [data-thq="thq-dropdown"]:hover>div [data-thq="thq-dropdown-arrow"] {
+      transform: rotate(90deg);
+    }
+  </style>
+  <link href="base.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+  <!-- <link href="{% static 'testapp/css/home.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/register.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/login.css' %}" rel="stylesheet" /> -->
+  <link href="dashboard.css" rel="stylesheet" />
+
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="script.js"></script>
+
+</head>
+
+<body>
+  <div>
+    <!-- {% block content %} 
+      {% endblock %} -->
+
+
+    <!-- navbar -->
+
+    <header data-thq="thq-navbar" class="home-navbar-interactive">
+      <div class="home-container01">
+        <a href="#"><img src="header-logo.png" alt="logo" class="main_logo" /></a>
+      </div>
+
+      <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
+        <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
+          <a href="#" class="home-link">Student</a>
+          <a href="#" class="home-link">Teacher</a>
+          <a href="#" class="home-link">Schedule</a>
+          <a href="#" class="home-link">Camera</a>
+          <!-- <a href="#" class="home-link">Contact</a> -->
+        </nav>
+      </div>
+
+      <div class="profile">
+        <ul>
+          <li class="dropdown">
+            <ul>
+              <a href="#">
+                <img src="profile-pic.jpg" alt="Profile Picture">
+              </a>
+              <a href="">UserName</a>
+            </ul>
+            <ul class="dropdown-menu">
+              <li><a href="#">My Account</a></li>
+              <li><a href="#">Dashboard</a></li>
+              <li><a href="#">Need Help?</a></li>
+              <li><a href="#">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- <div data-thq="thq-navbar-btn-group" class="home-btn-group">
+        <a href="#" class="home-login button">Login</a>
+        <a href="#" class="home-register button">Register</a>
+      </div> -->
+
+      <!-- burger button -->
+      <div data-thq="thq-burger-menu" class="home-burger-menu">
+        <svg viewBox="0 0 1024 1024" class="home-icon">
+          <path
+            d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z">
+          </path>
+        </svg>
+      </div>
+
+      <!-- mobile-nav -->
+      <div data-thq="thq-mobile-menu" class="home-mobile-menu">
+        <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
+          <div class="home-container02">
+            <!-- {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %} -->
+            <a href="#"><img src="header-logo.png" alt="logo" class="main_logo" /></a>
+            <div data-thq="thq-close-menu" class="home-menu-close">
+              <svg viewBox="0 0 1024 1024" class="home-icon02">
+                <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z">
+                </path>
+              </svg>
+            </div>
+          </div>
+
+          <nav data-thq="thq-mobile-menu-nav-links" data-role="Nav" class="home-nav2">
+            <a href="#" class="home-link1">Student</a>
+            <a href="#" class="home-link1">Teacher</a>
+            <a href="#" class="home-link1">Schedule</a>
+            <a href="#" class="home-link1">Camera</a>
+            <!-- <a href="#" class="home-link1">Contact</a> -->
+          </nav>
+
+          <!-- <div class="home-container03">
+            <a href="#" class="home-login1 button">Login</a>
+            <a href="#" class="home-register1 button">Register</a>
+          </div> -->
+        </div>
+        <!-- {% comment %}
+        <div class="home-icon-group">
+          <svg viewBox="0 0 950.8571428571428 1024" class="home-icon04">
+            <path
+              d="M925.714 233.143c-25.143 36.571-56.571 69.143-92.571 95.429 0.571 8 0.571 16 0.571 24 0 244-185.714 525.143-525.143 525.143-104.571 0-201.714-30.286-283.429-82.857 14.857 1.714 29.143 2.286 44.571 2.286 86.286 0 165.714-29.143 229.143-78.857-81.143-1.714-149.143-54.857-172.571-128 11.429 1.714 22.857 2.857 34.857 2.857 16.571 0 33.143-2.286 48.571-6.286-84.571-17.143-148-91.429-148-181.143v-2.286c24.571 13.714 53.143 22.286 83.429 23.429-49.714-33.143-82.286-89.714-82.286-153.714 0-34.286 9.143-65.714 25.143-93.143 90.857 112 227.429 185.143 380.571 193.143-2.857-13.714-4.571-28-4.571-42.286 0-101.714 82.286-184.571 184.571-184.571 53.143 0 101.143 22.286 134.857 58.286 41.714-8 81.714-23.429 117.143-44.571-13.714 42.857-42.857 78.857-81.143 101.714 37.143-4 73.143-14.286 106.286-28.571z">
+            </path>
+          </svg><svg viewBox="0 0 877.7142857142857 1024" class="home-icon06">
+            <path
+              d="M585.143 512c0-80.571-65.714-146.286-146.286-146.286s-146.286 65.714-146.286 146.286 65.714 146.286 146.286 146.286 146.286-65.714 146.286-146.286zM664 512c0 124.571-100.571 225.143-225.143 225.143s-225.143-100.571-225.143-225.143 100.571-225.143 225.143-225.143 225.143 100.571 225.143 225.143zM725.714 277.714c0 29.143-23.429 52.571-52.571 52.571s-52.571-23.429-52.571-52.571 23.429-52.571 52.571-52.571 52.571 23.429 52.571 52.571zM438.857 152c-64 0-201.143-5.143-258.857 17.714-20 8-34.857 17.714-50.286 33.143s-25.143 30.286-33.143 50.286c-22.857 57.714-17.714 194.857-17.714 258.857s-5.143 201.143 17.714 258.857c8 20 17.714 34.857 33.143 50.286s30.286 25.143 50.286 33.143c57.714 22.857 194.857 17.714 258.857 17.714s201.143 5.143 258.857-17.714c20-8 34.857-17.714 50.286-33.143s25.143-30.286 33.143-50.286c22.857-57.714 17.714-194.857 17.714-258.857s5.143-201.143-17.714-258.857c-8-20-17.714-34.857-33.143-50.286s-30.286-25.143-50.286-33.143c-57.714-22.857-194.857-17.714-258.857-17.714zM877.714 512c0 60.571 0.571 120.571-2.857 181.143-3.429 70.286-19.429 132.571-70.857 184s-113.714 67.429-184 70.857c-60.571 3.429-120.571 2.857-181.143 2.857s-120.571 0.571-181.143-2.857c-70.286-3.429-132.571-19.429-184-70.857s-67.429-113.714-70.857-184c-3.429-60.571-2.857-120.571-2.857-181.143s-0.571-120.571 2.857-181.143c3.429-70.286 19.429-132.571 70.857-184s113.714-67.429 184-70.857c60.571-3.429 120.571-2.857 181.143-2.857s120.571-0.571 181.143 2.857c70.286 3.429 132.571 19.429 184 70.857s67.429 113.714 70.857 184c3.429 60.571 2.857 120.571 2.857 181.143z">
+            </path>
+          </svg><svg viewBox="0 0 602.2582857142856 1024" class="home-icon08">
+            <path
+              d="M548 6.857v150.857h-89.714c-70.286 0-83.429 33.714-83.429 82.286v108h167.429l-22.286 169.143h-145.143v433.714h-174.857v-433.714h-145.714v-169.143h145.714v-124.571c0-144.571 88.571-223.429 217.714-223.429 61.714 0 114.857 4.571 130.286 6.857z">
+            </path>
+          </svg>
+        </div>
+        {% endcomment %} -->
+      </div>
+    </header>
+    <div class="home-separator"></div>
+
+
+    <!-- dashboard-content -->
+
+    <div class="adminrights-container">
+
+      <div class="adminrights-testimonial">
+        <div class="adminrights-container01">
+          <h1 class="adminrights-text18">Glimpses</h1>
+          <div class="adminrights-container16">
+            <!-- glimpses -->
+            <div class="adminrights-stats">
+
+              <!-- <div id="maxAtt-cls"></div> -->
+
+              <div id="" class="adminrights-stat1">
+                <svg viewBox="0 0 1024 1024" class="adminrights-icon04">
+                  <path
+                    d="M785.143 375.429c-4.571-19.429-24-31.429-44-26.857-81.714 19.429-156 35.429-229.143 35.429s-147.429-16-229.143-35.429c-20-4.571-39.429 7.429-44 26.857-4.571 20 7.429 39.429 26.857 44 60.571 14.286 117.143 26.857 173.143 33.143-2.286 193.143-23.429 246.857-47.429 308.571l-5.143 12c-7.429 18.857 2.286 40 21.143 47.429 4 1.714 8.571 2.286 13.143 2.286 14.857 0 28.571-8.571 34.286-23.429l4.571-11.429c16-41.143 30.857-79.429 40.571-148h24c9.714 68.571 24.571 106.857 40.571 148l4.571 11.429c5.714 14.857 19.429 23.429 34.286 23.429 4.571 0 9.143-0.571 13.143-2.286 18.857-7.429 28.571-28.571 21.143-47.429l-5.143-12c-24-61.714-45.143-115.429-47.429-308.571 56-6.286 112.571-18.857 173.143-33.143 19.429-4.571 31.429-24 26.857-44zM585.143 292.571c0-40.571-32.571-73.143-73.143-73.143s-73.143 32.571-73.143 73.143 32.571 73.143 73.143 73.143 73.143-32.571 73.143-73.143zM914.286 512c0 222.286-180 402.286-402.286 402.286s-402.286-180-402.286-402.286 180-402.286 402.286-402.286 402.286 180 402.286 402.286zM512 73.143c-241.714 0-438.857 197.143-438.857 438.857s197.143 438.857 438.857 438.857 438.857-197.143 438.857-438.857-197.143-438.857-438.857-438.857zM1024 512c0 282.857-229.143 512-512 512s-512-229.143-512-512 229.143-512 512-512v0c282.857 0 512 229.143 512 512z">
+                  </path>
+                </svg>
+                <span class="adminrights-text23">Most Attentive Class</span>
+                <!-- <h1 class="adminrights-text24">VIII</h1> -->
+                <div id="maxAtt-cls"></div>
+              </div>
+
+              <div id="" class="adminrights-stat2">
+                <svg viewBox="0 0 1024 1024" class="adminrights-icon06">
+                  <path
+                    d="M170 214h684v84h-684v-84zM170 640v-86h684v86h-684zM854 384v86h-684v-86h684zM598 726v84h-428v-84h428z">
+                  </path>
+                </svg>
+                <span class="adminrights-text25">Favorite Subject</span>
+                <h1 class="adminrights-text26">CS471</h1>
+              </div>
+
+              <div class="adminrights-stat">
+                <svg viewBox="0 0 1024 1024" class="adminrights-icon02">
+                  <path
+                    d="M854 896v-554h-684v554h684zM854 128q34 0 59 26t25 60v682q0 34-25 60t-59 26h-684q-34 0-59-26t-25-60v-682q0-34 25-60t59-26h44v-86h84v86h428v-86h84v86h44z">
+                  </path>
+                </svg>
+                <span class="adminrights-text19">
+                  <span class="adminrights-text20">Month</span>
+                  <br />
+                </span>
+                <h1 class="adminrights-text22">February</h1>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+        <div class="adminrights-separator"></div>
+        <div class="adminrights-container17">
+          <div class="adminrights-container18">
+            <h1 class="adminrights-text27">Camera Setup</h1>
+            <form method="post" class="adminrights-form2">
+              <!-- {% csrf_token %} -->
+              <div class="adminrights-container19">
+                <div class="adminrights-container20">
+
+                  <input type="text" disabled="" required="" value="{{ user.dpt_name }}"
+                    class="adminrights-textinput06 input" />
+                </div>
+                <div class="adminrights-container21">
+                  <input type="number" required="" placeholder="Room No." class="adminrights-textinput07 input" />
+                </div>
+                <div class="adminrights-container22">
+                  <input type="number" required="" placeholder="Class" class="adminrights-textinput08 input" />
+                </div>
+              </div>
+              <div class="adminrights-container23">
+                <button type="submit" class="adminrights-button2 button">
+                  <span class="adminrights-text28">
+                    <span>Submit</span>
+                    <br />
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="adminrights-container24">
+            <h1 class="adminrights-text31">
+              <span>Schedule Classes</span>
+              <br />
+            </h1>
+            <form class="adminrights-form3">
+              <div class="adminrights-container25">
+                <div class="adminrights-container26">
+                  <div data-thq="thq-dropdown" class="adminrights-thq-dropdown1 list-item">
+                    <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle06">
+                      <span class="adminrights-text34">Class</span>
+                      <div data-thq="thq-dropdown-arrow" class="adminrights-dropdown-arrow1">
+                        <svg viewBox="0 0 1024 1024" class="adminrights-icon08">
+                          <path d="M426 726v-428l214 214z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <ul data-thq="thq-dropdown-list" class="adminrights-dropdown-list1">
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown05 list-item">
+                        <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle07">
+                          <span class="adminrights-text35">Second Year</span>
+                        </div>
+                      </li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown06 list-item">
+                        <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle08">
+                          <span class="adminrights-text36">Third Year</span>
+                        </div>
+                      </li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown07 list-item">
+                        <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle09">
+                          <span class="adminrights-text37">Final Year</span>
+                        </div>
+                      </li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown08 list-item"></li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown09 list-item"></li>
+                    </ul>
+                  </div>
+                  <div data-thq="thq-dropdown" class="adminrights-thq-dropdown2 list-item">
+                    <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle10">
+                      <span class="adminrights-text38">Semester</span>
+                      <div data-thq="thq-dropdown-arrow" class="adminrights-dropdown-arrow2">
+                        <svg viewBox="0 0 1024 1024" class="adminrights-icon10">
+                          <path d="M426 726v-428l214 214z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <ul data-thq="thq-dropdown-list" class="adminrights-dropdown-list2">
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown10 list-item">
+                        <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle11">
+                          <span class="adminrights-text39">SEM I</span>
+                        </div>
+                      </li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown11 list-item">
+                        <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle12">
+                          <span class="adminrights-text40">SEM II</span>
+                        </div>
+                      </li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown12 list-item"></li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown13 list-item"></li>
+                      <li data-thq="thq-dropdown" class="adminrights-dropdown14 list-item"></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="adminrights-container27">
+                  <input type="time" required="" placeholder="Period" class="adminrights-textinput09 input" />
+                  <input type="text" required="" placeholder="Subject" class="adminrights-textinput10 input" />
+                </div>
+              </div>
+              <div class="adminrights-container28">
+                <button type="submit" class="adminrights-button3 button">
+                  <span class="adminrights-text41">
+                    <span>Submit</span>
+                    <br />
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </div>
+
+  <footer id="contact" class="footer">
+    <div class="home-separator1"></div>
+    <span class="home-text58">© 2023 FRAS, Made with 💕</span>
+  </footer>
+
+  <script>
+    var data = [5, 10, 15, 20, 25];
+
+    var svg = d3.select("#maxAtt-cls")
+      .append("svg")
+      .attr("width", 400)
+      .attr("height", 200);
+
+    svg.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("x", function (d, i) {
+        return i * 50;
+      })
+      .attr("y", function (d) {
+        return 200 - d;
+      })
+      .attr("width", 40)
+      .attr("height", function (d) {
+        return d;
+      })
+      .attr("fill", "blue");
+
+  </script>
+  <script data-section-id="navbar" src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</body>
+
+</html>
