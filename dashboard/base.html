@@ -27,6 +27,10 @@
     <link href="{% static 'testapp/css/register.css' %}" rel="stylesheet" />
     <link href="{% static 'testapp/css/login.css' %}" rel="stylesheet" /> -->
   <link href="dashboard.css" rel="stylesheet" />
+
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="script.js"></script>
+
 </head>
 
 <body>
@@ -35,26 +39,48 @@
       {% endblock %} -->
 
 
-      <!-- navbar -->
+    <!-- navbar -->
 
     <header data-thq="thq-navbar" class="home-navbar-interactive">
       <div class="home-container01">
-        <a href="#"><img src="header-logo.png" alt="logo"
-            class="main_logo" /></a>
+        <a href="#"><img src="header-logo.png" alt="logo" class="main_logo" /></a>
       </div>
+
       <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
         <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
-          <a href="#about" class="home-link">About</a>
-          <a href="#features" class="home-link">Features</a>
-          <a href="#process" class="home-link">Workflow</a>
-          <a href="#members" class="home-link">Team</a>
-          <a href="#contact" class="home-link">Contact</a>
+          <a href="#" class="home-link">Student</a>
+          <a href="#" class="home-link">Teacher</a>
+          <a href="#" class="home-link">Schedule</a>
+          <a href="#" class="home-link">Camera</a>
+          <!-- <a href="#" class="home-link">Contact</a> -->
         </nav>
       </div>
-      <div data-thq="thq-navbar-btn-group" class="home-btn-group">
+
+      <div class="profile">
+        <ul>
+          <li class="dropdown">
+            <ul>
+              <a href="#">
+                <img src="profile-pic.jpg" alt="Profile Picture">
+              </a>
+              <a href="">UserName</a>
+            </ul>
+            <ul class="dropdown-menu">
+              <li><a href="#">My Account</a></li>
+              <li><a href="#">Dashboard</a></li>
+              <li><a href="#">Need Help?</a></li>
+              <li><a href="#">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- <div data-thq="thq-navbar-btn-group" class="home-btn-group">
         <a href="#" class="home-login button">Login</a>
         <a href="#" class="home-register button">Register</a>
-      </div>
+      </div> -->
+
+      <!-- burger button -->
       <div data-thq="thq-burger-menu" class="home-burger-menu">
         <svg viewBox="0 0 1024 1024" class="home-icon">
           <path
@@ -62,12 +88,13 @@
           </path>
         </svg>
       </div>
+
+      <!-- mobile-nav -->
       <div data-thq="thq-mobile-menu" class="home-mobile-menu">
         <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
           <div class="home-container02">
             <!-- {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %} -->
-            <a href="#"><img src="header-logo.png" alt="logo"
-                class="main_logo" /></a>
+            <a href="#"><img src="header-logo.png" alt="logo" class="main_logo" /></a>
             <div data-thq="thq-close-menu" class="home-menu-close">
               <svg viewBox="0 0 1024 1024" class="home-icon02">
                 <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z">
@@ -75,17 +102,19 @@
               </svg>
             </div>
           </div>
+
           <nav data-thq="thq-mobile-menu-nav-links" data-role="Nav" class="home-nav2">
-            <a href="#about" class="home-link05">About</a>
-            <a href="#features" class="home-link06">Features</a>
-            <a href="#process" class="home-link07">Workflow</a>
-            <a href="#members" class="home-link08">Team</a>
-            <a href="#contact" class="home-link09">Contact</a>
+            <a href="#" class="home-link1">Student</a>
+            <a href="#" class="home-link1">Teacher</a>
+            <a href="#" class="home-link1">Schedule</a>
+            <a href="#" class="home-link1">Camera</a>
+            <!-- <a href="#" class="home-link1">Contact</a> -->
           </nav>
-          <div class="home-container03">
+
+          <!-- <div class="home-container03">
             <a href="#" class="home-login1 button">Login</a>
             <a href="#" class="home-register1 button">Register</a>
-          </div>
+          </div> -->
         </div>
         <!-- {% comment %}
         <div class="home-icon-group">
@@ -112,157 +141,37 @@
     <!-- dashboard-content -->
 
     <div class="adminrights-container">
-      
+
       <div class="adminrights-testimonial">
         <div class="adminrights-container01">
-          <div class="adminrights-container02">
-            <div class="adminrights-container03">
-              <h1 class="adminrights-text">
-                <span>Student&nbsp;</span>
-                <span>Registration</span>
-              </h1>
-              <form method="post" class="adminrights-form" enctype='multipart/form-data'>
-                <!-- {% csrf_token %} -->
-                <div class="adminrights-container04">
-                  <div class="adminrights-container05">
-                    <input type="text" required="" placeholder="Full Name" class="adminrights-textinput input"
-                      name="student_name" />
-                  </div>
-                  <div class="adminrights-container06">
-                    <input type="text" required="" placeholder="Enrollment No." class="adminrights-textinput01 input"
-                      name="enroll" />
-                  </div>
-                  <div class="adminrights-container07">
-                    <input type="file" accept="image/*" required="" placeholder="capture"
-                      class="adminrights-textinput02 input" name="img" />
-                  </div>
-                </div>
-                <div class="adminrights-container08">
-                  <button type="submit" class="adminrights-button button">
-                    <span class="adminrights-text03">
-                      <span>Submit</span>
-                      <br />
-                    </span>
-                  </button>
-                </div>
-              </form>
-              <!--            {% if s_submit %}-->
-              <!--            <form method="post">-->
-              <!--              {% csrf_token %}-->
-              <!--                <div class="order-list">-->
-              <!--                    <table class="myTable">-->
-              <!--                        <colgroup span="8"></colgroup>-->
-              <!--                        <tr>-->
-              <!--                            <th>Name</th>-->
-              <!--                            <th>Enrollment No.</th>-->
-              <!--                            <th>Modify</th>-->
-              <!--                        </tr>-->
-              <!--                        <tr id="order_values">-->
-
-              <!--                            <td data-model-name="edit_name">{{ table.0 }}</td>-->
-              <!--                            <td data-model-name="edit_enroll">{{ table.1 }}</td>-->
-
-              <!--                            <td>-->
-              <!--                                <div class="box-button">-->
-              <!--                                    <input formaction="{ url 'testapp:edit_student' table %}" type="submit" value="Edit">-->
-              <!--                                    <br>-->
-              <!--                                    <input formaction="{ url 'testapp:remove_student' %}" type="submit" value="Remove">-->
-              <!--                                </div>-->
-              <!--                            </td>-->
-              <!--                        </tr>-->
-              <!--                    </table>-->
-              <!--                </div>-->
-              <!--            </form>-->
-              <!--            {% endif %}-->
-
-              <!-- {% if messages %}
-              {% for message in messages %}
-              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}
-              </div>
-              {% endfor %}
-              {% endif %} -->
-            </div>
-            <div class="adminrights-container09">
-              <h1 class="adminrights-text06">
-                <span>Teacher&nbsp;</span>
-                <span>Registration</span>
-              </h1>
-              <form class="adminrights-form1">
-                <div class="adminrights-container10">
-                  <div class="adminrights-container11">
-                    <input type="text" required="" placeholder="Full Name" class="adminrights-textinput03 input" />
-                  </div>
-                  <div class="adminrights-container12">
-                    <input type="email" required="" placeholder="Mail" class="adminrights-textinput04 input" />
-                  </div>
-                  <div class="adminrights-container13">
-                    <input type="tel" pattern="[0-9]{10}" required="" maxlength="10" placeholder="Mobile No."
-                      class="adminrights-textinput05 input" />
-                  </div>
-                  <div class="adminrights-container14">
-                    <div data-thq="thq-dropdown" class="adminrights-thq-dropdown list-item">
-                      <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle">
-                        <span class="adminrights-text09">
-                          Choose Subjects
-                        </span>
-                        <div data-thq="thq-dropdown-arrow" class="adminrights-dropdown-arrow">
-                          <svg viewBox="0 0 1024 1024" class="adminrights-icon">
-                            <path d="M426 726v-428l214 214z"></path>
-                          </svg>
-                        </div>
-                      </div>
-                      <ul data-thq="thq-dropdown-list" class="adminrights-dropdown-list">
-                        <li data-thq="thq-dropdown" class="adminrights-dropdown list-item">
-                          <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle01">
-                            <span class="adminrights-text10">
-                              Operating System
-                            </span>
-                          </div>
-                        </li>
-                        <li data-thq="thq-dropdown" class="adminrights-dropdown01 list-item">
-                          <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle02">
-                            <span class="adminrights-text11">DBMS</span>
-                          </div>
-                        </li>
-                        <li data-thq="thq-dropdown" class="adminrights-dropdown02 list-item">
-                          <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle03">
-                            <span class="adminrights-text12">
-                              Computer Networks
-                            </span>
-                          </div>
-                        </li>
-                        <li data-thq="thq-dropdown" class="adminrights-dropdown03 list-item">
-                          <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle04">
-                            <span class="adminrights-text13">
-                              Theory of Computing
-                            </span>
-                          </div>
-                        </li>
-                        <li data-thq="thq-dropdown" class="adminrights-dropdown04 list-item">
-                          <div data-thq="thq-dropdown-toggle" class="adminrights-dropdown-toggle05">
-                            <span class="adminrights-text14">
-                              Compiler Design
-                            </span>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="adminrights-container15">
-                  <button type="submit" class="adminrights-button1 button">
-                    <span class="adminrights-text15">
-                      <span>Submit</span>
-                      <br />
-                    </span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <h1 class="adminrights-text18">Glimpses</h1>
           <div class="adminrights-container16">
+            <!-- glimpses -->
             <div class="adminrights-stats">
-              <h1 class="adminrights-text18">A Glimpse</h1>
+
+              <!-- <div id="maxAtt-cls"></div> -->
+
+              <div id="" class="adminrights-stat1">
+                <svg viewBox="0 0 1024 1024" class="adminrights-icon04">
+                  <path
+                    d="M785.143 375.429c-4.571-19.429-24-31.429-44-26.857-81.714 19.429-156 35.429-229.143 35.429s-147.429-16-229.143-35.429c-20-4.571-39.429 7.429-44 26.857-4.571 20 7.429 39.429 26.857 44 60.571 14.286 117.143 26.857 173.143 33.143-2.286 193.143-23.429 246.857-47.429 308.571l-5.143 12c-7.429 18.857 2.286 40 21.143 47.429 4 1.714 8.571 2.286 13.143 2.286 14.857 0 28.571-8.571 34.286-23.429l4.571-11.429c16-41.143 30.857-79.429 40.571-148h24c9.714 68.571 24.571 106.857 40.571 148l4.571 11.429c5.714 14.857 19.429 23.429 34.286 23.429 4.571 0 9.143-0.571 13.143-2.286 18.857-7.429 28.571-28.571 21.143-47.429l-5.143-12c-24-61.714-45.143-115.429-47.429-308.571 56-6.286 112.571-18.857 173.143-33.143 19.429-4.571 31.429-24 26.857-44zM585.143 292.571c0-40.571-32.571-73.143-73.143-73.143s-73.143 32.571-73.143 73.143 32.571 73.143 73.143 73.143 73.143-32.571 73.143-73.143zM914.286 512c0 222.286-180 402.286-402.286 402.286s-402.286-180-402.286-402.286 180-402.286 402.286-402.286 402.286 180 402.286 402.286zM512 73.143c-241.714 0-438.857 197.143-438.857 438.857s197.143 438.857 438.857 438.857 438.857-197.143 438.857-438.857-197.143-438.857-438.857-438.857zM1024 512c0 282.857-229.143 512-512 512s-512-229.143-512-512 229.143-512 512-512v0c282.857 0 512 229.143 512 512z">
+                  </path>
+                </svg>
+                <span class="adminrights-text23">Most Attentive Class</span>
+                <!-- <h1 class="adminrights-text24">VIII</h1> -->
+                <div id="maxAtt-cls"></div>
+              </div>
+
+              <div id="" class="adminrights-stat2">
+                <svg viewBox="0 0 1024 1024" class="adminrights-icon06">
+                  <path
+                    d="M170 214h684v84h-684v-84zM170 640v-86h684v86h-684zM854 384v86h-684v-86h684zM598 726v84h-428v-84h428z">
+                  </path>
+                </svg>
+                <span class="adminrights-text25">Favorite Subject</span>
+                <h1 class="adminrights-text26">CS471</h1>
+              </div>
+
               <div class="adminrights-stat">
                 <svg viewBox="0 0 1024 1024" class="adminrights-icon02">
                   <path
@@ -275,27 +184,12 @@
                 </span>
                 <h1 class="adminrights-text22">February</h1>
               </div>
-              <div class="adminrights-stat1">
-                <svg viewBox="0 0 1024 1024" class="adminrights-icon04">
-                  <path
-                    d="M785.143 375.429c-4.571-19.429-24-31.429-44-26.857-81.714 19.429-156 35.429-229.143 35.429s-147.429-16-229.143-35.429c-20-4.571-39.429 7.429-44 26.857-4.571 20 7.429 39.429 26.857 44 60.571 14.286 117.143 26.857 173.143 33.143-2.286 193.143-23.429 246.857-47.429 308.571l-5.143 12c-7.429 18.857 2.286 40 21.143 47.429 4 1.714 8.571 2.286 13.143 2.286 14.857 0 28.571-8.571 34.286-23.429l4.571-11.429c16-41.143 30.857-79.429 40.571-148h24c9.714 68.571 24.571 106.857 40.571 148l4.571 11.429c5.714 14.857 19.429 23.429 34.286 23.429 4.571 0 9.143-0.571 13.143-2.286 18.857-7.429 28.571-28.571 21.143-47.429l-5.143-12c-24-61.714-45.143-115.429-47.429-308.571 56-6.286 112.571-18.857 173.143-33.143 19.429-4.571 31.429-24 26.857-44zM585.143 292.571c0-40.571-32.571-73.143-73.143-73.143s-73.143 32.571-73.143 73.143 32.571 73.143 73.143 73.143 73.143-32.571 73.143-73.143zM914.286 512c0 222.286-180 402.286-402.286 402.286s-402.286-180-402.286-402.286 180-402.286 402.286-402.286 402.286 180 402.286 402.286zM512 73.143c-241.714 0-438.857 197.143-438.857 438.857s197.143 438.857 438.857 438.857 438.857-197.143 438.857-438.857-197.143-438.857-438.857-438.857zM1024 512c0 282.857-229.143 512-512 512s-512-229.143-512-512 229.143-512 512-512v0c282.857 0 512 229.143 512 512z">
-                  </path>
-                </svg>
-                <span class="adminrights-text23">Most Attentive Class</span>
-                <h1 class="adminrights-text24">VIII</h1>
-              </div>
-              <div class="adminrights-stat2">
-                <svg viewBox="0 0 1024 1024" class="adminrights-icon06">
-                  <path
-                    d="M170 214h684v84h-684v-84zM170 640v-86h684v86h-684zM854 384v86h-684v-86h684zM598 726v84h-428v-84h428z">
-                  </path>
-                </svg>
-                <span class="adminrights-text25">Favorite Subject</span>
-                <h1 class="adminrights-text26">CS471</h1>
-              </div>
+
             </div>
           </div>
         </div>
+
+
         <div class="adminrights-separator"></div>
         <div class="adminrights-container17">
           <div class="adminrights-container18">
@@ -417,7 +311,31 @@
     <span class="home-text58">© 2023 FRAS, Made with 💕</span>
   </footer>
 
+  <script>
+    var data = [5, 10, 15, 20, 25];
 
+    var svg = d3.select("#maxAtt-cls")
+      .append("svg")
+      .attr("width", 400)
+      .attr("height", 200);
+
+    svg.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("x", function (d, i) {
+        return i * 50;
+      })
+      .attr("y", function (d) {
+        return 200 - d;
+      })
+      .attr("width", 40)
+      .attr("height", function (d) {
+        return d;
+      })
+      .attr("fill", "blue");
+
+  </script>
   <script data-section-id="navbar" src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </body>

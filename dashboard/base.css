@@ -10,6 +10,7 @@ body {
   box-sizing: border-box;
   border-width: 0;
   border-style: solid;
+  font-family: 'Arial Narrow', Arial, sans-serif;
 }
 
 p,
