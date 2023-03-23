@@ -115,14 +115,14 @@ def dashboard(request, reason=''):
 
             messages.info(request, f'{enroll} is registered successfully!')
             table.append([request.POST.get('student_name'), enroll])
-            return render(request, 'testapp/admin.html',
+            return render(request, 'testapp/dashboard.html',
                           {'user': admin_user,'s_submit':s_submit,'table':table[0]})
 
         else:
             messages.warning(request, f"{enroll} is already registered!")
-            return render(request, 'testapp/admin.html', context)
+            return render(request, 'testapp/dashboard.html', context)
 
-    return render(request, 'testapp/admin.html', {'user': admin_user})
+    return render(request, 'testapp/dashboard.html', {'user': admin_user})
 
 
 
