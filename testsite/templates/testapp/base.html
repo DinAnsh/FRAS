@@ -10,6 +10,7 @@
     type="image/x-icon"
     />
     {% block title %}
+    {% comment %} title should be given in each child page {% endcomment %}
     {% endblock %}
     <link
     rel="stylesheet"
@@ -37,9 +38,11 @@
   <link href="{% static 'testapp/css/home.css' %}" rel="stylesheet" />
   <link href="{% static 'testapp/css/register.css' %}" rel="stylesheet" />
   <link href="{% static 'testapp/css/login.css' %}" rel="stylesheet" />
+
   <!-- <link href="{% static 'testapp/css/dashboard.css' %}" rel="stylesheet" /> -->
   
   {% block head %}
+  {% comment %} Any script or css sheet will be added  {% endcomment %}
   {% endblock %}
   
   <!-- graph script -->
@@ -63,7 +66,7 @@
 </head>
 
 <body>
-  <div>
+  <div class="home-container">
     {% block content %}
     {% endblock %}
   </div>

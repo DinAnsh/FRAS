@@ -4,11 +4,9 @@
 {% block title %}
 <title>Dashboard | FRAS</title>
 {% endblock %}
-
 {% block head %}
-<link rel="stylesheet" href="{% static 'testapp/css/dashboard.css' %}">
-{% endblock  %}
-
+  {% comment %} Any script or css sheet will be added  {% endcomment %}  <link href="{% static 'testapp/css/dashboard.css' %}" rel="stylesheet">
+  {% endblock %}
 {% block content %}
 <!-- navbar -->
 <header data-thq="thq-navbar" class="home-navbar-interactive">
@@ -18,6 +16,7 @@
 
   <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
     <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
+      <a href="{% url 'testapp:dashboard' %}" class="home-link">Dashboard</a>
       <a href="{% url 'testapp:students' %}" class="home-link">Student</a>
       <a href="{% url 'testapp:teachers' %}" class="home-link">Teacher</a>
       <a href="{% url 'testapp:classes' %}" class="home-link">Schedule</a>
@@ -96,12 +95,10 @@
     });
   </script>
 </header>
-
 <div class="home-separator"></div>
-
+{% block body %}
 
 <!-- dashboard-content -->
-
 <div class="adminrights-container">
 
   <div class="adminrights-testimonial">
@@ -289,5 +286,6 @@
 
   </script>
 </div>
+{% endblock body %}
 
 {% endblock %}

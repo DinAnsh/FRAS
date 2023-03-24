@@ -1,4 +1,4 @@
-{% extends "testapp/base.html" %}
+{% extends "testapp/dashboard.html" %}
 {% load static %}
 
 {% block title %}
@@ -8,95 +8,7 @@
 {% block head %}
 <link rel="stylesheet" href="{% static 'testapp/css/student.css' %}">
 {% endblock  %}
-
-{% block content %}
-  <div class="home-container">
-    <header data-thq="thq-navbar" class="home-navbar-interactive">
-      <div class="home-container01">
-        <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
-      </div>
-    
-      <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
-        <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
-          <a href="{% url 'testapp:students' %}" class="home-link">Student</a>
-          <a href="{% url 'testapp:teachers' %}" class="home-link">Teacher</a>
-          <a href="{% url 'testapp:classes' %}" class="home-link">Schedule</a>
-          <a href="{% url 'testapp:cameras' %}" class="home-link">Camera</a>
-          <!-- <a href="#" class="home-link">Contact</a> -->
-        </nav>
-      </div>
-    
-      <div class="profile">
-        <ul>
-          <li class="dropdown">
-            <ul>
-              <a href="#">
-                <img src="../../static/testapp/images/profile-pic.jpg" alt="Profile Picture">
-              </a>
-              <a href="">UserName</a>
-            </ul>
-            <ul class="dropdown-menu">
-              <li><a href="#">My Account</a></li>
-              <li><a href="#">Dashboard</a></li>
-              <li><a href="#">Need Help?</a></li>
-              <li>
-                <form method="post" action="{% url 'testapp:logout' %}">
-                  {% csrf_token %}
-                  <button type="submit">Logout</button>
-                </form>
-              </li>
-              <!-- <li><a href="{% url 'testapp:logout' %}">Logout</a></li> -->
-            </ul>
-          </li>
-        </ul>
-      </div>
-    
-      <!-- burger button -->
-      <div data-thq="thq-burger-menu" class="home-burger-menu">
-        <svg viewBox="0 0 1024 1024" class="home-icon">
-          <path
-            d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z">
-          </path>
-        </svg>
-      </div>
-    
-      <!-- mobile-nav -->
-      <div data-thq="thq-mobile-menu" class="home-mobile-menu">
-        <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
-          <div class="home-container02">
-            <!-- {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %} -->
-            <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
-            <div data-thq="thq-close-menu" class="home-menu-close">
-              <svg viewBox="0 0 1024 1024" class="home-icon02">
-                <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z">
-                </path>
-              </svg>
-            </div>
-          </div>
-    
-          <nav data-thq="thq-mobile-menu-nav-links" data-role="Nav" class="home-nav2">
-            <a href="#" class="home-link1">Student</a>
-            <a href="#" class="home-link1">Teacher</a>
-            <a href="#" class="home-link1">Schedule</a>
-            <a href="#" class="home-link1">Camera</a>
-            <!-- <a href="#" class="home-link1">Contact</a> -->
-          </nav>
-    
-        </div>
-      </div>
-    
-      <script>
-        const activePage = window.location.pathname;
-        const navLinks = document.querySelectorAll("nav a")
-        navLinks.forEach((link) => {
-          const pathName = new URL(link.href).pathname;
-          if (pathName === activePage) {
-            link.classList.add("active");
-          }
-        });
-      </script>
-    </header>
-    
+{% block body %}
     <div class="main-container">
       <div class="main-part1">
           <div class="part1-content">
@@ -218,5 +130,5 @@
       </div>
     </div>
   
-  </div>
+
 {% endblock %}

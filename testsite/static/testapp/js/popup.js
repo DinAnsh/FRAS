@@ -23,6 +23,10 @@ function addcam(){
 
 }
 
+function closeModal3() {
+  document.getElementById("myModal3").style.display = "none";
+}
+
 function closeModal4() {
   document.getElementById("myModal4").style.display = "none";
 }
@@ -39,6 +43,19 @@ window.onclick = function (event) {
   ) {
     closeModal2();
   }
+  else if (
+    event.target == document.getElementById("cbtn3") ||
+    event.target == document.getElementById("content3")
+  ) {
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => {
+      track.stop();
+    });
+    video.srcObject = null;
+    closeModal3();
+  }
+
+
   else if (
     event.target == document.getElementById("cbtn4") ||
     event.target == document.getElementById("content4")
@@ -59,4 +76,8 @@ function handleFileSelect(event) {
           alert('Please select an Excel file');
       }
   }
+}
+
+function goDash(){
+  window.location.pathname = "testapp/dashboard";
 }

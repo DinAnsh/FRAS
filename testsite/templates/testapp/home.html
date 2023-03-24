@@ -11,7 +11,7 @@
           class="main_logo" /></a>
     </div>
     <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
-      <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
+      <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav0">
         <a href="#about" class="home-link">About</a>
         <a href="#features" class="home-link">Features</a>
         <a href="#process" class="home-link">Workflow</a>
@@ -55,12 +55,7 @@
           <a href="#contact" class="home-link09">Contact</a>
         </nav>
         <div class="home-container03">
-          {% comment %} <a href="{% url 'testapp:login' %}" class="home-login1 button"
-            >Login</a
-          > {% endcomment %}
           <button class="home-login1 button" onclick="openModal2()">Log in</button>
-          {% comment %} <a href="{% url 'testapp:register' %}" class="home-register1 button"
-            >Register</a> {% endcomment %}
           <button class="home-register1 button" onclick="openModal()">Register</button>
         </div>
       </div>
@@ -91,7 +86,7 @@
           <span></span>
         </span>
       </span>
-      <button class="home-button button">Get Started</button>
+      <button class="home-button button" onclick="goDash()">Get Started</button>
     </div>
   </div>
   <div id="features" class="home-features">
@@ -371,4 +366,4 @@
 
 </div>
 
-{% endblock %}
+{% endblock content %}

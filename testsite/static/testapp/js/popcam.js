@@ -61,10 +61,6 @@ function sregister() {
     });
 }
 
-function closeModal3() {
-  document.getElementById("myModal3").style.display = "none";
-}
-
 //Save Button
 saveBtn.addEventListener("click", () => {
   if (canvas.style.display != "block") {
@@ -79,17 +75,3 @@ saveBtn.addEventListener("click", () => {
 
   closeModal3();
 });
-
-window.onclick = function (event) {
-  if (
-    event.target == document.getElementById("cbtn3") ||
-    event.target == document.getElementById("content3")
-  ) {
-    const tracks = stream.getTracks();
-    tracks.forEach((track) => {
-      track.stop();
-    });
-    video.srcObject = null;
-    closeModal3();
-  }
-};
