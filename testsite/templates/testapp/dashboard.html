@@ -1,9 +1,16 @@
 {% extends "testapp/base.html" %}
 {% load static %}
-{% block content %}
 
-<!-- navbar -->
+{% block title %}
+<title>Dashboard | FRAS</title>
+{% endblock %}
+
+{% block head %}
 <link rel="stylesheet" href="{% static 'testapp/css/dashboard.css' %}">
+{% endblock  %}
+
+{% block content %}
+<!-- navbar -->
 <header data-thq="thq-navbar" class="home-navbar-interactive">
   <div class="home-container01">
     <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
@@ -11,10 +18,10 @@
 
   <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
     <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
-      <a href="#" class="home-link">Student</a>
-      <a href="#" class="home-link">Teacher</a>
-      <a href="#" class="home-link">Schedule</a>
-      <a href="#" class="home-link">Camera</a>
+      <a href="{% url 'testapp:students' %}" class="home-link">Student</a>
+      <a href="{% url 'testapp:teachers' %}" class="home-link">Teacher</a>
+      <a href="{% url 'testapp:classes' %}" class="home-link">Schedule</a>
+      <a href="{% url 'testapp:cameras' %}" class="home-link">Camera</a>
       <!-- <a href="#" class="home-link">Contact</a> -->
     </nav>
   </div>

@@ -17,17 +17,46 @@ function closeModal2() {
 }
 
 
+
+function addcam(){
+  document.getElementById("myModal4").style.display = "block";
+
+}
+
+function closeModal4() {
+  document.getElementById("myModal4").style.display = "none";
+}
+
+
 window.onclick = function (event) {
   // console.log(event.target)
   if (
-    event.target == document.getElementById("cbtn") ||
-    event.target == document.getElementById("content") 
+    event.target == document.getElementById("cbtn") 
   ) {
     closeModal();
-  }
-
-  else if (event.target == document.getElementById("cbtn2") ||
-  event.target == document.getElementById("content2")) {
+  } else if (
+    event.target == document.getElementById("cbtn2")
+  ) {
     closeModal2();
   }
+  else if (
+    event.target == document.getElementById("cbtn4") ||
+    event.target == document.getElementById("content4")
+  ) {
+    closeModal4();
+  }
 };
+
+
+function handleFileSelect(event) {
+  const files = event.target.files;
+  for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+          // Handle the selected Excel file(s) here
+          console.log('Selected file:', file.name);
+      } else {
+          alert('Please select an Excel file');
+      }
+  }
+}

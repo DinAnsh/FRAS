@@ -88,47 +88,59 @@ t_submit, t_edit = False, False
 c_submit, c_edit = False, False
 p_submit, p_edit = False, False
 
-@login_required(login_url='testapp:login')
+# @login_required(login_url='testapp:login')
 def dashboard(request, reason=''):
 
-    global s_submit,p_submit,t_submit,c_submit
-    context = {'s_submit': s_submit, 't_submit': t_submit,
-               'c_submit': c_submit, 'p_submit': p_submit,}
+    # global s_submit,p_submit,t_submit,c_submit
+    # context = {'s_submit': s_submit, 't_submit': t_submit,
+    #            'c_submit': c_submit, 'p_submit': p_submit,}
 
-    user = User.objects.get(username=request.user)
-    admin_user = System_Admin.objects.get(email=user.email)
+    # user = User.objects.get(username=request.user)
+    # admin_user = System_Admin.objects.get(email=user.email)
 
-    # if request.method == 'POST':
-    enroll = request.POST.get('enroll')
-    teacher_name = request.POST.get('teacher_name')
-    room = request.POST.get('room')
-    subject =  request.POST.get('subject')
+    # # if request.method == 'POST':
+    # enroll = request.POST.get('enroll')
+    # teacher_name = request.POST.get('teacher_name')
+    # room = request.POST.get('room')
+    # subject =  request.POST.get('subject')
 
-    table = []
-    if enroll:                      #for student registration
-        if not Student.objects.filter(enroll=enroll).exists():
-            s_submit = True
-            student = Student(request.POST.get('student_name'), enroll,
-                              request.FILES.get('img'))
-            print(request.FILES.get('img'))
-            student.save()
+    # table = []
+    # if enroll:                      #for student registration
+    #     if not Student.objects.filter(enroll=enroll).exists():
+    #         s_submit = True
+    #         student = Student(request.POST.get('student_name'), enroll,
+    #                           request.FILES.get('img'))
+    #         print(request.FILES.get('img'))
+    #         student.save()
 
-            messages.info(request, f'{enroll} is registered successfully!')
-            table.append([request.POST.get('student_name'), enroll])
-            return render(request, 'testapp/dashboard.html',
-                          {'user': admin_user,'s_submit':s_submit,'table':table[0]})
+    #         messages.info(request, f'{enroll} is registered successfully!')
+    #         table.append([request.POST.get('student_name'), enroll])
+    #         return render(request, 'testapp/dashboard.html',
+    #                       {'user': admin_user,'s_submit':s_submit,'table':table[0]})
 
-        else:
-            messages.warning(request, f"{enroll} is already registered!")
-            return render(request, 'testapp/dashboard.html', context)
+    #     else:
+    #         messages.warning(request, f"{enroll} is already registered!")
+    #         return render(request, 'testapp/dashboard.html', context)
 
-    return render(request, 'testapp/dashboard.html', {'user': admin_user})
-
-
-
+    # return render(request, 'testapp/dashboard.html', {'user': admin_user})
+    return render(request, 'testapp/dashboard.html')
 
 
+def student(request):
+    return render(request, 'testapp/student.html')
+    
 
+def teacher(request):
+    return render(request, 'testapp/teacher.html')
+    
+
+def schedule(request):
+    return render(request, 'testapp/schedule.html')
+    
+
+def camera(request):
+    return render(request, 'testapp/camera.html')
+    
 
 
 
