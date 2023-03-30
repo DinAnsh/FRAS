@@ -2,290 +2,156 @@
 {% load static %}
 
 {% block title %}
-<title>Dashboard | FRAS</title>
+  <title>Dashboard | FRAS</title>
 {% endblock %}
+
 {% block head %}
-  {% comment %} Any script or css sheet will be added  {% endcomment %}  <link href="{% static 'testapp/css/dashboard.css' %}" rel="stylesheet">
-  {% endblock %}
+  {% comment %} Any script or css sheet will be added  {% endcomment %}  
+  <link href="{% static 'testapp/css/dashboard.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<!-- navbar -->
-<header data-thq="thq-navbar" class="home-navbar-interactive">
-  <div class="home-container01">
-    <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
-  </div>
+  <!-- navbar -->
+  <header data-thq="thq-navbar" class="home-navbar-interactive">
+    <div class="home-container01">
+      <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
+    </div>
 
-  <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
-    <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
-      <a href="{% url 'testapp:dashboard' %}" class="home-link">Dashboard</a>
-      <a href="{% url 'testapp:students' %}" class="home-link">Student</a>
-      <a href="{% url 'testapp:teachers' %}" class="home-link">Teacher</a>
-      <a href="{% url 'testapp:classes' %}" class="home-link">Schedule</a>
-      <a href="{% url 'testapp:cameras' %}" class="home-link">Camera</a>
-      <!-- <a href="#" class="home-link">Contact</a> -->
-    </nav>
-  </div>
-
-  <div class="profile">
-    <ul>
-      <li class="dropdown">
-        <ul>
-          <a href="#">
-            <img src="../../static/testapp/images/profile-pic.jpg" alt="Profile Picture">
-          </a>
-          <a href="">UserName</a>
-        </ul>
-        <ul class="dropdown-menu">
-          <li><a href="#">My Account</a></li>
-          <li><a href="#">Dashboard</a></li>
-          <li><a href="#">Need Help?</a></li>
-          <li>
-            <form method="post" action="{% url 'testapp:logout' %}">
-              {% csrf_token %}
-              <button type="submit">Logout</button>
-            </form>
-          </li>
-          <!-- <li><a href="{% url 'testapp:logout' %}">Logout</a></li> -->
-        </ul>
-      </li>
-    </ul>
-  </div>
-
-  <!-- burger button -->
-  <div data-thq="thq-burger-menu" class="home-burger-menu">
-    <svg viewBox="0 0 1024 1024" class="home-icon">
-      <path
-        d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z">
-      </path>
-    </svg>
-  </div>
-
-  <!-- mobile-nav -->
-  <div data-thq="thq-mobile-menu" class="home-mobile-menu">
-    <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
-      <div class="home-container02">
-        <!-- {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %} -->
-        <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
-        <div data-thq="thq-close-menu" class="home-menu-close">
-          <svg viewBox="0 0 1024 1024" class="home-icon02">
-            <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z">
-            </path>
-          </svg>
-        </div>
-      </div>
-
-      <nav data-thq="thq-mobile-menu-nav-links" data-role="Nav" class="home-nav2">
-        <a href="#" class="home-link1">Student</a>
-        <a href="#" class="home-link1">Teacher</a>
-        <a href="#" class="home-link1">Schedule</a>
-        <a href="#" class="home-link1">Camera</a>
-        <!-- <a href="#" class="home-link1">Contact</a> -->
+    <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
+      <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
+        <a href="{% url 'testapp:dashboard' %}" class="home-link">Dashboard</a>
+        <a href="{% url 'testapp:students' %}" class="home-link">Student</a>
+        <a href="{% url 'testapp:teachers' %}" class="home-link">Teacher</a>
+        <a href="{% url 'testapp:classes' %}" class="home-link">Schedule</a>
+        <a href="{% url 'testapp:cameras' %}" class="home-link">Camera</a>
+        <!-- <a href="#" class="home-link">Contact</a> -->
       </nav>
-
     </div>
-  </div>
 
-  <script>
-    const activePage = window.location.pathname;
-    const navLinks = document.querySelectorAll("nav a")
-    navLinks.forEach((link) => {
-      const pathName = new URL(link.href).pathname;
-      if (pathName === activePage) {
-        link.classList.add("active");
-      }
-    });
-  </script>
-</header>
-<div class="home-separator"></div>
-{% block body %}
+    <div class="profile">
+      <ul>
+        <li class="dropdown">
+          <ul>
+            <a href="#">
+              <img src="../../static/testapp/images/profile-pic.jpg" alt="Profile Picture">
+            </a>
+            <a href="">UserName</a>
+          </ul>
+          <ul class="dropdown-menu">
+            <li><a href="#">My Account</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Need Help?</a></li>
+            <li>
+              <form method="post" action="{% url 'testapp:logout' %}">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+              </form>
+            </li>
+            <!-- <li><a href="{% url 'testapp:logout' %}">Logout</a></li> -->
+          </ul>
+        </li>
+      </ul>
+    </div>
 
-<!-- dashboard-content -->
-<div class="adminrights-container">
+    <!-- burger button -->
+    <div data-thq="thq-burger-menu" class="home-burger-menu">
+      <svg viewBox="0 0 1024 1024" class="home-icon">
+        <path
+          d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z">
+        </path>
+      </svg>
+    </div>
 
-  <div class="adminrights-testimonial">
-    <div class="adminrights-container01">
-      <h1 class="adminrights-text18">Glimpses</h1>
-      <!-- glimpses -->
-      <div class="adminrights-container16">
-        <div class="adminrights-stat">
-          <div id='calendar'></div>
+    <!-- mobile-nav -->
+    <div data-thq="thq-mobile-menu" class="home-mobile-menu">
+      <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
+        <div class="home-container02">
+          <!-- {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %} -->
+          <a href="{% url 'testapp:home' %}"><img src="../../static/testapp/images/header-logo.png" alt="logo" class="main_logo" /></a>
+          <div data-thq="thq-close-menu" class="home-menu-close">
+            <svg viewBox="0 0 1024 1024" class="home-icon02">
+              <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z">
+              </path>
+            </svg>
+          </div>
         </div>
 
-        <div class="adminrights-stats">
+        <nav data-thq="thq-mobile-menu-nav-links" data-role="Nav" class="home-nav2">
+          <a href="#" class="home-link1">Student</a>
+          <a href="#" class="home-link1">Teacher</a>
+          <a href="#" class="home-link1">Schedule</a>
+          <a href="#" class="home-link1">Camera</a>
+          <!-- <a href="#" class="home-link1">Contact</a> -->
+        </nav>
 
-          <div id="" class="adminrights-stat1">
-            <div id="maxAtt-cls"></div>
-            <span class="adminrights-text23">Class-wise Attendance</span>
-          </div>
-
-          <div id="" class="adminrights-stat2">
-            <div id="maxAtt-sub"></div>
-            <span class="adminrights-text23">Subject-wise Attendance</span>
-          </div>
-        </div>
       </div>
     </div>
 
-
-    <div class="adminrights-separator"></div>
-    <div class="adminrights-container17">
-      <h1 class="adminrights-text18">Live</h1>
-      <div class="adminrights-container18">
-        <div class="live">
-          <video style="transform: scaleX(-1);" id="player" width="700" height="480" autoplay></video>
-          <h3 style="width: fit-content; margin: 0 auto;">Class: 2nd Year</h3>
-
-          <!-- <script>
-                var video = document.getElementById('player');
-                navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-                  video.srcObject = stream;
-                  video.play();
-                  // OpenCV code to process video stream
-                  cv.onRuntimeInitialized = function () {
-                    var cap = new cv.VideoCapture(video);
-                    function processVideo() {
-                      cap.readAsync(function (frame) {
-                        // Process frame here
-                        cv.imshow('player', frame);
-                        setTimeout(processVideo, 0);
-                      });
-                    }
-                    processVideo();
-                  }
-                });
-              </script> -->
-        </div>
-
-        <div class="live">
-          <video style="transform: scaleX(-1);" id="player" width="700" height="480" autoplay></video>
-          <h3 style="width: fit-content; margin: 0 auto;">Class: 3rd Year</h3>
-        </div>
-
-        <div class="live">
-          <video style="transform: scaleX(-1);" id="player" width="700" height="480" autoplay></video>
-          <h3 style="width: fit-content; margin: 0 auto;">Class: 4th Year</h3>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- calendar script -->
-  <script>
-    $(document).ready(function () {
-      $('#calendar').fullCalendar({
-        // Options and callbacks
-        // themeSystem: 'lux'
+    <script>
+      const activePage = window.location.pathname;
+      const navLinks = document.querySelectorAll("nav a")
+      navLinks.forEach((link) => {
+        const pathName = new URL(link.href).pathname;
+        if (pathName === activePage) {
+          link.classList.add("active");
+        }
       });
-    });
-  </script>
+    </script>
+  </header>
+  <div class="home-separator"></div>
+  {% block body %}
 
-  <!-- maxAtt-cls -->
-  <script>
-    var data = [150, 200, 250];
+    <!-- dashboard-content -->
+    <div class="adminrights-container">
 
-    // append svg to the selected element with defined attributes
-    var svg = d3.select("#maxAtt-cls")
-      .append("svg")
-      .attr("width", 250)
-      .attr("height", 250)
-      .append("g")
-      .attr("transform", "translate(" + 50 + "," + 0 + ")");
+      <div class="adminrights-testimonial">
+        <div class="adminrights-container01">
+          <h1 class="adminrights-text18">Glimpses</h1>
+          <!-- glimpses -->
+          <div class="adminrights-container16">
+            <div class="adminrights-stat">
+              <div id='calendar'></div>
+            </div>
 
-    var xScale = d3.scalePoint()
-      .domain(['II', 'III', 'Iv'])
-      .range([20, 125]);
+            <div class="adminrights-stats">
 
-    // append rectangles to the svg element
-    svg.selectAll("rect")
-      .data(data)
-      .enter()
-      .append("rect")
-      // positions the rectangle horizontally & vertically 
-      .attr("x", function (d, i) {
-        return i * 50;  //with a gap of 50px between each
-      })
-      .attr("y", function (d) {
-        return 300 - d;
-      })
-      //sets the height & width of each rectangle
-      .attr("width", 40)
-      .attr("height", function (d) {
-        return d - 80;
-      })
-      .attr("fill", "#d0b49f");
+              <div id="" class="adminrights-stat1">
+                <div id="maxAtt-cls"></div>
+                <span class="adminrights-text23">Class-wise Attendance</span>
+              </div>
 
-    svg.selectAll("text")
-      .data(data)
-      .enter()
-      .append("text")
-      .text(function (d) { return d; })
-      .attr("x", function (d, i) {
-        return i * 50 + 10;
-      })
-      .attr("y", function (d) {
-        return 300 - d - 5;
-      })
+              <div id="" class="adminrights-stat2">
+                <div id="maxAtt-sub"></div>
+                <span class="adminrights-text23">Subject-wise Attendance</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + 230 + ")")
-      .call(d3.axisBottom(xScale));
 
-  </script>
+        <div class="adminrights-separator"></div>
+        <div class="adminrights-container17">
+          <h1 class="adminrights-text18">Live</h1>
+          <div class="adminrights-container18">
+            <div class="live">
+              <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video>
+              <h3 style="width: fit-content; margin: 0 auto;">Class: 2nd Year</h3>
+            </div>
 
-  <!-- maxAtt-sub -->
-  <script>
-    var data = [115, 180, 150];
+            <div class="live">
+              <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video>
+              <h3 style="width: fit-content; margin: 0 auto;">Class: 3rd Year</h3>
+            </div>
 
-    // append svg to the selected element with defined attributes
-    var svg = d3.select("#maxAtt-sub")
-      .append("svg")
-      .attr("width", 250)
-      .attr("height", 250)
-      .append("g")
-      .attr("transform", "translate(" + 50 + "," + 0 + ")");
-
-    var xScale = d3.scalePoint()
-      .domain(['CS471', 'CS352', 'CS247'])
-      .range([20, 125]);
-
-    // append rectangles to the svg element
-    svg.selectAll("rect")
-      .data(data)
-      .enter()
-      .append("rect")
-      // positions the rectangle horizontally & vertically 
-      .attr("x", function (d, i) {
-        return i * 50;  //with a gap of 50px between each
-      })
-      .attr("y", function (d) {
-        return 300 - d;
-      })
-      //sets the height & width of each rectangle
-      .attr("width", 40)
-      .attr("height", function (d) {
-        return d - 80;
-      })
-      .attr("fill", "#d0b49f");
-
-    svg.selectAll("text")
-      .data(data)
-      .enter()
-      .append("text")
-      .text(function (d) { return d; })
-      .attr("x", function (d, i) {
-        return i * 50 + 10;
-      })
-      .attr("y", function (d) {
-        return 300 - d - 5;
-      })
-
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + 230 + ")")
-      .call(d3.axisBottom(xScale));
-
-  </script>
-</div>
-{% endblock body %}
+            <div class="live">
+              <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video>
+              <h3 style="width: fit-content; margin: 0 auto;">Class: 4th Year</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src={% static "testapp/js/dashboard.js" %}></script>
+  {% endblock body %}
 
 {% endblock %}

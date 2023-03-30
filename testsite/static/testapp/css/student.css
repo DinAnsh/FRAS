@@ -66,6 +66,7 @@
 .part2-content table {
   width: 100%;
   border-collapse: collapse;
+  background-color: white;
 }
 
 .part2-content th,
@@ -84,6 +85,7 @@ td {
   width: 70%;
   margin: auto;
   border-collapse: collapse;
+  background-color: white;
 }
 
 .part3-content th,
@@ -109,6 +111,9 @@ td {
   cursor: pointer;
   border-width: 1px;
   border-radius: 5px;
+  background-color: #7045f7;
+  color:white;
+  margin: 10px;
 }
 
 .button1 {
@@ -156,6 +161,10 @@ td {
 }
 
 .pagination {
+  margin: 20px;
+}
+
+.bfield{
   margin-top: 20px;
 }
 
@@ -425,4 +434,8 @@ td {
   width: 100%;
   background-color: #c1bebe;
   height: 360px;
+}
+
+.home-container41{
+  display: none;
 }

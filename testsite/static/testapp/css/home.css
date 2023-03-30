@@ -5,6 +5,15 @@
   height: 52px;
 }
 
+.home-nav {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: space-between;
+  width: 30vw;
+  flex-direction: row;
+}
+
+
 .feature-card2-feature-card {
   width: 100%;
   display: flex;
@@ -23,6 +32,54 @@
 .feature-card2-text {
   font-weight: 600;
   margin-bottom: var(--dl-space-space-unit);
+}
+
+/* Profile */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: max-content;
+  background-color: #d0b49f;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  display: none;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+  z-index: 1;
+}
+
+.profile img {
+  width: 2.5rem;
+  /* height: 30px; */
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.dropdown-menu li{
+  padding: 0.8rem 1.5rem;
+}
+
+.dropdown-menu li:hover{
+  background-color: #cebdaf;
+}
+
+.dropdown-menu form button{
+  cursor: pointer;
 }
 
 
