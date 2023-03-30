@@ -16,9 +16,13 @@ class Student(models.Model):
     name = models.CharField(max_length=50)
     enroll = models.CharField(primary_key=True, max_length=20)
     img = models.ImageField(upload_to='students/')   #here media is our base dir 
+    # email, mobile, 
     def __str__(self):
         return self.name
     
+# need to create an attendance table having Enrll no, subjects as columns
+
+
 class Team(models.Model):
     name = models.CharField(max_length=50)
     designation = models.CharField(max_length=50)

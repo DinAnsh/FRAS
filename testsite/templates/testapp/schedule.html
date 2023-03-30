@@ -1,0 +1,181 @@
+{% extends "testapp/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+<title>Class Timmings | FRAS</title>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'testapp/css/student.css' %}">
+{% endblock  %}
+
+{% block body %}  
+    <div class="main-container">
+      <div class="main-part1">
+          <div class="part1-content">
+            <select name="department" id="" disabled>
+              <option value="cse">Computer Science and Engineering</option>
+            </select>
+          </div>
+          <div class="part1-content">
+            <label for="room">Room No. - </label>
+            <select name="room_no" id="room">
+              <option value="101">101</option>
+              <option value="102">102</option>
+              <option value="103">103</option>
+              <option value="103">104</option>
+            </select>
+          </div>
+          <div class="part1-content">
+            <select class="" id="" name="year">
+              <option value="1">First year</option>
+              <option value="2">Second year</option>
+              <option value="3">Third year</option>
+              <option value="4">Final year</option>
+            </select>
+          </div>
+          <div class="part1-content">
+            <label for="fileInput" class="custom-file-upload" title="Class Time Table">
+              <!-- Custom button or icon goes here -->
+              Upload
+          </label>
+          <input id="fileInput" type="file" accept=".xlsx, .xls, .csv" onchange="handleFileSelect(event)"
+              style="display: none;">
+          </div>
+      </div>
+      <div class="main-part2">
+        <div class="time_head">
+          <div class="tabletitle">
+            <h2>
+              Time Table
+            </h2>
+          </div>
+        </div>
+        <div class="part2-content">
+          <table>
+            <thead>
+              <tr>
+                <th class="ttcol1">Day</th>
+                <th class="ttcol">9-10</th>
+                <th class="ttcol">10-11</th>
+                <th class="ttcol">11-12</th>
+                <th class="ttcol">12-1</th>
+                <th class="ttcol">1-2</th>
+                <th class="ttcol">2-3</th>
+                <th class="ttcol">3-4</th>
+                <th class="ttcol">4-5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                  <td>Monday</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>Tuesday</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>Wednesday</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>Thursday</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>Friday</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>Saturday</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+             
+          </tbody>
+          </table>
+        </div>
+        <div class="bfield">
+          <button id="tt_edt" class="comman_btn">Edit</button>
+          <span id="page-info"></span>
+          <button id="tt_sbmt" class="comman_btn">Submit</button>
+      </div>
+      </div>
+    </div>
+
+    <div id="myModal3" class="modal3">
+      <div class="modal-content3" id="content3">
+        <div class="popup3">
+          <span class="close3" id="cbtn3">&times;</span>
+          <div class="popup_title3">
+            Register Student Face
+          </div>
+          <div class="popup_body3">
+            <div class="capture-window">
+              <div id="video1"><video id="video"></video></div>
+              <div id="canvas1"><canvas id="canvas"></canvas></div>
+              
+            </div>
+            <div class="takebtn">
+              <button id="capture-btn">Capture</button>
+              <button id="retake-btn">Retake</button>
+            </div>
+          </div>
+          <button id="save-btn">Save</button>
+          <div class="popup_inst">
+            <h2>Instructions:-</h2>
+            <ul>
+              <li>Ensure that you have a stable internet connection and a webcam or a front-facing camera on your device.</li>
+              <li>Position student face in center of designated area on the screen and hold still while the camera captures several images of your face from different angles.</li>
+              <li>Once you have captured the required images, the system will analyze and process them to create a digital representation of your face. This representation will be used to match your face with the images captured during attendance recording.</li>
+  
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+
+{% endblock %}
