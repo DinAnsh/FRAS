@@ -323,7 +323,7 @@
           Create Account
         </div>
         <div class="popup_body">
-          <form class="popup_form" action="#">
+          <form class="popup_form" action="{% url 'testapp:register' %}}">
             {% csrf_token %}
             <div class="in_div">
               <span class="input_label">Department</span>

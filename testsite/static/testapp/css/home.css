@@ -430,7 +430,7 @@ nav a:is(:link, :active, :visited).active {
 .home-features {
   width: 100%;
   display: flex;
-  padding: var(--dl-space-space-threeunits);
+  padding: 70px;
   max-width: auto;
   flex-direction: column;
   background-image: linear-gradient(to bottom, #e2e6e7 0%, #e4d4c8 100%);

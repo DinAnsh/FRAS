@@ -28,8 +28,9 @@ def user_register(request):
 
         if not User.objects.filter(email=email).exists():
             if password and confirm_password:
-                if password != confirm_password:
-                    return render(request, 'testapp/register.html', {'error_msg':'The two password fields must match.'})
+                # below code will be done by js
+                # if password != confirm_password:
+                #     return render(request, 'testapp/home.html', {'error_msg':'The two password fields must match.'})
 
                 names = name.split()
                 username = names[0]+'@'+dept[:3]
@@ -40,12 +41,12 @@ def user_register(request):
                 admin = System_Admin(dept, name, email, password)
                 admin.save()
                 messages.success(request, f'You have registered successfully! Your username is {username}')
-                return redirect('testapp:login')
+                return redirect('testapp:home')
         else:
-            return render(request, 'testapp/register.html', {'error_msg':'Looks like a user with that email or password already exists'})
+            return render(request, 'testapp/home.html', {'error_msg':'Looks like a user with that email or password already exists'})
 
     else:
-        return render(request, 'testapp/register.html', {'error_msg':''})
+        return render(request, 'testapp/home.html', {'error_msg':''})
 
 
 @never_cache
