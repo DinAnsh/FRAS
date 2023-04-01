@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from .models import System_Admin, Student, Team
@@ -43,10 +43,11 @@ def user_register(request):
                 messages.success(request, f'You have registered successfully! Your username is {username}')
                 return redirect('testapp:home')
         else:
-            return render(request, 'testapp/home.html', {'error_msg':'Looks like a user with that email or password already exists'})
+            messages.warning(request, 'Looks like a user with that email or password already exists')
+            return render(request, 'testapp/home.html')
 
     else:
-        return render(request, 'testapp/home.html', {'error_msg':''})
+        return render(request, 'testapp/home.html')
 
 
 @never_cache
@@ -81,7 +82,7 @@ def user_login(request, reason=''):
 def user_logout(request):
     if request.method == 'POST':
         logout(request)
-        return redirect('testapp:login')
+        return redirect('testapp:home')
 
 
 s_submit, s_edit = False, False
@@ -89,14 +90,14 @@ t_submit, t_edit = False, False
 c_submit, c_edit = False, False
 p_submit, p_edit = False, False
 
-# @login_required(login_url='testapp:login')
+@login_required(login_url='testapp:login')
 def dashboard(request, reason=''):
 
     # global s_submit,p_submit,t_submit,c_submit
     # context = {'s_submit': s_submit, 't_submit': t_submit,
     #            'c_submit': c_submit, 'p_submit': p_submit,}
 
-    # user = User.objects.get(username=request.user)
+    user = User.objects.get(username=request.user)
     # admin_user = System_Admin.objects.get(email=user.email)
 
     # # if request.method == 'POST':
@@ -124,23 +125,53 @@ def dashboard(request, reason=''):
     #         return render(request, 'testapp/dashboard.html', context)
 
     # return render(request, 'testapp/dashboard.html', {'user': admin_user})
-    return render(request, 'testapp/dashboard.html')
+
+    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+
+
+@login_required(login_url='testapp:login')
+def update_profile(request):
+    if request.method=='POST':
+        old_password = request.POST.get('old-password','')
+        new_password = request.POST.get('new-password','')
+        cnf_password = request.POST.get('confirm-password','')
+        
+        user = User.objects.get(username=request.user)
+        sys_admin = System_Admin.objects.get(email=user.email)
+
+        user = request.user
+        if not user.check_password(old_password):
+            messages.error(request, 'Your old password was entered incorrectly.')
+            return redirect('testapp:dashboard') 
+        if new_password != cnf_password:
+            messages.error(request, 'The two password fields did not match.')
+            return redirect('testapp:dashboard') 
+        user.set_password(new_password)
+        user.save()
+        update_session_auth_hash(request, user)
+        messages.success(request, 'Your password was successfully updated!')
+
+        return redirect('testapp:dashboard') 
 
 
 def student(request):
-    return render(request, 'testapp/student.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
 def teacher(request):
-    return render(request, 'testapp/teacher.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
 def schedule(request):
-    return render(request, 'testapp/schedule.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
 def camera(request):
-    return render(request, 'testapp/camera.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
 

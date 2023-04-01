@@ -1,4 +1,4 @@
-{% extends 'testapp/base.html' %} 
+{% extends 'testapp/base.html' %}
 {% block title %}
 <title>FRAS</title>
 {% endblock %}
@@ -22,9 +22,7 @@
     <div data-thq="thq-navbar-btn-group" class="home-btn-group">
       {% comment %} <a class="home-login button">Login</a> {% endcomment %}
       <button class="home-login button" onclick="openModal2()">Login</button>
-      {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button"
-        >Register</a
-      > {% endcomment %}
+      {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button">Register</a> {% endcomment %}
       <button class="home-register button" onclick="openModal()">Register</button>
     </div>
     <div data-thq="thq-burger-menu" class="home-burger-menu">
@@ -270,10 +268,11 @@
           </div>
         </div>
       </div>
-      {% endfor %} 
+      {% endfor %}
     </div>
   </section>
-  {% comment %} Login form  {% endcomment %}
+
+  {% comment %} Login form {% endcomment %}
   <div id="myModal2" class="modal2">
     <div class="modal-content2" id="content2">
       <div class="popup2">
@@ -287,32 +286,40 @@
 
             <div class="in_div">
               <label for="username" class="input_label">Username:</label>
-              <input type="text" id="username" name="username" required class="in_field" placeholder="name@com" autofocus>
+              <input type="text" id="username" name="username" required class="in_field" placeholder="name@com"
+                autofocus>
             </div>
 
             <div class="in_div">
               <label for="lpassword" class="input_label">Password:</label>
               <input type="password" id="lpassword" name="password" class="in_field" required>
             </div>
+            
             {% if messages %}
+            <div class="in_div">
               {% for message in messages %}
-                  <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+              <input type="text" id="alert" value="{{ message }}" style="display: none;">
+              <script>
+                msg = document.getElementById('alert').value;
+                if (msg) {
+                  window.alert(msg);
+                }
+              </script>
               {% endfor %}
+            </div>
             {% endif %}
+
             <input type="submit" value="Log in" class="register_btn">
             <div class="in_div2">
-                <a href="#">Forgot your password</a>
-                <span>or</span>
-                <a href="#">Don't have an account?</a>
+              <a href="#">Forgot your password</a>
+              <span>or</span>
+              <a href="#">Don't have an account?</a>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
-
-</div>
-
 
   {% comment %} register Form {% endcomment %}
   <div id="myModal" class="modal">
@@ -323,12 +330,12 @@
           Create Account
         </div>
         <div class="popup_body">
-          <form class="popup_form" action="{% url 'testapp:register' %}}">
+          <form class="popup_form" action="{% url 'testapp:register' %}">
             {% csrf_token %}
             <div class="in_div">
               <span class="input_label">Department</span>
               <select name="department" disabled class="in_field">
-                <option value="cse" >Computer science and engineering</option>
+                <option value="cse">Computer science and engineering</option>
               </select>
             </div>
 
@@ -336,12 +343,12 @@
               <label for="name" class="input_label">Name:</label>
               <input type="text" id="name" name="name" required class="in_field" placeholder="Your full name">
             </div>
-            
+
             <div class="in_div">
               <label for="email" class="input_label">Email:</label>
-              <input type="email" id="email" name="email"  class="in_field" required placeholder="Ex. email@org.com">
+              <input type="email" id="email" name="email" class="in_field" required placeholder="Ex. email@org.com">
             </div>
-              
+
             <div class="in_div">
               <label for="password" class="input_label">Password:</label>
               <input type="password" id="password" name="password" class="in_field" required>
@@ -351,12 +358,12 @@
               <label for="cpassword" class="input_label">Confirm Password:</label>
               <input type="password" id="cpassword" name="password" class="in_field" required>
             </div>
-            
-            
+
+
             <input type="submit" value="Register" class="register_btn">
             <div class="in_div2">
               Already have an account?
-                <a href="#">Log in</a>
+              <a href="#">Log in</a>
             </div>
           </form>
         </div>

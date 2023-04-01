@@ -1,11 +1,11 @@
 //----------------------- calendar script -----------------------
 
 $(document).ready(function () {
-    $('#calendar').fullCalendar({
-      // Options and callbacks
-      // themeSystem: 'lux'
-    });
+  $('#calendar').fullCalendar({
+    // Options and callbacks
+    // themeSystem: 'lux'
   });
+});
 
 
 //---------------------- maxAtt-cls ------------------------------
@@ -124,7 +124,7 @@ svg
   .call(d3.axisBottom(xScale));
 
 
-  
+//-------------------------------- cctv-video -------------------------
 
 //   var video = document.getElementById('player');
 //   navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
@@ -143,3 +143,36 @@ svg
 //       processVideo();
 //     }
 //   });
+
+
+//-------------------------------- profile-section -------------------------
+
+function showprofile() {
+  document.getElementById("profile-popup").style.display = "block";
+}
+
+function closeProfile() {
+  document.getElementById("profile-popup").style.display = "none";
+}
+
+
+function handleChange() {
+  const passwordInput = document.getElementById("new-password");
+  const confirmPasswordInput = document.getElementById("confirm-password");
+  const updateBtn = document.getElementById("update-btn");
+
+
+  if (
+    passwordInput.value !== "" &&
+    confirmPasswordInput.value !== ""
+  ) {
+    if (passwordInput.value === confirmPasswordInput.value) {
+      updateBtn.style.display = "block";
+    }
+    else {
+      alert("Passwords do not match!");
+      updateBtn.style.display = "none";
+    }
+  }
+
+}

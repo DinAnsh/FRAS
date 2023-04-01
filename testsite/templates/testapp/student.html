@@ -1,4 +1,3 @@
-
 {% extends "testapp/dashboard.html" %}
 {% load static %}
 
@@ -8,184 +7,188 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'testapp/css/student.css' %}">
-{% endblock  %}
+{% endblock %}
 
 {% block body %}
-    
-    <div class="main-container">
-      <div class="main-part1">
-          <div class="part1-content">
-            <select name="department" id="" disabled>
-              <option value="cse">Computer Science and Engineering</option>
-            </select>
-          </div>
-          <div class="part1-content">
-            <select class="" id="" name="year">
-              <option value="1">First year</option>
-              <option value="2">Second year</option>
-              <option value="3">Third year</option>
-              <option value="4">Final year</option>
-            </select>
-          </div>
-          <div class="part1-content">
-            <label for="fileInput" class="custom-file-upload" title="Students details sheet">
-              <!-- Custom button or icon goes here -->
-              Upload Excel File
-          </label>
-          <input id="fileInput" type="file" accept=".xlsx, .xls, .csv" onchange="handleFileSelect(event)"
-              style="display: none;">
-          </div>
-      </div>
-      <div class="main-part2">
-        <div class="btn-cont">
-          <div class="tabletitle">
-            <h2>
-              Student Details
-            </h2>
-          </div>
-          <div class="searchright">
-            <input type="search" name="idsearch" id="idsearch" placeholder="Enroll Id">
-            <button class="comman_btn button1" onclick="search()">Search</button>
-            <button class="comman_btn button2" onclick="sort()" title="sort based on not register">Sort</button>
-          </div>
-        </div>
-        <div class="part2-content">
-          <table>
-            <thead>
-              <tr>
-                <th class="tcol1">Enrollment ID</th>
-                <th class="tcol2">Name</th>
-                <th class="tcol3">Email</th>
-                <th class="tcol4">Mob no.</th>
-                <th class="tcol5">Attendance</th>
-                <th class="tcol6">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                  <td>1</td>
-                  <td>John</td>
-                  <td>john@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td></td>
 
-              </tr>
-              <tr>
-                  <td>2</td>
-                  <td>Jane</td>
-                  <td>jane@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td></td>
-              </tr>
-              <tr>
-                  <td>3</td>
-                  <td>Bob</td>
-                  <td>bob@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td><button class="comman_btn button2" onclick="sregister()">Register</button></td>
-              </tr>
-              <tr>
-                  <td>4</td>
-                  <td>Alice</td>
-                  <td>alice@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td></td>
-              </tr>
-              <tr>
-                  <td>5</td>
-                  <td>David</td>
-                  <td>david@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td><span>&#9745</span></td>
-              </tr>
-              <tr>
-                  <td>6</td>
-                  <td>Susan</td>
-                  <td>susan@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td><span>&#9745</span></td>
-              </tr>
-              <tr>
-                  <td>7</td>
-                  <td>Mike</td>
-                  <td>mike@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td><button class="comman_btn button2" onclick="sregister()">Register</button></td>
-              </tr>
-              <tr>
-                  <td>8</td>
-                  <td>Lisa</td>
-                  <td>lisa@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td></td>
-              </tr>
-              <tr>
-                  <td>9</td>
-                  <td>Tom</td>
-                  <td>tom@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td></td>
-              </tr>
-              <tr>
-                  <td>10</td>
-                  <td>Sara</td>
-                  <td>sara@example.com</td>
-                  <td>12345465</td>
-                  <td></td>
-                  <td></td>
-              </tr>
-          </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <button id="prev-page-btn">Prev</button>
-          <span id="page-info"></span>
-          <button id="next-page-btn">Next</button>
+<div class="main-container">
+  <div class="main-part1">
+    <div class="part1-content">
+      <select name="department" id="" disabled>
+        <option value="cse">Computer Science and Engineering</option>
+      </select>
+    </div>
+    <div class="part1-content">
+      <select class="" id="" name="year">
+        <option value="1">First year</option>
+        <option value="2">Second year</option>
+        <option value="3">Third year</option>
+        <option value="4">Final year</option>
+      </select>
+    </div>
+    <div class="part1-content">
+      <label for="fileInput" class="custom-file-upload" title="Students details sheet">
+        <!-- Custom button or icon goes here -->
+        Upload Excel File
+      </label>
+      <input id="fileInput" type="file" accept=".xlsx, .xls, .csv" onchange="handleFileSelect(event)"
+        style="display: none;">
+    </div>
+  </div>
+  <div class="main-part2">
+    <div class="btn-cont">
+      <div class="tabletitle">
+        <h2>
+          Student Details
+        </h2>
       </div>
+      <div class="searchright">
+        <input type="search" name="idsearch" id="idsearch" placeholder="Enroll Id">
+        <button class="common_btn button1" onclick="search()">Search</button>
+        <button class="common_btn button2" onclick="sort()" title="sort based on not register">Sort</button>
       </div>
     </div>
+    <div class="part2-content">
+      <table>
+        <thead>
+          <tr>
+            <th class="tcol1">Enrollment ID</th>
+            <th class="tcol2">Name</th>
+            <th class="tcol3">Email</th>
+            <th class="tcol4">Mob no.</th>
+            <th class="tcol5">Attendance</th>
+            <th class="tcol6">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>John</td>
+            <td>john@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td></td>
 
-    <div id="myModal3" class="modal3">
-      <div class="modal-content3" id="content3">
-        <div class="popup3">
-          <span class="close3" id="cbtn3">&times;</span>
-          <div class="popup_title3">
-            Register Student Face
-          </div>
-          <div class="popup_body3">
-            <div class="capture-window">
-              <div id="video1"><video id="video"></video></div>
-              <div id="canvas1"><canvas id="canvas"></canvas></div>
-              
-            </div>
-            <div class="takebtn">
-              <button id="capture-btn">Capture</button>
-              <button id="retake-btn">Retake</button>
-            </div>
-          </div>
-          <button id="save-btn">Save</button>
-          <div class="popup_inst">
-            <h2>Instructions:-</h2>
-            <ul>
-              <li>Ensure that you have a stable internet connection and a webcam or a front-facing camera on your device.</li>
-              <li>Position student face in center of designated area on the screen and hold still while the camera captures several images of your face from different angles.</li>
-              <li>Once you have captured the required images, the system will analyze and process them to create a digital representation of your face. This representation will be used to match your face with the images captured during attendance recording.</li>
-  
-            </ul>
-          </div>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Jane</td>
+            <td>jane@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Bob</td>
+            <td>bob@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td><button class="common_btn button2" onclick="sregister()">Register</button></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Alice</td>
+            <td>alice@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>David</td>
+            <td>david@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td><span>&#9745</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Susan</td>
+            <td>susan@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td><span>&#9745</span></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Mike</td>
+            <td>mike@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td><button class="common_btn button2" onclick="sregister()">Register</button></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Lisa</td>
+            <td>lisa@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>Tom</td>
+            <td>tom@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>Sara</td>
+            <td>sara@example.com</td>
+            <td>12345465</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <button id="prev-page-btn">Prev</button>
+      <span id="page-info"></span>
+      <button id="next-page-btn">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="myModal3" class="modal3">
+  <div class="modal-content3" id="content3">
+    <div class="popup3">
+      <span class="close3" id="cbtn3">&times;</span>
+      <div class="popup_title3">
+        Register Student Face
+      </div>
+      <div class="popup_body3">
+        <div class="capture-window">
+          <div id="video1"><video id="video"></video></div>
+          <div id="canvas1"><canvas id="canvas"></canvas></div>
+
+        </div>
+        <div class="takebtn">
+          <button id="capture-btn">Capture</button>
+          <button id="retake-btn">Retake</button>
         </div>
       </div>
+      <button id="save-btn">Save</button>
+      <div class="popup_inst">
+        <h2>Instructions:-</h2>
+        <ul>
+          <li>Ensure that you have a stable internet connection and a webcam or a front-facing camera on your device.
+          </li>
+          <li>Position student face in center of designated area on the screen and hold still while the camera captures
+            several images of your face from different angles.</li>
+          <li>Once you have captured the required images, the system will analyze and process them to create a digital
+            representation of your face. This representation will be used to match your face with the images captured
+            during attendance recording.</li>
+
+        </ul>
+      </div>
     </div>
-  
-  
-  <script src="{% static 'testapp/js/popcam.js' %}"></script>
-  {% endblock %}
+  </div>
+</div>
+
+
+<script src="{% static 'testapp/js/popcam.js' %}"></script>
+{% endblock %}

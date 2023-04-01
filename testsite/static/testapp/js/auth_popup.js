@@ -17,7 +17,7 @@ function closeModal2() {
 }
 
 
-
+//for camera
 function addcam(){
   document.getElementById("myModal4").style.display = "block";
 
