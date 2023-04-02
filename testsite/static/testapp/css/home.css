@@ -35,12 +35,16 @@
 }
 
 /* Profile */
+.profile{
+  width: 170px;
+}
+
 ul {
   list-style: none;
-  margin: 0;
   padding: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .dropdown {
@@ -2037,3 +2041,7 @@ nav a:is(:link, :active, :visited).active {
 }
 
 
+.warn{
+  color:#af2f2f;
+  display: none;
+}

@@ -19,13 +19,38 @@
         <a href="#contact" class="home-link">Contact</a>
       </nav>
     </div>
-    <div data-thq="thq-navbar-btn-group" class="home-btn-group">
+    <div data-thq="thq-navbar-btn-group" class="home-btn-group" id="log_reg_btns">
       {% comment %} <a class="home-login button">Login</a> {% endcomment %}
       <button class="home-login button" onclick="openModal2()">Login</button>
       {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button"
         >Register</a
       > {% endcomment %}
       <button class="home-register button" onclick="openModal()">Register</button>
+    </div>
+    <div class="profile" id="prof" style="display:none">
+      <span style="display:none">{{logged}}</span>
+      <ul>
+        <li class="dropdown">
+          <ul>
+            <a href="#">
+              <img src="../../static/testapp/images/profile-pic.jpg" alt="Profile Picture">
+            </a>
+            <a href="">UserName</a>
+          </ul>
+          <ul class="dropdown-menu">
+            <li><a href="#">My Account</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Need Help?</a></li>
+            <li>
+              <form method="post" action="{% url 'testapp:logout' %}">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+              </form>
+            </li>
+            <!-- <li><a href="{% url 'testapp:logout' %}">Logout</a></li> -->
+          </ul>
+        </li>
+      </ul>
     </div>
     <div data-thq="thq-burger-menu" class="home-burger-menu">
       <svg viewBox="0 0 1024 1024" class="home-icon">
@@ -282,28 +307,27 @@
           Log in
         </div>
         <div class="popup_body2">
-          <form class="popup_form2" action="{% url 'testapp:login' %}" method='post'>
-            {% csrf_token %}
-
+          <form class="popup_form2" method='post'>
             <div class="in_div">
               <label for="username" class="input_label">Username:</label>
-              <input type="text" id="username" name="username" required class="in_field" placeholder="name@com" autofocus>
+              <input type="text" id="username" name="username" required class="in_field" placeholder="firstname@com" autofocus>
             </div>
 
             <div class="in_div">
               <label for="lpassword" class="input_label">Password:</label>
               <input type="password" id="lpassword" name="password" class="in_field" required>
+              <label for="cpassword" class="warn input_label">* Looks like you've entered the wrong password!</label>
             </div>
-            {% if messages %}
+            {% comment %} {% if messages %}
               {% for message in messages %}
                   <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
               {% endfor %}
-            {% endif %}
-            <input type="submit" value="Log in" class="register_btn">
+            {% endif %} {% endcomment %}
+            <input type="submit" value="Log in" class="register_btn" id="lsubmitBtn">
             <div class="in_div2">
                 <a href="#">Forgot your password</a>
                 <span>or</span>
-                <a href="#">Don't have an account?</a>
+                <a href="#" id="dhaa">Don't have an account?</a>
             </div>
           </form>
         </div>
@@ -323,18 +347,17 @@
           Create Account
         </div>
         <div class="popup_body">
-          <form class="popup_form" action="{% url 'testapp:register' %}}">
-            {% csrf_token %}
+          <form class="popup_form" method="post" id='register-form'>
             <div class="in_div">
               <span class="input_label">Department</span>
-              <select name="department" disabled class="in_field">
-                <option value="cse" >Computer science and engineering</option>
+              <select name="dept" disabled class="in_field">
+                <option value="computer" selected >Computer science and engineering</option>
               </select>
             </div>
 
             <div class="in_div">
               <label for="name" class="input_label">Name:</label>
-              <input type="text" id="name" name="name" required class="in_field" placeholder="Your full name">
+              <input type="text" id="name" name="username" required class="in_field" placeholder="Your full name" required>
             </div>
             
             <div class="in_div">
@@ -349,14 +372,14 @@
 
             <div class="in_div">
               <label for="cpassword" class="input_label">Confirm Password:</label>
-              <input type="password" id="cpassword" name="password" class="in_field" required>
+              <input type="password" id="cpassword" name="confirm_password" class="in_field" required>
+              <label for="cpassword" class="warn input_label">* Your password doesn't match!</label>
             </div>
             
-            
-            <input type="submit" value="Register" class="register_btn">
+            <input type="submit" value="Register" class="register_btn" id="submitBtn">
             <div class="in_div2">
               Already have an account?
-                <a href="#">Log in</a>
+                <a href="#" id="anchor_login">Log in</a>
             </div>
           </form>
         </div>
@@ -367,3 +390,9 @@
 </div>
 
 {% endblock content %}
+
+{% block js %}
+<script src="{% static 'testapp/js/auth_popup.js' %}"></script>
+
+{% endblock js %}
+
