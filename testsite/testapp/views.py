@@ -12,7 +12,7 @@ import json
 def home(request):
     student_data = Student.objects.all()
     team_data = Team.objects.all()
-    return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data, "logged":0})
+    return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data})
 
 
 def user_register(request):
@@ -42,7 +42,7 @@ def user_register(request):
 @never_cache
 def user_login(request, reason=''):
     if request.method=='POST':
-        if reason!='':
+        if reason!='':          #If CSRF Fails
             messages.warning(request, reason)
             return redirect('testapp:home')
         
@@ -80,50 +80,48 @@ def user_logout(request):
 
 
 
-s_submit, s_edit = False, False
-t_submit, t_edit = False, False
-c_submit, c_edit = False, False
-p_submit, p_edit = False, False
+# s_submit, s_edit = False, False
+# t_submit, t_edit = False, False
+# c_submit, c_edit = False, False
+# p_submit, p_edit = False, False
 
 #if we can provide other data from here to the page then we can show a message to the user 'Login first'
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
-    global s_submit,p_submit,t_submit,c_submit
-    context = {'s_submit': s_submit, 't_submit': t_submit,
-               'c_submit': c_submit, 'p_submit': p_submit,}
+    # global s_submit,p_submit,t_submit,c_submit
+    # context = {'s_submit': s_submit, 't_submit': t_submit,
+    #            'c_submit': c_submit, 'p_submit': p_submit,}
 
     user = User.objects.get(username=request.user)
     admin_user = System_Admin.objects.get(email=user.email)
 
-    user = User.objects.get(username=request.user)
+    # user = User.objects.get(username=request.user)
     # admin_user = System_Admin.objects.get(email=user.email)
 
-    table = []
-    if enroll:                      #for student registration
-        if not Student.objects.filter(enroll=enroll).exists():
-            s_submit = True
-            student = Student(request.POST.get('student_name'), enroll,
-                              request.FILES.get('img'))
-            print(request.FILES.get('img'))
-            student.save()
+    # table = []
+    # if enroll:                      #for student registration
+    #     if not Student.objects.filter(enroll=enroll).exists():
+    #         s_submit = True
+    #         student = Student(request.POST.get('student_name'), enroll,
+    #                           request.FILES.get('img'))
+    #         print(request.FILES.get('img'))
+    #         student.save()
 
-            messages.info(request, f'{enroll} is registered successfully!')
-            table.append([request.POST.get('student_name'), enroll])
-            return render(request, 'testapp/dashboard.html',
-                          {'user': admin_user,'s_submit':s_submit,'table':table[0]})
+    #         messages.info(request, f'{enroll} is registered successfully!')
+    #         table.append([request.POST.get('student_name'), enroll])
+    #         return render(request, 'testapp/dashboard.html',
+    #                       {'user': admin_user,'s_submit':s_submit,'table':table[0]})
 
-        else:
-            messages.warning(request, f"{enroll} is already registered!")
-            return render(request, 'testapp/dashboard.html', context)
-
-    return render(request, 'testapp/dashboard.html', {'user': admin_user})
+    #     else:
+    #         messages.warning(request, f"{enroll} is already registered!")
+    #         return render(request, 'testapp/dashboard.html', context)
 
     # return render(request, 'testapp/dashboard.html', {'user': admin_user})
 
     return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 
-@login_required(login_url='testapp:login')
+@login_required(login_url='testapp:home')
 def update_profile(request):
     if request.method=='POST':
         old_password = request.POST.get('old-password','')
@@ -148,21 +146,22 @@ def update_profile(request):
         return redirect('testapp:dashboard') 
 
 
+@login_required(login_url='testapp:home')
 def student(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
-@login_required(login_url='testapp:login')
+@login_required(login_url='testapp:home')
 def teacher(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
-@login_required(login_url='testapp:login')
+@login_required(login_url='testapp:home')
 def schedule(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
-@login_required(login_url='testapp:login')
+@login_required(login_url='testapp:home')
 def camera(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
