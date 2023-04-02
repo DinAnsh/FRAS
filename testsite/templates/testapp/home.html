@@ -1,4 +1,4 @@
-{% extends 'testapp/base.html' %} 
+{% extends 'testapp/base.html' %}
 {% block title %}
 <title>FRAS</title>
 {% endblock %}
@@ -22,9 +22,7 @@
     <div data-thq="thq-navbar-btn-group" class="home-btn-group" id="log_reg_btns">
       {% comment %} <a class="home-login button">Login</a> {% endcomment %}
       <button class="home-login button" onclick="openModal2()">Login</button>
-      {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button"
-        >Register</a
-      > {% endcomment %}
+      {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button">Register</a> {% endcomment %}
       <button class="home-register button" onclick="openModal()">Register</button>
     </div>
     <div class="profile" id="prof" style="display:none">
@@ -295,10 +293,11 @@
           </div>
         </div>
       </div>
-      {% endfor %} 
+      {% endfor %}
     </div>
   </section>
-  {% comment %} Login form  {% endcomment %}
+
+  {% comment %} Login form {% endcomment %}
   <div id="myModal2" class="modal2">
     <div class="modal-content2" id="content2">
       <div class="popup2">
@@ -320,7 +319,13 @@
             </div>
             {% comment %} {% if messages %}
               {% for message in messages %}
-                  <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+              <input type="text" id="alert" value="{{ message }}" style="display: none;">
+              <script>
+                msg = document.getElementById('alert').value;
+                if (msg) {
+                  window.alert(msg);
+                }
+              </script>
               {% endfor %}
             {% endif %} {% endcomment %}
             <input type="submit" value="Log in" class="register_btn" id="lsubmitBtn">
@@ -334,9 +339,6 @@
       </div>
     </div>
   </div>
-
-</div>
-
 
   {% comment %} register Form {% endcomment %}
   <div id="myModal" class="modal">
@@ -359,12 +361,12 @@
               <label for="name" class="input_label">Name:</label>
               <input type="text" id="name" name="username" required class="in_field" placeholder="Your full name" required>
             </div>
-            
+
             <div class="in_div">
               <label for="email" class="input_label">Email:</label>
-              <input type="email" id="email" name="email"  class="in_field" required placeholder="Ex. email@org.com">
+              <input type="email" id="email" name="email" class="in_field" required placeholder="Ex. email@org.com">
             </div>
-              
+
             <div class="in_div">
               <label for="password" class="input_label">Password:</label>
               <input type="password" id="password" name="password" class="in_field" required>

@@ -13,6 +13,5 @@ urlpatterns = [
     path('classes/', views.schedule, name='classes'),
     path('cameras/', views.camera, name='cameras'),
     path('logout/', views.user_logout, name='logout'),
-    # path('dashboard/edit_student/<table>', views.edit_student, name='edit_student'),
-    # path('dashboard/remove_student', views.remove_student, name='remove_student'),
+    path('dashboard/update_profile/', views.update_profile, name='update_profile'),
 ]

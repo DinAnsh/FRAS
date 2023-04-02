@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from .models import System_Admin, Student, Team
@@ -95,11 +95,8 @@ def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
     admin_user = System_Admin.objects.get(email=user.email)
 
-    # if request.method == 'POST':
-    enroll = request.POST.get('enroll')
-    teacher_name = request.POST.get('teacher_name')
-    room = request.POST.get('room')
-    subject =  request.POST.get('subject')
+    user = User.objects.get(username=request.user)
+    # admin_user = System_Admin.objects.get(email=user.email)
 
     table = []
     if enroll:                      #for student registration
@@ -121,21 +118,54 @@ def dashboard(request, reason=''):
 
     return render(request, 'testapp/dashboard.html', {'user': admin_user})
 
+    # return render(request, 'testapp/dashboard.html', {'user': admin_user})
+
+    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+
+
 @login_required(login_url='testapp:login')
+def update_profile(request):
+    if request.method=='POST':
+        old_password = request.POST.get('old-password','')
+        new_password = request.POST.get('new-password','')
+        cnf_password = request.POST.get('confirm-password','')
+        
+        user = User.objects.get(username=request.user)
+        sys_admin = System_Admin.objects.get(email=user.email)
+
+        user = request.user
+        if not user.check_password(old_password):
+            messages.error(request, 'Your old password was entered incorrectly.')
+            return redirect('testapp:dashboard') 
+        if new_password != cnf_password:
+            messages.error(request, 'The two password fields did not match.')
+            return redirect('testapp:dashboard') 
+        user.set_password(new_password)
+        user.save()
+        update_session_auth_hash(request, user)
+        messages.success(request, 'Your password was successfully updated!')
+
+        return redirect('testapp:dashboard') 
+
+
 def student(request):
-    return render(request, 'testapp/student.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 @login_required(login_url='testapp:login')
 def teacher(request):
-    return render(request, 'testapp/teacher.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 @login_required(login_url='testapp:login')
 def schedule(request):
-    return render(request, 'testapp/schedule.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 @login_required(login_url='testapp:login')
 def camera(request):
-    return render(request, 'testapp/camera.html')
+    user = User.objects.get(username=request.user)
+    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
 
