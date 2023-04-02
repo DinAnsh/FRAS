@@ -32,12 +32,27 @@
   <!-- FullCalendar CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.css" />
 
+  <!-- graph script -->
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+
+  <!-- jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+  <!-- Moment.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+
+  <!-- FullCalendar JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.js"></script>
+
+  <!-- opencv JavaScript -->
+  <script src="https://docs.opencv.org/4.5.1/opencv.js" async></script>
+
 
   {% block head %}
   {% comment %} Any script or css sheet will be added {% endcomment %}
   {% endblock %}
 
-  
+
 </head>
 
 <body>
@@ -82,25 +97,9 @@
     <span class="home-text58">Copyright &copy; 2023 FRAS. All Rights Reserved.</span>
   </footer>
 
-  <!-- graph script -->
-  <script src="https://d3js.org/d3.v6.min.js"></script>
-
-  <!-- jQuery library -->
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
-  <!-- Moment.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-
-  <!-- FullCalendar JavaScript -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.js"></script>
-
-  <!-- opencv JavaScript -->
-  <script src="https://docs.opencv.org/4.5.1/opencv.js" async></script>
-
+  <!-- for all popups and file-upload -->
   <script src="{% static 'testapp/js/auth_popup.js' %}"></script>
-  
-  <script src="{% static 'testapp/js/dashboard.js' %}"></script>
- 
+
   <script data-section-id="navbar" src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </body>

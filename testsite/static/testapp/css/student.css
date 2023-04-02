@@ -3,7 +3,7 @@
 .main-container {
   /* border: 1px solid black; */
   width: 100%;
-  height: 90vh;
+  /* height: 90vh; */
 }
 
 .main-part1 {
@@ -14,7 +14,7 @@
   position: relative;
   height: 5em;
   width: 80%;
-  margin: 30px auto 0 auto;
+  margin: 30px auto;
 }
 
 .part1-content {
@@ -25,11 +25,12 @@
   height: 100%;
   border-radius: 5px;
   padding: 0 10px;
+  cursor: pointer;
 }
 
 .main-part2 {
   /* border: 1px solid black; */
-  height: 80vh;
+  /* height: 80vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,25 +40,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 30px;
+  margin: 30px auto;
   /* border: 1px solid red; */
   height: 40px;
-  width: 80vw;
-}
-
-.time_head {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 30px;
-  /* border: 1px solid red; */
-  height: 40px;
-  width: 80vw;
+  width: 80%;
 }
 
 .part2-content {
   /* border: 1px solid blue; */
-  width: 80vw;
+  width: 80%;
+}
+
+.part2-content button{
+  margin:0;
 }
 
 .searchright input {
@@ -74,31 +69,10 @@
 td {
   border: 1px solid;
   height: 3rem;
-  padding-left: 8px;
+  text-align: center;
 }
 
-.part3-content {
-  /* border: 1px solid blue; */
-  width: 80vw;
-}
-
-.part3-content table {
-  width: 70%;
-  margin: auto;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-.part3-content th,
-td {
-  border: 1px solid;
-  height: 3rem;
-  padding-left: 8px;
-}
-
-
-.main-part1 table,
-span {
+.part2-content span {
   color: green;
   font-size: 30px;
 }
@@ -113,20 +87,29 @@ span {
   cursor: pointer;
   border-width: 1px;
   border-radius: 5px;
-  background-color: #7045f7;
-  color: white;
-  margin: 10px;
+  border-color: #201a1e90;
+  margin-left: 10px;
+  width: 4rem;
 }
 
-/* .button1 {} */
+.button1 {
+  color: #201a1e;
+  background-color: #e2e6e7;
+}
 
 .button2 {
-  background-color: rgb(142 100 169);
-  color: #ddd;
+  background-color: #201a1e;
+  color: #e2e6e7;
+}
+
+.button1:hover {
+  background-color: #201a1e;
+  color: #e2e6e7;
 }
 
 .button2:hover {
-  background-color: rgb(127, 72, 162);
+  color: #201a1e;
+  background-color: #e2e6e7;
 }
 
 .tcol1 {
@@ -176,8 +159,9 @@ span {
 }
 
 .pagination button {
-  background-color: #eee;
+  background-color: #fff;
   border: none;
+  border-radius: 5px;
   padding: 10px;
   margin-right: 10px;
   cursor: pointer;
@@ -191,13 +175,14 @@ span {
   display: inline-block;
   padding: 6px 12px;
   cursor: pointer;
-  background-color: #007bff;
-  color: #fff;
+  background-color: #201a1e;
+  color: #e2e6e7;
   border-radius: 5px;
 }
 
 .custom-file-upload:hover {
-  background-color: #0069d9;
+  background-color: #e2e6e7;
+  color: #201a1e;
 }
 
 

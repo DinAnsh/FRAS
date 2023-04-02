@@ -18,6 +18,7 @@
         <option value="cse">Computer Science and Engineering</option>
       </select>
     </div>
+
     <div class="part1-content">
       <select class="" id="" name="year">
         <option value="1">First year</option>
@@ -26,8 +27,9 @@
         <option value="4">Final year</option>
       </select>
     </div>
+
     <div class="part1-content">
-      <label for="fileInput" class="custom-file-upload" title="Students details sheet">
+      <label for="fileInput" class="custom-file-upload" title="Student details sheet">
         <!-- Custom button or icon goes here -->
         Upload Excel File
       </label>
@@ -35,19 +37,22 @@
         style="display: none;">
     </div>
   </div>
+
   <div class="main-part2">
     <div class="btn-cont">
       <div class="tabletitle">
-        <h2>
+        <h1>
           Student Details
-        </h2>
+        </h1>
       </div>
+
       <div class="searchright">
         <input type="search" name="idsearch" id="idsearch" placeholder="Enroll Id">
         <button class="common_btn button1" onclick="search()">Search</button>
-        <button class="common_btn button2" onclick="sort()" title="sort based on not register">Sort</button>
+        <button class="common_btn button2" onclick="sort()" title="sort based on status">Sort</button>
       </div>
     </div>
+
     <div class="part2-content">
       <table>
         <thead>
@@ -145,6 +150,7 @@
         </tbody>
       </table>
     </div>
+
     <div class="pagination">
       <button id="prev-page-btn">Prev</button>
       <span id="page-info"></span>
@@ -162,8 +168,8 @@
       </div>
       <div class="popup_body3">
         <div class="capture-window">
-          <div id="video1"><video id="video"></video></div>
-          <div id="canvas1"><canvas id="canvas"></canvas></div>
+          <div id="video1"><video style="transform: scaleX(-1);" id="video"></video></div>
+          <div id="canvas1"><canvas style="transform: scaleX(-1);" id="canvas"></canvas></div>
 
         </div>
         <div class="takebtn">
@@ -189,6 +195,5 @@
   </div>
 </div>
 
-
-<script src="{% static 'testapp/js/popcam.js' %}"></script>
+<script src="{% static 'testapp/js/student.js' %}"></script>
 {% endblock %}

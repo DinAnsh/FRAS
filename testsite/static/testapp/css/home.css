@@ -54,7 +54,8 @@ ul {
   top: 100%;
   left: 0;
   width: max-content;
-  background-color: #d0b49f;
+  color: #d0b49f;
+  background-color: #201a1e;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   display: none;
@@ -77,14 +78,19 @@ ul {
 }
 
 .dropdown-menu li:hover {
-  background-color: #cebdaf;
+  background-color: #d0b49f;
+  color: #201a1e;
 }
 
 .dropdown-menu form button {
   cursor: pointer;
   margin: 0;
+  color: #d0b49f;
 }
 
+.dropdown-menu li:hover button {
+  color: #201a1e;
+}
 
 
 
@@ -1179,7 +1185,6 @@ nav a:is(:link, :active, :visited).active {
   width: 100%;
   display: flex;
   padding: var(--dl-space-space-threeunits);
-  max-width: auto;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;

@@ -16,8 +16,10 @@ captureBtn.addEventListener("click", () => {
   saveBtn.style.visibility = "visible";
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
+
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
   const tracks = stream.getTracks();
   tracks.forEach((track) => {
     track.stop();
@@ -48,6 +50,7 @@ function sregister() {
   video.srcObject = null;
   canvas.style.display = "none";
   video.style.display = "block";
+
   // Get video stream from user's camera
   navigator.mediaDevices
     .getUserMedia({ video: true })
