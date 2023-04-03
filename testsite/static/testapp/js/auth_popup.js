@@ -54,6 +54,7 @@ window.onclick = function (event) {
   }
 };
 
+// handle file-upload
 function handleFileSelect(event) {
   const files = event.target.files;
   for (let i = 0; i < files.length; i++) {
@@ -186,4 +187,36 @@ var check = document.querySelector("#prof span").textContent;
 if (check !== "0") {
   document.getElementById("log_reg_btns").style.display = "none";
   document.getElementById("prof").style.display = "block";
+}
+
+
+// ------------------------ profile section ------------------------------
+
+function showprofile() {
+  document.getElementById("profile-popup").style.display = "block";
+}
+
+function closeProfile() {
+  document.getElementById("profile-popup").style.display = "none";
+}
+
+function handleChange() {
+  const passwordInput = document.getElementById("new-password");
+  const confirmPasswordInput = document.getElementById("confirm-password");
+  const updateBtn = document.getElementById("update-btn");
+
+
+  if (
+    passwordInput.value !== "" &&
+    confirmPasswordInput.value !== ""
+  ) {
+    if (passwordInput.value === confirmPasswordInput.value) {
+      updateBtn.style.display = "block";
+    }
+    else {
+      alert("Passwords do not match!");
+      updateBtn.style.display = "none";
+    }
+  }
+
 }
