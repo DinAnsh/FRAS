@@ -60,7 +60,56 @@
     </ul>
     </li>
 </div>
+<div id="profile-popup" class="modal">
+  <div class="modal-content" id="content">
+    <div class="profile-popup">
+      <span class="close" id="" onclick="closeProfile()">&times;</span>
+      <div class="popup_title">
+        Profile
+      </div>
+      <div class="popup_body">
+        <form class="popup_form" method="post" action="{% url 'testapp:update_profile' %}">
+          {% csrf_token %}
+          <div class="in_div">
+            <label for="department" class="input_label">Department</label>
+            <select name="department" id="department" disabled class="in_field">
+              <option value="cse">Computer science and engineering</option>
+            </select>
+          </div>
 
+          <div class="in_div">
+            <label for="name" class="input_label">Name:</label>
+            <input type="text"  name="name" class="in_field" value="{{ UserName }}" disabled>
+          </div>
+
+          <div class="in_div">
+            <label for="email" class="input_label">Email:</label>
+            <input type="email"  name="email" class="in_field" value="{{ UserMail }}" disabled>
+          </div>
+
+          <div class="in_div">
+            <label for="old-password" class="input_label">Old Password:</label>
+            <input type="password" id="old-password" name="old-password" class="in_field" required>
+          </div>
+
+          <div class="in_div">
+            <label for="new-password" class="input_label">New Password:</label>
+            <input type="password" id="new-password" name="new-password" class="in_field" required>
+          </div>
+
+          <div class="in_div">
+            <label for="confirm-password" class="input_label">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" class="in_field" required
+              onpointerout="handleChange()">
+          </div>
+
+          <input type="submit" id="update-btn" value="Update" class="update_btn" style="display: none;">
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
     
     <div data-thq="thq-burger-menu" class="home-burger-menu">
       <svg viewBox="0 0 1024 1024" class="home-icon">
@@ -419,7 +468,7 @@
               <label for="name" class="input_label">Name:</label>
               <input
                 type="text"
-                id="name"
+                id="fullname"
                 name="username"
                 required
                 class="in_field"
@@ -484,7 +533,7 @@
   </div>
 </div>
 
-{% endblock content %} {% block js %}
+{% endblock content %}
+ {% block js %}
 <script src="{% static 'testapp/js/auth_popup.js' %}"></script>
-
 {% endblock js %}

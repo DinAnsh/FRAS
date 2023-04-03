@@ -262,3 +262,30 @@ header {
     flex-direction: column;
   }
 }
+
+/* ========================== profile section ================================== */
+
+.profile-popup {
+  max-width: 400px;
+  border-radius: 5px;
+  width: 100%;
+  background-color: #c1bebe;
+  /* height: 545px; */
+}
+
+.in_div input:disabled {
+  background-color: #fff;
+}
+
+.update_btn {
+  margin: 20px 40%;
+  padding: 12px 5px;
+  border-radius: 5px;
+  background-color: #343333;
+  color: white;
+}
+
+.update_btn:hover {
+  background-color: rgb(23, 23, 23);
+  cursor: pointer;
+}

@@ -117,7 +117,7 @@ register_btn.addEventListener("click", function (event) {
 
   var formData = {
     dept: document.querySelector("#dept").value,
-    name: document.querySelector("#name").value,
+    name: document.querySelector("#fullname").value,
     email: document.querySelector("#email").value,
     password: document.querySelector("#password").value
   };
@@ -197,34 +197,3 @@ if (check !== "0") {
   document.getElementById("prof").style.display = "block";
 }
 
-
-// ------------------------ profile section ------------------------------
-
-function showprofile() {
-  document.getElementById("profile-popup").style.display = "block";
-}
-
-function closeProfile() {
-  document.getElementById("profile-popup").style.display = "none";
-}
-
-function handleChange() {
-  const passwordInput = document.getElementById("new-password");
-  const confirmPasswordInput = document.getElementById("confirm-password");
-  const updateBtn = document.getElementById("update-btn");
-
-
-  if (
-    passwordInput.value !== "" &&
-    confirmPasswordInput.value !== ""
-  ) {
-    if (passwordInput.value === confirmPasswordInput.value) {
-      updateBtn.style.display = "block";
-    }
-    else {
-      alert("Passwords do not match!");
-      updateBtn.style.display = "none";
-    }
-  }
-
-}

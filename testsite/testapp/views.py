@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from .models import System_Admin, Student, Team
+from django.http import JsonResponse
 import json
 
 def home(request):
@@ -36,10 +37,10 @@ def user_register(request):
             # database entry - Admin model
             admin = System_Admin(dept, name, email, password)
             admin.save()
-            return HttpResponse(json.dumps({"message":"You are successfully registered."}), status=200)
+            return JsonResponse({"message":"You are successfully registered."}, status=200)
         
         else:
-            return HttpResponse(json.dumps({'message':'Looks like a user with that email already exists'}),status=409)
+            return JsonResponse({'message':'Looks like a user with that email already exists'},status=409)
 
 
 @never_cache
@@ -61,14 +62,14 @@ def user_login(request, reason=''):
                 # if request.GET.get('next',None):
                 #     return redirect(request.GET['next'])
                 # else:
-                return HttpResponse(json.dumps({"message":"Successfully logged in"}),status=200)
+                return JsonResponse({"message":"Successfully logged in"},status=200)
             else:
                 # messages.warning(request, "Looks like you've entered the wrong password!")
-                return HttpResponse(json.dumps({"message":"Looks like you've entered the wrong password"}), status=401)
+                return JsonResponse({"message":"Looks like you've entered the wrong password"}, status=401)
 
         else:
             # messages.warning(request, 'Looks like you are not registered!')
-            return HttpResponse(json.dumps({"message":"Looks like you are not registered!"}), status=404)
+            return JsonResponse({"message":"Looks like you are not registered!"}, status=404)
     else:
         return render(request, 'testapp/home.html')
 
@@ -79,7 +80,8 @@ def user_logout(request):
         logout(request)
         student_data = Student.objects.all()
         team_data = Team.objects.all()
-        return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data,'logged':0})
+        # request.session['logged']=0
+        return redirect('testapp:home')
 
 
 
@@ -97,11 +99,11 @@ def dashboard(request, reason=''):
 
     #Check in session if logged in 
     
-    try:
-        user = User.objects.get(username=request.user)
-        admin_user = System_Admin.objects.get(email=user.email)
-    except:
-        return HttpResponse(json.dumps({"message":"Need to login again!"}), status=401)
+    # try:
+    user = User.objects.get(username=request.user)
+    # admin_user = System_Admin.objects.get(email=user.email)
+    # except:
+    #     return HttpResponse(json.dumps({"message":"Need to login again!"}), status=401)
 
     # user = User.objects.get(username=request.user)
     # admin_user = System_Admin.objects.get(email=user.email)
@@ -125,8 +127,8 @@ def dashboard(request, reason=''):
     #         return render(request, 'testapp/dashboard.html', context)
 
     # return render(request, 'testapp/dashboard.html', {'user': admin_user})
-    else:
-        return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    # else:
+    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 
 @login_required(login_url='testapp:home')
