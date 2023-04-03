@@ -5,6 +5,9 @@ function openModal() {
 
 function closeModal() {
   document.getElementById("myModal").style.display = "none";
+  document.getElementsByClassName("warn")[0].style.display = "none";
+  document.querySelector("#submitBtn").style.marginTop = "20px";
+  document.querySelector("#register-form").reset();
 }
 
 // for login
@@ -14,6 +17,9 @@ function openModal2() {
 
 function closeModal2() {
   document.getElementById("myModal2").style.display = "none";
+  document.getElementsByClassName("loginWarn")[0].style.display = "none";
+  document.querySelector("#lsubmitBtn").style.marginTop = "20px";
+  document.querySelector("#login-form").reset();
 }
 
 
@@ -110,9 +116,10 @@ register_btn.addEventListener("click", function (event) {
   event.preventDefault();
 
   var formData = {
+    dept: document.querySelector("#dept").value,
     name: document.querySelector("#name").value,
     email: document.querySelector("#email").value,
-    password: document.querySelector("#password").value,
+    password: document.querySelector("#password").value
   };
 
   var pass2 = document.getElementById("cpassword");
@@ -120,6 +127,7 @@ register_btn.addEventListener("click", function (event) {
   if (formData["password"] !== pass2.value) {
     document.getElementsByClassName("warn")[0].style.display = "block";
     document.querySelector("#submitBtn").style.marginTop = "0px";
+    document.getElementsByClassName("warn")[0].textContent = "* Your password doesn't match!"
     pass2.focus();
   } else {
     // var url = window.location.host;
@@ -169,13 +177,13 @@ login_btn.addEventListener("click", function (event) {
     } else if (xhr.status === 404) {
       document.querySelector("#username").focus();
     } else if(xhr.status === 200){
-      document.getElementsByClassName("warn")[0].style.display = "none";
+      document.getElementsByClassName("loginWarn")[0].style.display = "none";
       document.querySelector("#lsubmitBtn").style.marginTop = "20px";
       // var url = window.location.host;
       window.location="dashboard";
     }
-    document.getElementsByClassName("warn")[0].textContent = JSON.parse(this.responseText)["message"];
-    document.getElementsByClassName("warn")[0].style.display = "block";
+    document.getElementsByClassName("loginWarn")[0].textContent = JSON.parse(this.responseText)["message"];
+    document.getElementsByClassName("loginWarn")[0].style.display = "block";
     document.querySelector("#lsubmitBtn").style.marginTop = "0px";
   };
   xhr.send(JSON.stringify(formData));

@@ -1353,7 +1353,7 @@ nav a:is(:link, :active, :visited).active {
   border-radius: 5px;
   width: 100%;
   background-color: #c1bebe;
-  height: 545px;
+  height: 565px;
 }
 
 .popup_title {
@@ -1396,6 +1396,10 @@ nav a:is(:link, :active, :visited).active {
   width: 100%;
   margin-bottom: 10px;
   position: relative;
+}
+
+.in_div span{
+  font-size: 14px;
 }
 
 .in_div2 {
@@ -2258,6 +2262,11 @@ nav a:is(:link, :active, :visited).active {
 
 
 .warn{
+  color:#af2f2f;
+  display: none;
+}
+
+.loginWarn{
   color:#af2f2f;
   display: none;
 }

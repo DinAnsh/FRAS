@@ -10,24 +10,27 @@ from .models import System_Admin, Student, Team
 import json
 
 def home(request):
-    student_data = Student.objects.all()
     team_data = Team.objects.all()
-    return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data})
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user)
+        return render(request, 'testapp/home.html',{'tdata':team_data, 'logged':1, 'UserName': user.get_full_name(), 'UserMail': user.email})
+    else:
+        return render(request, 'testapp/home.html',{'tdata':team_data,'logged':0})
 
 
 def user_register(request):
     if request.method == 'POST':
         json_data = json.loads(request.body)
         # clg = request.POST.get('clg_name','')
-        dept = "cse"            #request.POST.get('dept','')
-        name = json_data.get('username','')
+        dept = json_data.get('dept','')
+        name = json_data.get('name','')
         email = json_data.get('email','')
         password = json_data.get('password','')
-        # confirm_password = request.POST.get('confirm_password', '')   #we can remove this line becs we don't need confirm password
+        
         if not User.objects.filter(email=email).exists():
             names = name.split()
-            username = names[0].lower()+'@'+'com'
-            
+            username = names[0].lower()+'@'+ dept[:3]
+
             User.objects.create_user(username, email, password, first_name=names[0],last_name=" ".join(names[1:]) )
 
             # database entry - Admin model
@@ -42,7 +45,7 @@ def user_register(request):
 @never_cache
 def user_login(request, reason=''):
     if request.method=='POST':
-        if reason!='':          #If CSRF Fails
+        if reason!='':          #If CSRF Fails return a json with the reason
             messages.warning(request, reason)
             return redirect('testapp:home')
         
@@ -55,10 +58,10 @@ def user_login(request, reason=''):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                if request.GET.get('next',None):
-                    return redirect(request.GET['next'])
-                else:
-                    return HttpResponse(json.dumps({"message":"Successfully logged in"}),status=200)
+                # if request.GET.get('next',None):
+                #     return redirect(request.GET['next'])
+                # else:
+                return HttpResponse(json.dumps({"message":"Successfully logged in"}),status=200)
             else:
                 # messages.warning(request, "Looks like you've entered the wrong password!")
                 return HttpResponse(json.dumps({"message":"Looks like you've entered the wrong password"}), status=401)
@@ -76,7 +79,7 @@ def user_logout(request):
         logout(request)
         student_data = Student.objects.all()
         team_data = Team.objects.all()
-        return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data})
+        return render(request, 'testapp/home.html',{"sdata":student_data,'tdata':team_data,'logged':0})
 
 
 
@@ -92,8 +95,13 @@ def dashboard(request, reason=''):
     # context = {'s_submit': s_submit, 't_submit': t_submit,
     #            'c_submit': c_submit, 'p_submit': p_submit,}
 
-    user = User.objects.get(username=request.user)
-    admin_user = System_Admin.objects.get(email=user.email)
+    #Check in session if logged in 
+    
+    try:
+        user = User.objects.get(username=request.user)
+        admin_user = System_Admin.objects.get(email=user.email)
+    except:
+        return HttpResponse(json.dumps({"message":"Need to login again!"}), status=401)
 
     # user = User.objects.get(username=request.user)
     # admin_user = System_Admin.objects.get(email=user.email)
@@ -117,8 +125,8 @@ def dashboard(request, reason=''):
     #         return render(request, 'testapp/dashboard.html', context)
 
     # return render(request, 'testapp/dashboard.html', {'user': admin_user})
-
-    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    else:
+        return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 
 @login_required(login_url='testapp:home')
