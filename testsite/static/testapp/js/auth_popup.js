@@ -179,8 +179,12 @@ login_btn.addEventListener("click", function (event) {
     } else if(xhr.status === 200){
       document.getElementsByClassName("loginWarn")[0].style.display = "none";
       document.querySelector("#lsubmitBtn").style.marginTop = "20px";
-      // var url = window.location.host;
-      window.location="dashboard";
+      var url = window.location.href;
+      if (url.includes("testapp")){
+        window.location="dashboard";
+      } else{
+        window.location="testapp/dashboard";
+      }
     }
     document.getElementsByClassName("loginWarn")[0].textContent = JSON.parse(this.responseText)["message"];
     document.getElementsByClassName("loginWarn")[0].style.display = "block";

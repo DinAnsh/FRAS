@@ -9,6 +9,9 @@ from django.contrib import messages
 from .models import System_Admin, Student, Team
 from django.http import JsonResponse
 import json
+import base64
+from django.core.files.base import ContentFile
+from PIL import Image
 
 def home(request):
     team_data = Team.objects.all()
@@ -161,6 +164,32 @@ def student(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
+# @login_required(login_url='testapp:home')
+def upload_image(request):
+    if request.method == 'POST':
+        # Get the image data from the request
+        json_data = json.loads(request.body)
+        image_data = json_data.get('image_data')
+        # enroll_id = json_data.get('enroll')
+        
+        # Decode the base64-encoded image data
+        decoded_image_data = base64.b64decode(image_data.split(',')[1])
+        
+        imgName = enroll_id+".png"
+        
+        # Create a ContentFile from the decoded image data
+        image_file = ContentFile(decoded_image_data, name='student.png')
+        
+        # Save the image to a file or database
+        # student = Student.objects.filter(enroll=enroll)
+        student = Student(name="Dipendra",enroll="2019/ctae/140",img=image_file)
+        student.save()
+        
+        return JsonResponse({'status': 'success'}, status=200)    
+    else:
+        return JsonResponse({'status': 'fail'})
+
+
 @login_required(login_url='testapp:home')
 def teacher(request):
     user = User.objects.get(username=request.user)
