@@ -16,7 +16,8 @@ class Student(models.Model):
     name = models.CharField(max_length=50)
     enroll = models.CharField(primary_key=True, max_length=20)
     img = models.ImageField(upload_to='students/')   #here media is our base dir 
-    # email, mobile, 
+    email = models.EmailField(max_length=50, default='abc@example.com')
+    mobile = models.CharField(max_length=15, default='+910123456789')
     def __str__(self):
         return self.name
     

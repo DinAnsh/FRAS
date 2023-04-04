@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
+from django.http import JsonResponse
+from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import System_Admin, Student, Team
 
 
@@ -85,10 +88,10 @@ def user_logout(request):
         return redirect('testapp:home')
 
 
-s_submit, s_edit = False, False
-t_submit, t_edit = False, False
-c_submit, c_edit = False, False
-p_submit, p_edit = False, False
+# s_submit, s_edit = False, False
+# t_submit, t_edit = False, False
+# c_submit, c_edit = False, False
+# p_submit, p_edit = False, False
 
 @login_required(login_url='testapp:login')
 def dashboard(request, reason=''):
@@ -154,21 +157,64 @@ def update_profile(request):
         return redirect('testapp:dashboard') 
 
 
+@login_required(login_url='testapp:login')
 def student(request):
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    students = Student.objects.all()
+    students_list = []
     
+    for student in students:
+        ref = student.__dict__
+        students_list.append([ref['enroll'],ref['name'],ref['email'],ref['mobile']])
+       
+    return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'Students':students_list})
 
+
+@login_required(login_url='testapp:login')
+def get_student_data(request):
+    selected_class = request.GET.get('class')
+    page_number = request.GET.get('page')
+
+    current_year = timezone.now().strftime('%Y')
+    # current_month = timezone.now().strftime('%m')
+
+    adm_year = str(int(current_year)-int(selected_class))
+    student_data = Student.objects.filter(enroll__startswith=adm_year).values()
+    
+    paginator = Paginator(list(student_data), 1)
+    page = paginator.get_page(page_number)
+    
+    previous_page_url = page.previous_page_number() if page.has_previous() else None
+    next_page_url = page.next_page_number() if page.has_next() else None
+    
+    page_obj = {
+        'number': page.number,
+        'has_next': page.has_next(),
+        'has_previous': page.has_previous(),
+        'current_page': page.number,
+        'total_pages': paginator.num_pages,
+        'has_other_pages': page.has_other_pages(),
+        'previous_page_number': previous_page_url,
+        'next_page_number': next_page_url,
+    }
+    print(page_obj)
+    
+    return JsonResponse({'data':list(page), 'page_obj':page_obj}, safe=False)
+
+
+@login_required(login_url='testapp:login')
 def teacher(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
+@login_required(login_url='testapp:login')
 def schedule(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
 
+@login_required(login_url='testapp:login')
 def camera(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
