@@ -1,3 +1,56 @@
+function openModal() {
+  document.getElementById("myModal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("myModal").style.display = "none";
+}
+
+// for login
+function openModal2() {
+  document.getElementById("myModal2").style.display = "block";
+}
+
+function closeModal2() {
+  document.getElementById("myModal2").style.display = "none";
+}
+
+function addcam() {
+  document.getElementById("myModal4").style.display = "block";
+}
+
+function closeModal3() {
+  document.getElementById("myModal3").style.display = "none";
+}
+
+function closeModal4() {
+  document.getElementById("myModal4").style.display = "none";
+}
+
+window.onclick = function (event) {
+  // console.log(event.target)
+  if (event.target == document.getElementById("cbtn")) {
+    closeModal();
+  } else if (event.target == document.getElementById("cbtn2")) {
+    closeModal2();
+  } else if (
+    event.target == document.getElementById("cbtn3") ||
+    event.target == document.getElementById("content3")
+  ) {
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => {
+      track.stop();
+    });
+    video.srcObject = null;
+    closeModal3();
+  } else if (
+    event.target == document.getElementById("cbtn4") ||
+    event.target == document.getElementById("content4")
+  ) {
+    closeModal4();
+  }
+};
+
 // Camera capture
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
@@ -69,9 +122,32 @@ function sregister() {
     });
 }
 
+<<<<<<< HEAD
 
 //------------------ Save Button -------------------------
 saveBtn.addEventListener("click", () => {
+=======
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+
+//Save Button
+saveBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+>>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
   if (canvas.style.display != "block") {
     alert("Please capture the student image first!");
     return;
@@ -81,6 +157,23 @@ saveBtn.addEventListener("click", () => {
 
   //After the image is successfully saved in db
   //change the register button with a green tick
+
+  // Convert the canvas to a base64 encoded string
+  const imageData = canvas.toDataURL("image/jpeg");
+  const csrftoken = getCookie("csrftoken");
+
+  // Send the image data to the Django server using AJAX
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/testapp/upload_image/", true);
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      console.log("Image saved successfully");
+    }
+  };
+  xhr.send(JSON.stringify({ image_data: imageData }));
 
   closeModal3();
 });

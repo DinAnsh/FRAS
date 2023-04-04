@@ -1,14 +1,15 @@
-{% extends 'testapp/base.html' %}
-{% block title %}
+{% extends 'testapp/base.html' %} {% block title %}
 <title>FRAS</title>
-{% endblock %}
-
-{% block content %} {% load static %}
+{% endblock %} {% block content %} {% load static %}
 <div class="home-container">
   <header data-thq="thq-navbar" class="home-navbar-interactive">
     <div class="home-container01">
-      <a href="{% url 'testapp:home' %}"><img src="{% static 'testapp/images/header-logo.png' %}" alt="logo"
-          class="main_logo" /></a>
+      <a href="{% url 'testapp:home' %}"
+        ><img
+          src="{% static 'testapp/images/header-logo.png' %}"
+          alt="logo"
+          class="main_logo"
+      /></a>
     </div>
     <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
       <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav0">
@@ -19,33 +20,127 @@
         <a href="#contact" class="home-link">Contact</a>
       </nav>
     </div>
-    <div data-thq="thq-navbar-btn-group" class="home-btn-group">
+    <div
+      data-thq="thq-navbar-btn-group"
+      class="home-btn-group"
+      id="log_reg_btns"
+    >
       {% comment %} <a class="home-login button">Login</a> {% endcomment %}
       <button class="home-login button" onclick="openModal2()">Login</button>
-      {% comment %} <a href="{% url 'testapp:register' %}" class="home-register button">Register</a> {% endcomment %}
-      <button class="home-register button" onclick="openModal()">Register</button>
+      {% comment %}
+      <a href="{% url 'testapp:register' %}" class="home-register button"
+        >Register</a
+      >
+      {% endcomment %}
+      <button class="home-register button" onclick="openModal()">
+        Register
+      </button>
     </div>
+    
+<!-- profile-section  -->
+<div class="profile" id="prof" style="display: none">
+  <span style="display: none">{{logged}}</span>
+  <ul class="dropdown">
+    <ul>
+      <a href="">
+        <img src="{% static 'testapp/images/profile-pic.jpg' %}" alt="Profile Picture">
+      </a>
+      <a href="">{{ UserName }}</a>
+    </ul>
+    <ul class="dropdown-menu">
+      <li><a href="#" onclick="showprofile()">Profile</a></li>
+      <li><a href="{% url 'testapp:dashboard' %}">Dashboard</a></li>
+      <li><a href="#">Need Help?</a></li>
+      <li>
+        <form method="post" action="{% url 'testapp:logout' %}">
+          {% csrf_token %}
+          <button type="submit">Logout</button>
+        </form>
+      </li>
+    </ul>
+    </li>
+</div>
+<div id="profile-popup" class="modal">
+  <div class="modal-content" id="content">
+    <div class="profile-popup">
+      <span class="close" id="" onclick="closeProfile()">&times;</span>
+      <div class="popup_title">
+        Profile
+      </div>
+      <div class="popup_body">
+        <form class="popup_form" method="post" action="{% url 'testapp:update_profile' %}">
+          {% csrf_token %}
+          <div class="in_div">
+            <label for="department" class="input_label">Department</label>
+            <select name="department" id="department" disabled class="in_field">
+              <option value="cse">Computer science and engineering</option>
+            </select>
+          </div>
+
+          <div class="in_div">
+            <label for="name" class="input_label">Name:</label>
+            <input type="text"  name="name" class="in_field" value="{{ UserName }}" disabled>
+          </div>
+
+          <div class="in_div">
+            <label for="email" class="input_label">Email:</label>
+            <input type="email"  name="email" class="in_field" value="{{ UserMail }}" disabled>
+          </div>
+
+          <div class="in_div">
+            <label for="old-password" class="input_label">Old Password:</label>
+            <input type="password" id="old-password" name="old-password" class="in_field" required>
+          </div>
+
+          <div class="in_div">
+            <label for="new-password" class="input_label">New Password:</label>
+            <input type="password" id="new-password" name="new-password" class="in_field" required>
+          </div>
+
+          <div class="in_div">
+            <label for="confirm-password" class="input_label">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" class="in_field" required
+              onpointerout="handleChange()">
+          </div>
+
+          <input type="submit" id="update-btn" value="Update" class="update_btn" style="display: none;">
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+    
     <div data-thq="thq-burger-menu" class="home-burger-menu">
       <svg viewBox="0 0 1024 1024" class="home-icon">
         <path
-          d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z">
-        </path>
+          d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z"
+        ></path>
       </svg>
     </div>
     <div data-thq="thq-mobile-menu" class="home-mobile-menu">
       <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
         <div class="home-container02">
           {% comment %} <a href="#" class="home-navlink1"> </a> {% endcomment %}
-          <a href="{% url 'testapp:home' %}"><img src="{% static 'testapp/images/header-logo.png' %}" alt="logo"
-              class="main_logo" /></a>
+          <a href="{% url 'testapp:home' %}"
+            ><img
+              src="{% static 'testapp/images/header-logo.png' %}"
+              alt="logo"
+              class="main_logo"
+          /></a>
           <div data-thq="thq-close-menu" class="home-menu-close">
             <svg viewBox="0 0 1024 1024" class="home-icon02">
-              <path d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z">
-              </path>
+              <path
+                d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z"
+              ></path>
             </svg>
           </div>
         </div>
-        <nav data-thq="thq-mobile-menu-nav-links" data-role="Nav" class="home-nav2">
+        <nav
+          data-thq="thq-mobile-menu-nav-links"
+          data-role="Nav"
+          class="home-nav2"
+        >
           <a href="#about" class="home-link05">About</a>
           <a href="#features" class="home-link06">Features</a>
           <a href="#process" class="home-link07">Workflow</a>
@@ -53,8 +148,12 @@
           <a href="#contact" class="home-link09">Contact</a>
         </nav>
         <div class="home-container03">
-          <button class="home-login1 button" onclick="openModal2()">Log in</button>
-          <button class="home-register1 button" onclick="openModal()">Register</button>
+          <button class="home-login1 button" onclick="openModal2()">
+            Log in
+          </button>
+          <button class="home-register1 button" onclick="openModal()">
+            Register
+          </button>
         </div>
       </div>
     </div>
@@ -160,8 +259,8 @@
           <div class="home-container08">
             <svg viewBox="0 0 1024 1024" class="home-icon10">
               <path
-                d="M634 558q92-64 92-174 0-88-63-151t-151-63-151 63-63 151q0 46 27 96t65 78l36 26v98h172v-98zM512 86q124 0 211 87t87 211q0 156-128 244v98q0 18-12 30t-30 12h-256q-18 0-30-12t-12-30v-98q-128-88-128-244 0-124 87-211t211-87zM384 896v-42h256v42q0 18-12 30t-30 12h-172q-18 0-30-12t-12-30z">
-              </path>
+                d="M634 558q92-64 92-174 0-88-63-151t-151-63-151 63-63 151q0 46 27 96t65 78l36 26v98h172v-98zM512 86q124 0 211 87t87 211q0 156-128 244v98q0 18-12 30t-30 12h-256q-18 0-30-12t-12-30v-98q-128-88-128-244 0-124 87-211t211-87zM384 896v-42h256v42q0 18-12 30t-30 12h-172q-18 0-30-12t-12-30z"
+              ></path>
             </svg>
           </div>
           <div class="home-line1"></div>
@@ -181,8 +280,8 @@
           <div class="home-container11">
             <svg viewBox="0 0 1024 1024" class="home-icon12">
               <path
-                d="M746 512q26 0 45-18t19-46-19-46-45-18-45 18-19 46 19 46 45 18zM618 342q26 0 45-19t19-45-19-45-45-19-45 19-19 45 19 45 45 19zM406 342q26 0 45-19t19-45-19-45-45-19-45 19-19 45 19 45 45 19zM278 512q26 0 45-18t19-46-19-46-45-18-45 18-19 46 19 46 45 18zM512 128q158 0 271 100t113 242q0 88-63 150t-151 62h-74q-28 0-46 19t-18 45q0 22 16 42t16 44q0 28-18 46t-46 18q-160 0-272-112t-112-272 112-272 272-112z">
-              </path>
+                d="M746 512q26 0 45-18t19-46-19-46-45-18-45 18-19 46 19 46 45 18zM618 342q26 0 45-19t19-45-19-45-45-19-45 19-19 45 19 45 45 19zM406 342q26 0 45-19t19-45-19-45-45-19-45 19-19 45 19 45 45 19zM278 512q26 0 45-18t19-46-19-46-45-18-45 18-19 46 19 46 45 18zM512 128q158 0 271 100t113 242q0 88-63 150t-151 62h-74q-28 0-46 19t-18 45q0 22 16 42t16 44q0 28-18 46t-46 18q-160 0-272-112t-112-272 112-272 272-112z"
+              ></path>
             </svg>
           </div>
           <div class="home-line3"></div>
@@ -222,8 +321,8 @@
           <div class="home-container17">
             <svg viewBox="0 0 1024 1024" class="home-icon17">
               <path
-                d="M480 64c-265.096 0-480 214.904-480 480 0 265.098 214.904 480 480 480 265.098 0 480-214.902 480-480 0-265.096-214.902-480-480-480zM751.59 704c8.58-40.454 13.996-83.392 15.758-128h127.446c-3.336 44.196-13.624 87.114-30.68 128h-112.524zM208.41 384c-8.58 40.454-13.996 83.392-15.758 128h-127.444c3.336-44.194 13.622-87.114 30.678-128h112.524zM686.036 384c9.614 40.962 15.398 83.854 17.28 128h-191.316v-128h174.036zM512 320v-187.338c14.59 4.246 29.044 11.37 43.228 21.37 26.582 18.74 52.012 47.608 73.54 83.486 14.882 24.802 27.752 52.416 38.496 82.484h-155.264zM331.232 237.516c21.528-35.878 46.956-64.748 73.54-83.486 14.182-10 28.638-17.124 43.228-21.37v187.34h-155.264c10.746-30.066 23.616-57.68 38.496-82.484zM448 384v128h-191.314c1.88-44.146 7.666-87.038 17.278-128h174.036zM95.888 704c-17.056-40.886-27.342-83.804-30.678-128h127.444c1.762 44.608 7.178 87.546 15.758 128h-112.524zM256.686 576h191.314v128h-174.036c-9.612-40.96-15.398-83.854-17.278-128zM448 768v187.34c-14.588-4.246-29.044-11.372-43.228-21.37-26.584-18.74-52.014-47.61-73.54-83.486-14.882-24.804-27.75-52.418-38.498-82.484h155.266zM628.768 850.484c-21.528 35.876-46.958 64.746-73.54 83.486-14.184 9.998-28.638 17.124-43.228 21.37v-187.34h155.266c-10.746 30.066-23.616 57.68-38.498 82.484zM512 704v-128h191.314c-1.88 44.146-7.666 87.040-17.28 128h-174.034zM767.348 512c-1.762-44.608-7.178-87.546-15.758-128h112.524c17.056 40.886 27.344 83.806 30.68 128h-127.446zM830.658 320h-95.9c-18.638-58.762-44.376-110.294-75.316-151.428 42.536 20.34 81.058 47.616 114.714 81.272 21.48 21.478 40.362 44.938 56.502 70.156zM185.844 249.844c33.658-33.658 72.18-60.932 114.714-81.272-30.942 41.134-56.676 92.666-75.316 151.428h-95.898c16.138-25.218 35.022-48.678 56.5-70.156zM129.344 768h95.898c18.64 58.762 44.376 110.294 75.318 151.43-42.536-20.34-81.058-47.616-114.714-81.274-21.48-21.478-40.364-44.938-56.502-70.156zM774.156 838.156c-33.656 33.658-72.18 60.934-114.714 81.274 30.942-41.134 56.678-92.668 75.316-151.43h95.9c-16.14 25.218-35.022 48.678-56.502 70.156z">
-              </path>
+                d="M480 64c-265.096 0-480 214.904-480 480 0 265.098 214.904 480 480 480 265.098 0 480-214.902 480-480 0-265.096-214.902-480-480-480zM751.59 704c8.58-40.454 13.996-83.392 15.758-128h127.446c-3.336 44.196-13.624 87.114-30.68 128h-112.524zM208.41 384c-8.58 40.454-13.996 83.392-15.758 128h-127.444c3.336-44.194 13.622-87.114 30.678-128h112.524zM686.036 384c9.614 40.962 15.398 83.854 17.28 128h-191.316v-128h174.036zM512 320v-187.338c14.59 4.246 29.044 11.37 43.228 21.37 26.582 18.74 52.012 47.608 73.54 83.486 14.882 24.802 27.752 52.416 38.496 82.484h-155.264zM331.232 237.516c21.528-35.878 46.956-64.748 73.54-83.486 14.182-10 28.638-17.124 43.228-21.37v187.34h-155.264c10.746-30.066 23.616-57.68 38.496-82.484zM448 384v128h-191.314c1.88-44.146 7.666-87.038 17.278-128h174.036zM95.888 704c-17.056-40.886-27.342-83.804-30.678-128h127.444c1.762 44.608 7.178 87.546 15.758 128h-112.524zM256.686 576h191.314v128h-174.036c-9.612-40.96-15.398-83.854-17.278-128zM448 768v187.34c-14.588-4.246-29.044-11.372-43.228-21.37-26.584-18.74-52.014-47.61-73.54-83.486-14.882-24.804-27.75-52.418-38.498-82.484h155.266zM628.768 850.484c-21.528 35.876-46.958 64.746-73.54 83.486-14.184 9.998-28.638 17.124-43.228 21.37v-187.34h155.266c-10.746 30.066-23.616 57.68-38.498 82.484zM512 704v-128h191.314c-1.88 44.146-7.666 87.040-17.28 128h-174.034zM767.348 512c-1.762-44.608-7.178-87.546-15.758-128h112.524c17.056 40.886 27.344 83.806 30.68 128h-127.446zM830.658 320h-95.9c-18.638-58.762-44.376-110.294-75.316-151.428 42.536 20.34 81.058 47.616 114.714 81.272 21.48 21.478 40.362 44.938 56.502 70.156zM185.844 249.844c33.658-33.658 72.18-60.932 114.714-81.272-30.942 41.134-56.676 92.666-75.316 151.428h-95.898c16.138-25.218 35.022-48.678 56.5-70.156zM129.344 768h95.898c18.64 58.762 44.376 110.294 75.318 151.43-42.536-20.34-81.058-47.616-114.714-81.274-21.48-21.478-40.364-44.938-56.502-70.156zM774.156 838.156c-33.656 33.658-72.18 60.934-114.714 81.274 30.942-41.134 56.678-92.668 75.316-151.43h95.9c-16.14 25.218-35.022 48.678-56.502 70.156z"
+              ></path>
             </svg>
           </div>
           <div class="home-line7"></div>
@@ -256,7 +355,11 @@
         <div id="" class="home-container22">
           <div id="" class="home-container23">
             <div id="" class="home-container24">
-              <img alt="Oops! image not found" src="{{user.image.url}}" class="home-image" />
+              <img
+                alt="Oops! image not found"
+                src="{{user.image.url}}"
+                class="home-image"
+              />
             </div>
             <div id="" class="home-container25">
               <h3 id="" class="home-text38">
@@ -277,43 +380,59 @@
     <div class="modal-content2" id="content2">
       <div class="popup2">
         <span class="close2" id="cbtn2">&times;</span>
-        <div class="popup_title2">
-          Log in
-        </div>
+        <div class="popup_title2">Log in</div>
         <div class="popup_body2">
-          <form class="popup_form2" action="{% url 'testapp:login' %}" method='post'>
-            {% csrf_token %}
-
+          <form class="popup_form2" method="post" id="login-form">
             <div class="in_div">
               <label for="username" class="input_label">Username:</label>
-              <input type="text" id="username" name="username" required class="in_field" placeholder="name@com"
-                autofocus>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                required
+                class="in_field"
+                placeholder="firstname@com"
+                autofocus
+              />
             </div>
 
             <div class="in_div">
               <label for="lpassword" class="input_label">Password:</label>
-              <input type="password" id="lpassword" name="password" class="in_field" required>
+              <input
+                type="password"
+                id="lpassword"
+                name="password"
+                class="in_field"
+                required
+              />
+              <label for="cpassword" class="loginWarn input_label"
+                >* Looks like you've entered the wrong password!</label
+              >
             </div>
-            
-            {% if messages %}
-            <div class="in_div">
-              {% for message in messages %}
-              <input type="text" id="alert" value="{{ message }}" style="display: none;">
-              <script>
-                msg = document.getElementById('alert').value;
-                if (msg) {
-                  window.alert(msg);
-                }
-              </script>
-              {% endfor %}
-            </div>
-            {% endif %}
-
-            <input type="submit" value="Log in" class="register_btn">
+            {% comment %} {% if messages %} {% for message in messages %}
+            <input
+              type="text"
+              id="alert"
+              value="{{ message }}"
+              style="display: none"
+            />
+            <script>
+              msg = document.getElementById("alert").value;
+              if (msg) {
+                window.alert(msg);
+              }
+            </script>
+            {% endfor %} {% endif %} {% endcomment %}
+            <input
+              type="submit"
+              value="Log in"
+              class="register_btn"
+              id="lsubmitBtn"
+            />
             <div class="in_div2">
               <a href="#">Forgot your password</a>
               <span>or</span>
-              <a href="#">Don't have an account?</a>
+              <a href="#" id="dhaa">Don't have an account?</a>
             </div>
           </form>
         </div>
@@ -326,51 +445,95 @@
     <div class="modal-content" id="content">
       <div class="popup">
         <span class="close" id="cbtn">&times;</span>
-        <div class="popup_title">
-          Create Account
-        </div>
+        <div class="popup_title">Create Account</div>
         <div class="popup_body">
-          <form class="popup_form" action="{% url 'testapp:register' %}">
-            {% csrf_token %}
+          <div class="in_div">
+            <span
+              ><b
+                >Note- Name and Email can not be changed once created.</b
+              ></span
+            >
+          </div>
+          <form class="popup_form" method="post" id="register-form">
             <div class="in_div">
               <span class="input_label">Department</span>
-              <select name="department" disabled class="in_field">
-                <option value="cse">Computer science and engineering</option>
+              <select name="dept" disabled class="in_field" id="dept">
+                <option value="computer science and engineering" selected>
+                  Computer science and engineering
+                </option>
               </select>
             </div>
 
             <div class="in_div">
               <label for="name" class="input_label">Name:</label>
-              <input type="text" id="name" name="name" required class="in_field" placeholder="Your full name">
+              <input
+                type="text"
+                id="fullname"
+                name="username"
+                required
+                class="in_field"
+                placeholder="Your full name"
+                required
+              />
             </div>
 
             <div class="in_div">
               <label for="email" class="input_label">Email:</label>
-              <input type="email" id="email" name="email" class="in_field" required placeholder="Ex. email@org.com">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="in_field"
+                required
+                placeholder="Ex. email@org.com"
+              />
             </div>
 
             <div class="in_div">
               <label for="password" class="input_label">Password:</label>
-              <input type="password" id="password" name="password" class="in_field" required>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="in_field"
+                required
+              />
             </div>
 
             <div class="in_div">
-              <label for="cpassword" class="input_label">Confirm Password:</label>
-              <input type="password" id="cpassword" name="password" class="in_field" required>
+              <label for="cpassword" class="input_label"
+                >Confirm Password:</label
+              >
+              <input
+                type="password"
+                id="cpassword"
+                name="confirm_password"
+                class="in_field"
+                required
+              />
+              <label for="cpassword" class="warn input_label"
+                >* Your password doesn't match!</label
+              >
             </div>
 
-
-            <input type="submit" value="Register" class="register_btn">
+            <input
+              type="submit"
+              value="Register"
+              class="register_btn"
+              id="submitBtn"
+            />
             <div class="in_div2">
               Already have an account?
-              <a href="#">Log in</a>
+              <a href="#" id="anchor_login">Log in</a>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
 {% endblock content %}
+ {% block js %}
+<script src="{% static 'testapp/js/auth_popup.js' %}"></script>
+{% endblock js %}

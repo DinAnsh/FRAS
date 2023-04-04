@@ -37,12 +37,16 @@
 }
 
 /* Profile */
+.profile{
+  width: 170px;
+}
+
 ul {
   list-style: none;
-  margin: 0;
   padding: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .dropdown {
@@ -1349,7 +1353,7 @@ nav a:is(:link, :active, :visited).active {
   border-radius: 5px;
   width: 100%;
   background-color: #c1bebe;
-  height: 545px;
+  height: 565px;
 }
 
 .popup_title {
@@ -1392,6 +1396,10 @@ nav a:is(:link, :active, :visited).active {
   width: 100%;
   margin-bottom: 10px;
   position: relative;
+}
+
+.in_div span{
+  font-size: 14px;
 }
 
 .in_div2 {
@@ -2250,4 +2258,15 @@ nav a:is(:link, :active, :visited).active {
   .home-btn-group {
     width: 170px;
   }
+}
+
+
+.warn{
+  color:#af2f2f;
+  display: none;
+}
+
+.loginWarn{
+  color:#af2f2f;
+  display: none;
 }
