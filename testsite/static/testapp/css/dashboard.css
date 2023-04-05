@@ -1308,12 +1308,16 @@
   .adminrights-container27 {
     flex-direction: column;
   }
-}
 
-@media(max-width: 1200px) {
   .adminrights-container16 {
     align-self: center;
     flex-direction: column;
+  }
+
+  .adminrights-stats {
+    flex-direction: row;
+    padding-left: var(--dl-space-space-twounits);
+    padding-right: var(--dl-space-space-twounits);
   }
 }
 
@@ -1462,11 +1466,6 @@
     flex-direction: column;
   }
 
-  .adminrights-stats {
-    flex-direction: row;
-    padding-left: var(--dl-space-space-twounits);
-    padding-right: var(--dl-space-space-twounits);
-  }
 }
 
 @media(max-width: 767px) {

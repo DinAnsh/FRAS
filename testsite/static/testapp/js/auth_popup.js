@@ -60,23 +60,6 @@ window.onclick = function (event) {
   }
 };
 
-// handle file-upload
-function handleFileSelect(event) {
-  const files = event.target.files;
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    if (
-      file.type === "application/vnd.ms-excel" ||
-      file.type ===
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ) {
-      // Handle the selected Excel file(s) here
-      console.log("Selected file:", file.name);
-    } else {
-      alert("Please select an Excel file");
-    }
-  }
-}
 
 function goDash() {
   window.location.pathname = "testapp/dashboard";
