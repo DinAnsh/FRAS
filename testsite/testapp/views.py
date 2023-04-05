@@ -175,7 +175,7 @@ def upload_image(request):
         # Decode the base64-encoded image data
         decoded_image_data = base64.b64decode(image_data.split(',')[1])
         
-        imgName = enroll_id+".png"
+        # imgName = enroll_id+".png"
         
         # Create a ContentFile from the decoded image data
         image_file = ContentFile(decoded_image_data, name='student.png')
