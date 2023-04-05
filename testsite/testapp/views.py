@@ -8,13 +8,17 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator
 from .models import System_Admin, Student, Team
 from django.http import JsonResponse
 import json
 import base64
 from django.core.files.base import ContentFile
 from PIL import Image
+import pandas as pd
+import numpy as np
+
+
 
 def home(request):
     team_data = Team.objects.all()
@@ -90,57 +94,10 @@ def user_logout(request):
         return redirect('testapp:home')
 
 
-<<<<<<< HEAD
-# s_submit, s_edit = False, False
-# t_submit, t_edit = False, False
-# c_submit, c_edit = False, False
-# p_submit, p_edit = False, False
-=======
->>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
-
-# s_submit, s_edit = False, False
-# t_submit, t_edit = False, False
-# c_submit, c_edit = False, False
-# p_submit, p_edit = False, False
-
 #if we can provide other data from here to the page then we can show a message to the user 'Login first'
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
-    # global s_submit,p_submit,t_submit,c_submit
-    # context = {'s_submit': s_submit, 't_submit': t_submit,
-    #            'c_submit': c_submit, 'p_submit': p_submit,}
-
-    #Check in session if logged in 
-    
-    # try:
     user = User.objects.get(username=request.user)
-    # admin_user = System_Admin.objects.get(email=user.email)
-    # except:
-    #     return HttpResponse(json.dumps({"message":"Need to login again!"}), status=401)
-
-    # user = User.objects.get(username=request.user)
-    # admin_user = System_Admin.objects.get(email=user.email)
-
-    # table = []
-    # if enroll:                      #for student registration
-    #     if not Student.objects.filter(enroll=enroll).exists():
-    #         s_submit = True
-    #         student = Student(request.POST.get('student_name'), enroll,
-    #                           request.FILES.get('img'))
-    #         print(request.FILES.get('img'))
-    #         student.save()
-
-    #         messages.info(request, f'{enroll} is registered successfully!')
-    #         table.append([request.POST.get('student_name'), enroll])
-    #         return render(request, 'testapp/dashboard.html',
-    #                       {'user': admin_user,'s_submit':s_submit,'table':table[0]})
-
-    #     else:
-    #         messages.warning(request, f"{enroll} is already registered!")
-    #         return render(request, 'testapp/dashboard.html', context)
-
-    # return render(request, 'testapp/dashboard.html', {'user': admin_user})
-    # else:
     return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 
@@ -169,25 +126,38 @@ def update_profile(request):
         return redirect('testapp:dashboard') 
 
 
-<<<<<<< HEAD
-@login_required(login_url='testapp:login')
-=======
 @login_required(login_url='testapp:home')
->>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
 def student(request):
-    user = User.objects.get(username=request.user)
-    students = Student.objects.all()
-    students_list = []
-    
-<<<<<<< HEAD
-    for student in students:
-        ref = student.__dict__
-        students_list.append([ref['enroll'],ref['name'],ref['email'],ref['mobile']])
-       
-    return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'Students':students_list})
+    if request.method=='POST' and request.FILES['studentDetails']:
+        excel_file = request.FILES['studentDetails']
+
+        skipR = [0,1,2,4] + list(np.linspace(404,408,6, dtype=int))
+        df = pd.read_excel(excel_file, skiprows=skipR, usecols='B:J')
+        # print(df.head(2))
+        try:
+            for index, row in df.iterrows():
+                student, created = Student.objects.get_or_create(
+                    enroll = str(int(row['Enrollment No.'])),
+                    defaults={
+                        'name': row['NAME'],
+                        'email': row['Email'],
+                        'mobile': str(int(row['Mobile']))
+                    }
+                )
+                if not created:
+                    student.email = row['Email']
+                    student.mobile = str(int(row['Mobile']))
+                    student.save()
+
+            return JsonResponse({'success': True, 'message': 'Student details uploaded successfully.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+
+    user = User.objects.get(username=request.user)   
+    return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email,})
 
 
-@login_required(login_url='testapp:login')
+@login_required(login_url='testapp:home')
 def get_student_data(request):
     selected_class = request.GET.get('class')
     page_number = request.GET.get('page')
@@ -196,9 +166,9 @@ def get_student_data(request):
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(selected_class))
-    student_data = Student.objects.filter(enroll__startswith=adm_year).values()
+    student_data = Student.objects.filter(enroll__startswith=selected_class).values()
     
-    paginator = Paginator(list(student_data), 1)
+    paginator = Paginator(list(student_data), 20)
     page = paginator.get_page(page_number)
     
     previous_page_url = page.previous_page_number() if page.has_previous() else None
@@ -214,14 +184,12 @@ def get_student_data(request):
         'previous_page_number': previous_page_url,
         'next_page_number': next_page_url,
     }
-    print(page_obj)
+    # print(page_obj)
     
     return JsonResponse({'data':list(page), 'page_obj':page_obj}, safe=False)
 
 
-@login_required(login_url='testapp:login')
-=======
-# @login_required(login_url='testapp:home')
+@login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
         # Get the image data from the request
@@ -232,7 +200,7 @@ def upload_image(request):
         # Decode the base64-encoded image data
         decoded_image_data = base64.b64decode(image_data.split(',')[1])
         
-        imgName = enroll_id+".png"
+        # imgName = enroll_id+".png"
         
         # Create a ContentFile from the decoded image data
         image_file = ContentFile(decoded_image_data, name='student.png')
@@ -248,51 +216,18 @@ def upload_image(request):
 
 
 @login_required(login_url='testapp:home')
->>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
 def teacher(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
-<<<<<<< HEAD
 
-@login_required(login_url='testapp:login')
-=======
 @login_required(login_url='testapp:home')
->>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
 def schedule(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
     
-<<<<<<< HEAD
 
-@login_required(login_url='testapp:login')
-=======
 @login_required(login_url='testapp:home')
->>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
 def camera(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
-    
-
-
-# future
-# 's_edit': s_edit, 't_edit': t_edit, 'c_edit': c_edit, 'p_edit': p_edit
-
-# def edit_student(request, table):
-#     global s_edit, s_submit
-#     s_edit = True
-#     s_submit = False
-#     table = table.replace("'", "")
-#     table = table.replace("[", "")
-#     table = table.replace("]", "")
-#     table = table.replace(",", "")
-#     table = table.split()
-#     print(request)
-#     return render(request, 'testapp/admin.html', {'s_edit':s_edit, 's_submit':s_submit, 'table':table})
-
-
-# def remove_student(request):
-#     print(request.POST.get('edit_name'))
-#     Student.objects.filter(enroll=enroll).delete()
-#     messages.info(request, f'{enroll} is deleted successfully!')
-#     return redirect('testapp:dashboard')

@@ -30,10 +30,9 @@
 
     <div class="part1-content">
       <label for="fileInput" class="custom-file-upload" title="Student details sheet">
-        <!-- Custom button or icon goes here -->
         Upload Excel File
       </label>
-      <input id="fileInput" type="file" accept=".xlsx, .xls, .csv" onchange="handleFileSelect(event)"
+      <input id="fileInput" type="file" accept=".xlsx, .xls, .csv" onchange="uploadStudents(event)"
         style="display: none;">
     </div>
   </div>
@@ -60,7 +59,7 @@
             <th class="tcol1">Enrollment ID</th>
             <th class="tcol2">Name</th>
             <th class="tcol3">Email</th>
-            <th class="tcol4">Mob no.</th>
+            <th class="tcol4">Mobile</th>
             <th class="tcol5">Attendance</th>
             <th class="tcol6">Status</th>
           </tr>

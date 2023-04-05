@@ -122,32 +122,10 @@ function sregister() {
     });
 }
 
-<<<<<<< HEAD
-
-//------------------ Save Button -------------------------
-saveBtn.addEventListener("click", () => {
-=======
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
 
 //Save Button
 saveBtn.addEventListener("click", (event) => {
   event.preventDefault();
->>>>>>> 7d6dfd007dd500511fd13f0652dc12b7f4d7b5a3
   if (canvas.style.display != "block") {
     alert("Please capture the student image first!");
     return;
@@ -160,7 +138,7 @@ saveBtn.addEventListener("click", (event) => {
 
   // Convert the canvas to a base64 encoded string
   const imageData = canvas.toDataURL("image/jpeg");
-  const csrftoken = getCookie("csrftoken");
+  const csrftoken = getCSRFToken();
 
   // Send the image data to the Django server using AJAX
   const xhr = new XMLHttpRequest();
@@ -233,7 +211,7 @@ function getStudents(pageNumber) {
       var nextLink = document.getElementById('next-link');
       const currentPage = response.page_obj.current_page;
       const totalPages = response.page_obj.total_pages;
-      const pageLabel = 'Page ' + currentPage + ' of ' + totalPages ;   //`Page ${currentPage} of ${totalPages}`;
+      const pageLabel = 'Page ' + currentPage + ' of ' + totalPages; 
       const pageElement = document.querySelector('.page-label');
       pageElement.textContent = pageLabel;
 
@@ -252,4 +230,49 @@ function getStudents(pageNumber) {
     }
   };
   xhr.send();
+}
+
+
+// -------------------------  handle file-upload ------------------------
+function uploadStudents(event) {
+  const files = event.target.files;
+  const file = files[0];
+  if (
+    file.type === "application/vnd.ms-excel" ||
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+
+    var formData = new FormData();
+    formData.append('studentDetails', file);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../students/');
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        if (response.success) {
+          alert(response.message);
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+
+    xhr.send(formData);
+
+    // alert("File uploaded successfully!");
+
+
+    // xhr.onload = function () {
+    //   if (xhr.status === 200) {
+    //   } else {
+    //     // handle error response
+    //   }
+    // };
+
+  } else {
+    alert("Please select an Excel file");
+  }
 }

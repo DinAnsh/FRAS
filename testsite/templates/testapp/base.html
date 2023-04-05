@@ -98,14 +98,12 @@
   </footer>
 
   <!-- for all popups and file-upload -->
-{% block js %}
+  {% block js %}
 
-{% endblock js %}
+  {% endblock js %}
 
-<script>
-  
-{% comment %} // ------------------------ profile section ------------------------------ {% endcomment %}
-
+  {% comment %} // ------------------------ profile section ------------------------------ {% endcomment %}
+  <script>
     function showprofile() {
       document.getElementById("profile-popup").style.display = "block";
     }
@@ -128,15 +126,15 @@
           updateBtn.style.display = "block";
         }
         else {
-          alert("Passwords do not match!");
+          alert("Confirm the new password correctly!");
           updateBtn.style.display = "none";
         }
       }
 
     }
-</script>
-  <script data-section-id="navbar" src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  </script>
+  <!-- <script data-section-id="navbar" src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script> -->
 </body>
 
 </html>
