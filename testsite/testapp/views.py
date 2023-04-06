@@ -139,11 +139,13 @@ def student(request):
 
         skipR = [0,1,2,4] + list(np.linspace(404,408,6, dtype=int))
         df = pd.read_excel(excel_file, skiprows=skipR, usecols='B:J')
-        # print(df.head(2))
+        df = df.dropna(subset=['NAME'])
+        # print(df)
+
         try:
             for index, row in df.iterrows():
                 student, created = Student.objects.get_or_create(
-                    enroll = str(int(row['Enrollment No.'])),
+                    enroll = str(row['Enrollment No.']),
                     defaults={
                         'name': row['NAME'],
                         'email': row['Email'],
@@ -151,11 +153,13 @@ def student(request):
                     }
                 )
                 if not created:
+                    student.name = row['NAME']
                     student.email = row['Email']
                     student.mobile = str(int(row['Mobile']))
                     student.save()
 
-            return JsonResponse({'success': True, 'message': 'Student details uploaded successfully.'})
+            return JsonResponse({'success': True, 'message': 'Student details uploaded successfully.',})
+        
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
 
@@ -172,7 +176,7 @@ def get_student_data(request):
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(selected_class))
-    student_data = Student.objects.filter(enroll__startswith=selected_class).values()
+    student_data = Student.objects.filter(enroll__startswith=adm_year).values()
     
     paginator = Paginator(list(student_data), 20)
     page = paginator.get_page(page_number)
@@ -190,7 +194,7 @@ def get_student_data(request):
         'previous_page_number': previous_page_url,
         'next_page_number': next_page_url,
     }
-    # print(page_obj)
+    # print(page[0])
     
     return JsonResponse({'data':list(page), 'page_obj':page_obj}, safe=False)
 
@@ -219,21 +223,22 @@ def upload_image(request):
         # Get the image data from the request
         json_data = json.loads(request.body)
         image_data = json_data.get('image_data')
-        # enroll_id = json_data.get('enroll')
+        enroll_id = json_data.get('enrollId')
         
         # Decode the base64-encoded image data
         decoded_image_data = base64.b64decode(image_data.split(',')[1])
         
-        # imgName = enroll_id+".png"
+        imgName = enroll_id.replace('/', '')+".png"
         
         # Create a ContentFile from the decoded image data
-        image_file = ContentFile(decoded_image_data, name='student.png')
+        image_file = ContentFile(decoded_image_data, name=imgName)
         
         get_encodings(image_file)
         # Save the image to a file or database
-        # student = Student.objects.filter(enroll=enroll)
-        # student = Student(name="Dipendra",enroll="2019/ctae/140",img=image_file)
-        # student.save()
+        student = Student.objects.get(enroll=enroll_id)
+        student.img=image_file
+        student.save()
+        # print(student)
         
         return JsonResponse({'status': 'success'}, status=200)    
     else:
