@@ -17,8 +17,14 @@ from django.core.files.base import ContentFile
 from PIL import Image
 import pandas as pd
 import numpy as np
+import cv2
+import os
 
 
+cascPathface = os.path.dirname(
+    cv2.__file__) + "/data/haarcascade_frontalface_alt2.xml"
+
+faceCascade = cv2.CascadeClassifier(cascPathface)
 
 def home(request):
     team_data = Team.objects.all()
@@ -189,6 +195,24 @@ def get_student_data(request):
     return JsonResponse({'data':list(page), 'page_obj':page_obj}, safe=False)
 
 
+
+def get_encodings(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
+                                        minNeighbors=6,
+                                        flags=cv2.CASCADE_SCALE_IMAGE)
+    for (x,y,w,h) in faces:
+        cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
+        faceROI = image[y:y+h,x:x+w]
+        
+    cv2.namedWindow("img_name",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("img_name", 600,400)
+    cv2.imshow("img_name", image) 
+
+    cv2.waitKey(0) 
+    cv2.destroyAllWindows()
+        
+
 @login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
@@ -205,14 +229,16 @@ def upload_image(request):
         # Create a ContentFile from the decoded image data
         image_file = ContentFile(decoded_image_data, name='student.png')
         
+        get_encodings(image_file)
         # Save the image to a file or database
         # student = Student.objects.filter(enroll=enroll)
-        student = Student(name="Dipendra",enroll="2019/ctae/140",img=image_file)
-        student.save()
+        # student = Student(name="Dipendra",enroll="2019/ctae/140",img=image_file)
+        # student.save()
         
         return JsonResponse({'status': 'success'}, status=200)    
     else:
         return JsonResponse({'status': 'fail'})
+
 
 
 @login_required(login_url='testapp:home')
