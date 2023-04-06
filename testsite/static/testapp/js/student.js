@@ -103,7 +103,14 @@ retakeBtn.addEventListener("click", () => {
 
 
 //----------------------- for student face register -------------------------
+let enrollId = null;
 function sregister() {
+
+  const tdElement = this.parentElement.parentElement.firstElementChild;
+  enrollId = tdElement.textContent;
+  // console.log('ID value:', enrollId);
+
+  
   document.getElementById("myModal3").style.display = "block";
   video.srcObject = null;
   canvas.style.display = "none";
@@ -131,11 +138,6 @@ saveBtn.addEventListener("click", (event) => {
     return;
   }
 
-  //Backend code to save the image with enrollment ids
-
-  //After the image is successfully saved in db
-  //change the register button with a green tick
-
   // Convert the canvas to a base64 encoded string
   const imageData = canvas.toDataURL("image/jpeg");
   const csrftoken = getCSRFToken();
@@ -148,10 +150,10 @@ saveBtn.addEventListener("click", (event) => {
 
   xhr.onload = function () {
     if (xhr.status === 200) {
-      console.log("Image saved successfully");
+      alert("Image saved successfully");
     }
   };
-  xhr.send(JSON.stringify({ image_data: imageData }));
+  xhr.send(JSON.stringify({ image_data: imageData, 'enrollId':enrollId }));
 
   closeModal3();
 });
@@ -164,8 +166,6 @@ function search() { }
 //-------------------------- sort button -------------------------
 function sort() { }
 
-
-// ---------------- to show the students list of selected class with pagination ---------------------
 
 // Get the CSRF token from a cookie
 function getCSRFToken() {
@@ -184,9 +184,12 @@ function getCSRFToken() {
   return cookieValue;
 }
 
+
+// ---------------- to show the students list of selected class with pagination ---------------------
 function getStudents(pageNumber) {
   // Get the class ID from the select box
   var classId = document.getElementById('class-dropdown').value;
+
 
   // Make an AJAX request to the Django view
   var xhr = new XMLHttpRequest();
@@ -197,21 +200,49 @@ function getStudents(pageNumber) {
       // Parse the JSON response
       var response = JSON.parse(xhr.responseText);
 
+
       // Update the student table with the new data
       var tableBody = document.getElementById('student-list');
       tableBody.innerHTML = '';
+
+      // add the register button to "unknown" students and "OK" status to known students
       for (var i = 0; i < response.data.length; i++) {
         var student = response.data[i];
-        var row = '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td></tr>';
+        var row = '';
+        if (!student.img) {
+          row = '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
+        } else {
+          row = '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+        }
         tableBody.innerHTML += row;
       }
+
+      var registerBtn = document.createElement("button");
+      registerBtn.innerHTML = "Register";
+      registerBtn.classList.add("common_btn", "button2");
+      
+      var sregisterBtns = document.querySelectorAll(".sregisterBtn");
+      sregisterBtns.forEach(function (element) {
+        element.appendChild(registerBtn.cloneNode(true)).addEventListener('click' , sregister);
+      });
+
+
+      var okStatus = document.createElement("span");
+      okStatus.innerHTML = '&#9745;';
+      okStatus.classList.add('okStatus');
+
+      var okays = document.querySelectorAll('.okStatus');
+      okays.forEach(function (element){
+        element.appendChild(okStatus);
+      });
+
 
       // Update the pagination links
       var prevLink = document.getElementById('prev-link');
       var nextLink = document.getElementById('next-link');
       const currentPage = response.page_obj.current_page;
       const totalPages = response.page_obj.total_pages;
-      const pageLabel = 'Page ' + currentPage + ' of ' + totalPages; 
+      const pageLabel = 'Page ' + currentPage + ' of ' + totalPages;
       const pageElement = document.querySelector('.page-label');
       pageElement.textContent = pageLabel;
 
@@ -261,17 +292,6 @@ function uploadStudents(event) {
     };
 
     xhr.send(formData);
-
-    // alert("File uploaded successfully!");
-
-
-    // xhr.onload = function () {
-    //   if (xhr.status === 200) {
-    //   } else {
-    //     // handle error response
-    //   }
-    // };
-
   } else {
     alert("Please select an Excel file");
   }
