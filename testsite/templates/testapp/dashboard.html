@@ -200,8 +200,12 @@
       <div class="adminrights-container18">
         <div class="live">
           <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video>
+          <div id="video1"><video style="transform: scaleX(-1);" id="video"></video></div>
+          <div id="canvas1"><canvas style="transform: scaleX(-1);" id="canvas"></canvas></div>
           <h3 style="width: fit-content; margin: 0 auto;">Class: 2nd Year</h3>
         </div>
+
+        <button id="save-btn">Save</button>
 
         <div class="live">
           <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video>
@@ -216,7 +220,7 @@
     </div>
   </div>
 </div>
-
+<!-- <script src="https://docs.opencv.org/4.5.1/opencv.js" async></script> -->
 <script src="{% static 'testapp/js/dashboard.js' %}"></script>
 {% endblock body %}
 

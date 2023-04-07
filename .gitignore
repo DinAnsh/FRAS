@@ -4,3 +4,4 @@ __pycache__
 test
 testsite/db.sqlite3
 .vscode
+students

@@ -20,7 +20,7 @@
     </div>
 
     <div class="part1-content">
-      <select class="" id="class-dropdown" name="class" onchange="getStudents(1)">
+      <select class="" id="class-dropdown" name="class" onchange="getStudents()">
         <option value="" disabled selected>Select Class</option>
         <option value="2">Second year</option>
         <option value="3">Third year</option>
@@ -46,9 +46,8 @@
       </div>
 
       <div class="searchright">
-        <input type="search" name="idsearch" id="idsearch" placeholder="Enroll Id">
-        <button class="common_btn button1" onclick="search()">Search</button>
-        <button class="common_btn button2" onclick="sort()" title="sort based on status">Sort</button>
+        <input type="search" name="searchId" id="searchId" placeholder="Search Enrollment ID">
+        <button class="common_btn button1" id="sortBtn" title="sort based on status">Sort</button>
       </div>
     </div>
 
@@ -87,6 +86,7 @@
       </div>
       <div class="popup_body3">
         <div class="capture-window">
+          <div id="buffering"></div>
           <div id="video1"><video style="transform: scaleX(-1);" id="video"></video></div>
           <div id="canvas1"><canvas style="transform: scaleX(-1);" id="canvas"></canvas></div>
         </div>
