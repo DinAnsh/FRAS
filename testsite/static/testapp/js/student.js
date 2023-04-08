@@ -20,6 +20,11 @@ function addcam() {
 }
 
 function closeModal3() {
+  const tracks = stream.getTracks();
+  tracks.forEach((track) => {
+    track.stop();
+  });
+  video.srcObject = null;
   document.getElementById("myModal3").style.display = "none";
 }
 
@@ -37,11 +42,6 @@ window.onclick = function (event) {
     event.target == document.getElementById("cbtn3") ||
     event.target == document.getElementById("content3")
   ) {
-    const tracks = stream.getTracks();
-    tracks.forEach((track) => {
-      track.stop();
-    });
-    video.srcObject = null;
     closeModal3();
   } else if (
     event.target == document.getElementById("cbtn4") ||
@@ -57,18 +57,17 @@ const canvas = document.getElementById("canvas");
 const captureBtn = document.getElementById("capture-btn");
 const retakeBtn = document.getElementById("retake-btn");
 const saveBtn = document.getElementById("save-btn");
-
 let stream;
 
 //------------------ Capture image from video stream and display in canvas ---------------
-captureBtn.addEventListener("click", () => {
+captureBtn.addEventListener("click", (event) => {
   video.style.display = "none";
-  canvas.style.display = "block";
-  retakeBtn.style.display = "block";
-
   captureBtn.style.display = "none";
 
+  canvas.style.display = "block";
+  retakeBtn.style.display = "block";
   saveBtn.style.display = "block";
+
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
 
@@ -95,9 +94,10 @@ retakeBtn.addEventListener("click", () => {
       console.log("Error accessing camera", error);
     });
   video.style.display = "block";
+  captureBtn.style.display = "block";
+
   canvas.style.display = "none";
   saveBtn.style.display = "none";
-  captureBtn.style.display = "block";
   retakeBtn.style.display = "none";
 });
 
@@ -110,18 +110,20 @@ function sregister() {
   enrollId = tdElement.textContent;
   // console.log('ID value:', enrollId);
 
-  
+
   document.getElementById("myModal3").style.display = "block";
   video.srcObject = null;
   canvas.style.display = "none";
   video.style.display = "block";
 
+  bufferingElement.style.display = 'block';
   // Get video stream from user's camera
   navigator.mediaDevices
     .getUserMedia({ video: true })
     .then((streamObj) => {
       stream = streamObj;
       video.srcObject = stream;
+      video.addEventListener('loadedmetadata', onVideoMetadataLoaded);
       video.play();
     })
     .catch((error) => {
@@ -130,7 +132,7 @@ function sregister() {
 }
 
 
-//Save Button
+// ------------------------------- Save Button ----------------------------------
 saveBtn.addEventListener("click", (event) => {
   event.preventDefault();
   if (canvas.style.display != "block") {
@@ -150,35 +152,30 @@ saveBtn.addEventListener("click", (event) => {
 
   xhr.onload = function () {
     if (xhr.status === 200) {
+      captureBtn.style.display = "block";
+      saveBtn.style.display = "none";
+      retakeBtn.style.display = "none";
+
+      document.querySelectorAll('tr').forEach(function (row) {
+        if (row.firstChild.textContent === enrollId) {
+          row.lastChild.className = 'okStatus';
+          row.lastChild.firstChild.remove();
+        }
+      })
+
+      updateStatus();
+      
       alert("Image saved successfully");
+      closeModal3();
     }
   };
-  xhr.send(JSON.stringify({ image_data: imageData, 'enrollId':enrollId }));
 
-  closeModal3();
+  xhr.send(JSON.stringify({ 'image_data': imageData, 'enrollId': enrollId }));
 });
 
-
-//---------------------- search button --------------------------
-function search() { }
-
-
-//-------------------------- sort button -------------------------
-function sort() { 
-  const csrftoken = getCSRFToken();
-
-  // Send the image data to the Django server using AJAX
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "../students/sort/", true);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.setRequestHeader("X-CSRFToken", csrftoken);
-
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      console.log(this.response)
-    }
-  };
-  xhr.send();
+function onVideoMetadataLoaded() {
+  bufferingElement.style.display = 'none';
+  video.removeEventListener('loadedmetadata', onVideoMetadataLoaded);
 }
 
 
@@ -197,85 +194,6 @@ function getCSRFToken() {
     }
   }
   return cookieValue;
-}
-
-
-// ---------------- to show the students list of selected class with pagination ---------------------
-function getStudents(pageNumber) {
-  // Get the class ID from the select box
-  var classId = document.getElementById('class-dropdown').value;
-
-
-  // Make an AJAX request to the Django view
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '../students/get-student-data/?class=' + classId + '&page=' + pageNumber, true);
-  xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      // Parse the JSON response
-      var response = JSON.parse(xhr.responseText);
-
-
-      // Update the student table with the new data
-      var tableBody = document.getElementById('student-list');
-      tableBody.innerHTML = '';
-
-      // add the register button to "unknown" students and "OK" status to known students
-      for (var i = 0; i < response.data.length; i++) {
-        var student = response.data[i];
-        var row = '';
-        if (!student.img) {
-          row = '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
-        } else {
-          row = '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
-        }
-        tableBody.innerHTML += row;
-      }
-
-      var registerBtn = document.createElement("button");
-      registerBtn.innerHTML = "Register";
-      registerBtn.classList.add("common_btn", "button2");
-      
-      var sregisterBtns = document.querySelectorAll(".sregisterBtn");
-      sregisterBtns.forEach(function (element) {
-        element.appendChild(registerBtn.cloneNode(true)).addEventListener('click' , sregister);
-      });
-
-
-      var okStatus = document.createElement("span");
-      okStatus.innerHTML = '&#9745;';
-      okStatus.classList.add('okStatus');
-
-      var okays = document.querySelectorAll('.okStatus');
-      okays.forEach(function (element){
-        element.appendChild(okStatus);
-      });
-
-
-      // Update the pagination links
-      var prevLink = document.getElementById('prev-link');
-      var nextLink = document.getElementById('next-link');
-      const currentPage = response.page_obj.current_page;
-      const totalPages = response.page_obj.total_pages;
-      const pageLabel = 'Page ' + currentPage + ' of ' + totalPages;
-      const pageElement = document.querySelector('.page-label');
-      pageElement.textContent = pageLabel;
-
-      if (response.page_obj.has_previous) {
-        prevLink.setAttribute('onclick', 'getStudents(' + response.page_obj.previous_page_number + ')');
-        prevLink.style.display = 'inline-block';
-      } else {
-        prevLink.style.display = 'none';
-      }
-      if (response.page_obj.has_next) {
-        nextLink.setAttribute('onclick', 'getStudents(' + response.page_obj.next_page_number + ')');
-        nextLink.style.display = 'inline-block';
-      } else {
-        nextLink.style.display = 'none';
-      }
-    }
-  };
-  xhr.send();
 }
 
 
@@ -311,3 +229,173 @@ function uploadStudents(event) {
     alert("Please select an Excel file");
   }
 }
+
+
+// ---------------- to get the students data of selected class ---------------------
+let currentPage = 1;
+const itemsPerPage = 10;
+let data = [];
+const tableBody = document.getElementById('student-list');
+
+function getStudents() {
+  // Get the class ID from the select box
+  var classId = document.getElementById('class-dropdown').value;
+  var xhr = new XMLHttpRequest();
+
+  // Make an AJAX request to the Django view
+  xhr.open('GET', '../students/get-student-data/?class=' + classId, true);
+  xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      currentPage = 1;
+      var response = JSON.parse(xhr.responseText);
+      data = response.data;
+      renderData(currentPage);
+    }
+  };
+  xhr.send();
+}
+
+
+// --------------------- rendering of students data with pagination -------------------------
+function renderData(page) {
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const pageData = data.slice(startIndex, endIndex);
+  currentPage = page;
+
+  tableBody.innerHTML = '';
+  let html = '';
+
+  pageData.forEach(student => {
+    if (!student.img) {
+      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
+    } else {
+      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+    }
+  });
+
+  tableBody.innerHTML = html;
+
+  updateStatus();
+
+  // update the previous and next buttons
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  var prevLink = document.getElementById('prev-link');
+  var nextLink = document.getElementById('next-link');
+
+  const pageLabel = 'Page ' + currentPage + ' of ' + totalPages;
+  const pageElement = document.querySelector('.page-label');
+  pageElement.textContent = pageLabel;
+
+
+  if (currentPage > 1) {
+    previous_page = currentPage - 1;
+    prevLink.setAttribute('onclick', 'renderData(' + previous_page + ')');
+    prevLink.style.display = 'inline-block';
+  } else {
+    prevLink.style.display = 'none';
+  }
+  if (currentPage < totalPages) {
+    next_page = currentPage + 1;
+    nextLink.setAttribute('onclick', 'renderData(' + next_page + ')');
+    nextLink.style.display = 'inline-block';
+  } else {
+    nextLink.style.display = 'none';
+  }
+}
+
+
+// updating the status to register and OK based on the abscence of img
+function updateStatus() {
+  var registerBtn = document.createElement("button");
+  registerBtn.innerHTML = "Register";
+  registerBtn.classList.add("common_btn", "button2");
+
+  var sregisterBtns = document.querySelectorAll(".sregisterBtn");
+  sregisterBtns.forEach(function (element) {
+    if (!element.hasChildNodes()) {
+      element.appendChild(registerBtn.cloneNode(true)).addEventListener('click', sregister);
+    }
+  });
+
+  var okStatus = document.createElement("span");
+  okStatus.innerHTML = '&#9745;';
+  okStatus.title = 'Registered!'
+
+  var okays = document.querySelectorAll('.okStatus');
+  okays.forEach(function (element) {
+    if (!element.hasChildNodes()) {
+      element.appendChild(okStatus.cloneNode(true));
+    }
+  });
+}
+
+
+//-------------------------- sort button -------------------------
+const sortBtn = document.getElementById('sortBtn');
+sortBtn.addEventListener('click', () => {
+  const columnToSort = 'img'; // index of the column to sort by
+
+  data.sort((a, b) => {
+    const aVal = a[columnToSort] ? 0 : 1;
+    const bVal = b[columnToSort] ? 0 : 1;
+
+    return bVal - aVal; // sort in descending order of button presence
+  });
+
+  renderData(currentPage);
+})
+
+
+//---------------------- search button --------------------------
+const searchInput = document.getElementById('searchId');
+const tableRows = tableBody.getElementsByTagName('tr');
+
+searchInput.addEventListener('keyup', function () {
+  const searchText = searchInput.value.toLowerCase();
+
+  const searchData = [];
+  for (let i = 0; i < data.length; i++) {
+    const enrollText = data[i].enroll.toLowerCase();
+
+    if (enrollText.includes(searchText)) {
+      searchData.push(data[i]);
+    }
+  }
+
+
+  tableBody.innerHTML = '';
+  let html = '';
+
+  searchData.forEach(student => {
+    if (!student.img) {
+      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
+    } else {
+      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+    }
+  });
+
+  tableBody.innerHTML = html;
+  updateStatus();
+  document.getElementById('pagination').style.display = 'none';
+
+  if (searchInput.value === '') {
+    renderData(currentPage);
+    document.getElementById('pagination').style.display = '';
+  }
+});
+
+
+searchInput.addEventListener('search', (event) => {
+  if (event.target.value === '') {
+    // The close button was clicked
+    renderData(currentPage);
+    document.getElementById('pagination').style.display = '';
+  }
+});
+
+
+// -------------------------- buffering ---------------------------
+var bufferingElement = document.getElementById('buffering');

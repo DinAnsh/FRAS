@@ -171,33 +171,14 @@ def student(request):
 @login_required(login_url='testapp:home')
 def get_student_data(request):
     selected_class = request.GET.get('class')
-    page_number = request.GET.get('page')
 
     current_year = timezone.now().strftime('%Y')
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(selected_class))
     student_data = Student.objects.filter(enroll__startswith=adm_year).values()
-    
-    paginator = Paginator(list(student_data), 20)
-    page = paginator.get_page(page_number)
-    
-    previous_page_url = page.previous_page_number() if page.has_previous() else None
-    next_page_url = page.next_page_number() if page.has_next() else None
-    
-    page_obj = {
-        'number': page.number,
-        'has_next': page.has_next(),
-        'has_previous': page.has_previous(),
-        'current_page': page.number,
-        'total_pages': paginator.num_pages,
-        'has_other_pages': page.has_other_pages(),
-        'previous_page_number': previous_page_url,
-        'next_page_number': next_page_url,
-    }
-    # print(page[0])
-    
-    return JsonResponse({'data':list(page), 'page_obj':page_obj}, safe=False)
+    # print(list(student_data))     #list of dicts
+    return JsonResponse({'data':list(student_data),}, safe=False)
 
 
 
