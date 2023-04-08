@@ -1,12 +1,11 @@
 //----------------------- calendar script -----------------------
 
 $(document).ready(function () {
-  $('#calendar').fullCalendar({
+  $("#calendar").fullCalendar({
     // Options and callbacks
     // themeSystem: 'lux'
   });
 });
-
 
 //---------------------- maxAtt-cls ------------------------------
 var data = [150, 200, 250];
@@ -62,8 +61,6 @@ svg
   .attr("class", "x axis")
   .attr("transform", "translate(0," + 230 + ")")
   .call(d3.axisBottom(xScale));
-
-
 
 //-------------------------------- maxAtt-sub -------------------------
 var data = [115, 180, 150];
@@ -123,24 +120,91 @@ svg
   .attr("transform", "translate(0," + 230 + ")")
   .call(d3.axisBottom(xScale));
 
-
 //-------------------------------- cctv-video -------------------------
+function getCSRFToken() {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    var cookies = document.cookie.split(";");
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      // The CSRF token cookie name may vary depending on the server-side framework
+      if (cookie.substring(0, 10) === "csrftoken=") {
+        cookieValue = decodeURIComponent(cookie.substring(10));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
 
-//   var video = document.getElementById('player');
-//   navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-//     video.srcObject = stream;
-//     video.play();
-//     // OpenCV code to process video stream
-//     cv.onRuntimeInitialized = function () {
-//       var cap = new cv.VideoCapture(video);
-//       function processVideo() {
-//         cap.readAsync(function (frame) {
-//           // Process frame here
-//           cv.imshow('player', frame);
-//           setTimeout(processVideo, 0);
-//         });
-//       }
-//       processVideo();
-//     }
-//   });
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const saveBtn = document.getElementById("save-btn");
 
+navigator.mediaDevices
+  .getUserMedia({ video: true })
+  .then((streamObj) => {
+    stream = streamObj;
+    video.srcObject = stream;
+    video.play();
+  })
+  .catch((error) => {
+    console.log("Error accessing camera", error);
+  });
+
+saveBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+
+  video.style.display = "none";
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const context = canvas.getContext("2d");
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const tracks = stream.getTracks();
+  tracks.forEach((track) => {
+    track.stop();
+  });
+
+  // Convert the canvas to a base64 encoded string
+  const class_image = canvas.toDataURL("image/jpeg");
+  const csrftoken = getCSRFToken();
+
+  // Send the image data to the Django server using AJAX
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "../dashboard/face_recognize/", true);
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Class Image saved successfully");
+    }
+  };
+
+  xhr.send(JSON.stringify({ class_image: class_image }));
+});
+
+function RecogniseImage(event) {
+  const files = event.target.files;
+  const file = files[0];
+
+  var formData = new FormData();
+  formData.append("image", file);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "../dashboard/face_recognize/", true);
+  xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+
+  xhr.onreadystatechange = function () {
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      alert("Class Image saved successfully");
+    }
+    else {
+      console.error('Failed to upload image');
+    }
+  };
+    xhr.send(formData);
+}

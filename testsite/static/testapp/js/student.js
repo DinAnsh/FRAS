@@ -164,7 +164,22 @@ function search() { }
 
 
 //-------------------------- sort button -------------------------
-function sort() { }
+function sort() { 
+  const csrftoken = getCSRFToken();
+
+  // Send the image data to the Django server using AJAX
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "../students/sort/", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      console.log(this.response)
+    }
+  };
+  xhr.send();
+}
 
 
 // Get the CSRF token from a cookie

@@ -17,6 +17,7 @@ from django.core.files.base import ContentFile
 from PIL import Image
 import pandas as pd
 import numpy as np
+import face_recognition
 import cv2
 import os
 
@@ -201,21 +202,98 @@ def get_student_data(request):
 
 
 def get_encodings(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
-                                        minNeighbors=6,
-                                        flags=cv2.CASCADE_SCALE_IMAGE)
-    for (x,y,w,h) in faces:
-        cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
-        faceROI = image[y:y+h,x:x+w]
-        
-    cv2.namedWindow("img_name",cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("img_name", 600,400)
-    cv2.imshow("img_name", image) 
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
+    #                                     minNeighbors=6,
+    #                                     flags=cv2.CASCADE_SCALE_IMAGE)
+    # for (x,y,w,h) in faces:
+    #     cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
+    #     faceROI = image[y:y+h,x:x+w]
+    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    boxes = face_recognition.face_locations(rgb,model='cnn')
+    enc = face_recognition.face_encodings(rgb,boxes)
+    return enc[0]
 
-    cv2.waitKey(0) 
-    cv2.destroyAllWindows()
+
+def face_recognize(request):
+    if request.method =='POST': 
+        if request.content_type == 'application/json':
+            json_data = json.loads(request.body)   
+            img = json_data.get('class_image')
+            
+            decoded_image_data = base64.b64decode(img.split(',')[1])
+            # Create a ContentFile from the decoded image data
+            image_file = ContentFile(decoded_image_data, name="Captured Image")
+            
+        elif 'image' in request.FILES:
+            image_file = request.FILES['image']
+            
         
+        pil_img = Image.open(image_file)
+        # pil_img.show()
+        
+        
+        knownEncodings = []
+        knownEnroll = []
+        
+        #need to fetch only particular year students 
+        # all_students = Student.objects.all()
+        year = '2020'
+        all_students = Student.objects.filter(enroll__startswith=year)
+        for obj in all_students:
+            if obj.encoding is None or obj.encoding == '':
+                continue
+            
+            else:
+                # Convert the string back to a NumPy array
+                float_array = np.fromstring(obj.encoding[1:-1], dtype=np.float64, sep=' ')
+                knownEncodings.append(float_array)
+                knownEnroll.append(obj.enroll)           
+            
+        #save encodings along with their names in dictionary data
+        data = {"encodings": knownEncodings, "enrollments": knownEnroll} 
+        
+        # convert the input frame from BGR to RGB 
+        rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
+        # the facial embeddings for face in input
+        encodings = face_recognition.face_encodings(rgb)
+        
+        enrolls = []
+        
+        for encoding in encodings:
+        #Compare encodings with encodings in data["encodings"]
+        #Matches contain array of the same length of data["encodings"] with boolean values and True for the embeddings it matches closely and False for rest
+            matches = face_recognition.compare_faces(data["encodings"], encoding)
+            
+            #set name =inknown if no encoding matches
+            enroll = "Unknown"
+            
+            # check to see if we have found a match
+            if True in matches:
+                #Find positions at which we get True and store them
+                matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+                
+                counts = {}
+                for i in matchedIdxs:
+                    #Check the names at respective indexes we stored in matchedIdxs
+                    enroll = data["enrollments"][i]
+                    
+                    #increase count for the name we got
+                    counts[enroll] = counts.get(enroll, 0) + 1
+                    
+                #set name which has highest count
+                enroll = max(counts, key=counts.get)
+                # enroll = [key for key, value in counts.items() if value == max(counts.values())]
+                
+            # update the list of names
+            enrolls.append(enroll)    
+            
+        return JsonResponse({"enrolls":enrolls})
+    
+    else:
+        return JsonResponse({"status":"There is some error!"})
+                
+
 
 @login_required(login_url='testapp:home')
 def upload_image(request):
@@ -233,17 +311,25 @@ def upload_image(request):
         # Create a ContentFile from the decoded image data
         image_file = ContentFile(decoded_image_data, name=imgName)
         
-        get_encodings(image_file)
+        pil_img = Image.open(image_file)
+        opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+        face_encoding = get_encodings(opencvImage)
+        
         # Save the image to a file or database
         student = Student.objects.get(enroll=enroll_id)
         student.img=image_file
-        student.save()
-        # print(student)
         
+        student.encoding = face_encoding
+        student.save()
+        
+        # face_recognize(enroll_id)
+        # print(student)
         return JsonResponse({'status': 'success'}, status=200)    
     else:
         return JsonResponse({'status': 'fail'})
 
+def sort(request):
+    return JsonResponse({"status":"success! sorted"})
 
 
 @login_required(login_url='testapp:home')
