@@ -27,13 +27,13 @@ pip install -r requirements.txt
 ```
 ---
 ## Backend Framework
-- **Django** - Flask is a web development framework developed in Python. It is also known as a micro-framework because it is lightweight and only provides components that are essential. It only provides the necessary components for web development, such as routing, request handling, sessions, and so on.
+- **Django** - Django is a popular open-source Python web framework that provides a high-level, efficient, and secure way to develop web applications. It follows the Model-View-Template (MVT) architecture and comes with a built-in administrative interface, robust security features, and a wide range of tools and libraries for rapid development.
 ![django-logo](https://user-images.githubusercontent.com/60287228/230828178-4297c75b-cd62-4461-8806-d73a8eedb231.png)
 
 ---
 ## Database
 used **SQLite** database locally with **Django**.<br>
-![pngegg](https://user-images.githubusercontent.com/60287228/230828466-449d335d-b435-4526-bfe9-63376806a1b5.png)
+<img src="https://user-images.githubusercontent.com/60287228/230828466-449d335d-b435-4526-bfe9-63376806a1b5.png" width="300 alt="django logo">
 
 ---
 ## Ready to Run
@@ -63,4 +63,4 @@ python manage.py runserver
 
 ---
 ### Thanks
-Team - Dipendra Singh, Dinash Bhardwaj, Diya Goyal, Aditi Singh
+Team - [Dipendra Singh](https://github.com/dipendrasingh100), [Dinash Bhardwaj](https://github.com/DinAnsh), [Diya Goyal](), [Aditi Singh](https://github.com/aditisingh0409)
