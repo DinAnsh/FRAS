@@ -28,12 +28,12 @@ pip install -r requirements.txt
 ---
 ## Backend Framework
 - **Django** - Django is a popular open-source Python web framework that provides a high-level, efficient, and secure way to develop web applications. It follows the Model-View-Template (MVT) architecture and comes with a built-in administrative interface, robust security features, and a wide range of tools and libraries for rapid development.
-![django-logo](https://user-images.githubusercontent.com/60287228/230828178-4297c75b-cd62-4461-8806-d73a8eedb231.png)
+<img src="https://user-images.githubusercontent.com/60287228/230828178-4297c75b-cd62-4461-8806-d73a8eedb231.png" alt="Django logo" width="300">
 
 ---
 ## Database
 used **SQLite** database locally with **Django**.<br>
-<img src="https://user-images.githubusercontent.com/60287228/230828466-449d335d-b435-4526-bfe9-63376806a1b5.png" width="300 alt="django logo">
+<img src="https://user-images.githubusercontent.com/60287228/230828466-449d335d-b435-4526-bfe9-63376806a1b5.png" alt="SQLite logo" width="300" >
 
 ---
 ## Ready to Run
