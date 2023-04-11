@@ -215,6 +215,7 @@ function uploadStudents(event) {
         } else {
           alert(response.message);
         }
+        location.reload();
       }
     };
 
