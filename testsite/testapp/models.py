@@ -19,7 +19,7 @@ class Student(models.Model):
     email = models.EmailField(max_length=50, default='abc@example.com')
     mobile = models.CharField(max_length=15, default='+911234567890')
     def __str__(self):
-        return self.name
+        return self.enroll
     
 # need to create an attendance table having Enrll no, subjects as columns
 
