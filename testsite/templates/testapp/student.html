@@ -69,11 +69,13 @@
 
     <div id="pagination" class="pagination">
       <span class="page-label"></span>
-      <div class="page-btn">
+      <div class="page-btn" id="page-btn">
         <button type="button" class="common_btn button2" id="prev-link" style="display:none;">Previous</button>
         <button type="button" class="common_btn button2" id="next-link" style="display:none;">Next</button>
       </div>
     </div>
+
+    <button id="export-btn" class="common_btn button1" onclick="downloadExcel()">Export to Excel</button>
   </div>
 </div>
 
@@ -116,5 +118,6 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script src="{% static 'testapp/js/student.js' %}"></script>
 {% endblock %}

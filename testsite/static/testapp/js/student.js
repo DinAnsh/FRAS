@@ -156,15 +156,9 @@ saveBtn.addEventListener("click", (event) => {
       saveBtn.style.display = "none";
       retakeBtn.style.display = "none";
 
-      document.querySelectorAll('tr').forEach(function (row) {
-        if (row.firstChild.textContent === enrollId) {
-          row.lastChild.className = 'okStatus';
-          row.lastChild.firstChild.remove();
-        }
-      })
-
+      getStudents(currentPage);
       updateStatus();
-      
+
       alert("Image saved successfully");
       closeModal3();
     }
@@ -221,6 +215,7 @@ function uploadStudents(event) {
         } else {
           alert(response.message);
         }
+        location.reload();
       }
     };
 
@@ -237,10 +232,15 @@ const itemsPerPage = 10;
 let data = [];
 const tableBody = document.getElementById('student-list');
 
-function getStudents() {
+function getStudents(page = 1) {
   // Get the class ID from the select box
   var classId = document.getElementById('class-dropdown').value;
   var xhr = new XMLHttpRequest();
+
+  // to display export button
+  if (classId) {
+    document.getElementById('export-btn').style.display = 'block';
+  }
 
   // Make an AJAX request to the Django view
   xhr.open('GET', '../students/get-student-data/?class=' + classId, true);
@@ -248,10 +248,10 @@ function getStudents() {
 
   xhr.onload = function () {
     if (xhr.status === 200) {
-      currentPage = 1;
+      // currentPage = 1;
       var response = JSON.parse(xhr.responseText);
       data = response.data;
-      renderData(currentPage);
+      renderData(page);
     }
   };
   xhr.send();
@@ -307,7 +307,7 @@ function renderData(page) {
 }
 
 
-// updating the status to register and OK based on the abscence of img
+// updating the status to register and OK based on the absence of img
 function updateStatus() {
   var registerBtn = document.createElement("button");
   registerBtn.innerHTML = "Register";
@@ -336,66 +336,163 @@ function updateStatus() {
 //-------------------------- sort button -------------------------
 const sortBtn = document.getElementById('sortBtn');
 sortBtn.addEventListener('click', () => {
-  const columnToSort = 'img'; // index of the column to sort by
+  var classId = document.getElementById('class-dropdown').value;
+  if (classId) {
+    const columnToSort = 'img'; // the column to sort by
+    data.sort((a, b) => {
+      const aVal = a[columnToSort] ? 0 : 1;
+      const bVal = b[columnToSort] ? 0 : 1;
 
-  data.sort((a, b) => {
-    const aVal = a[columnToSort] ? 0 : 1;
-    const bVal = b[columnToSort] ? 0 : 1;
-
-    return bVal - aVal; // sort in descending order of button presence
-  });
-
-  renderData(currentPage);
+      return bVal - aVal; // sort in descending order of button presence
+    });
+    renderData(currentPage);
+  }
+  else {
+    document.getElementById('pagination').style.display = '';
+    document.getElementById('page-btn').style.display = 'none';
+    document.querySelector('.page-label').textContent = "Please select class!";
+  }
 })
 
 
 //---------------------- search button --------------------------
 const searchInput = document.getElementById('searchId');
-const tableRows = tableBody.getElementsByTagName('tr');
-
 searchInput.addEventListener('keyup', function () {
-  const searchText = searchInput.value.toLowerCase();
+  var classId = document.getElementById('class-dropdown').value;
+  if (classId) {
+    const searchText = searchInput.value.toLowerCase();
 
-  const searchData = [];
-  for (let i = 0; i < data.length; i++) {
-    const enrollText = data[i].enroll.toLowerCase();
+    const searchData = [];
+    for (let i = 0; i < data.length; i++) {
+      const enrollText = data[i].enroll.toLowerCase();
 
-    if (enrollText.includes(searchText)) {
-      searchData.push(data[i]);
+      if (enrollText.includes(searchText)) {
+        searchData.push(data[i]);
+      }
     }
-  }
 
 
-  tableBody.innerHTML = '';
-  let html = '';
+    tableBody.innerHTML = '';
+    let html = '';
 
-  searchData.forEach(student => {
-    if (!student.img) {
-      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
-    } else {
-      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+    searchData.forEach(student => {
+      if (!student.img) {
+        html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
+      } else {
+        html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+      }
+    });
+
+    tableBody.innerHTML = html;
+    updateStatus();
+    document.getElementById('pagination').style.display = 'none';
+
+    // to remain on the same page after clearing the search
+    if (searchInput.value === '') {
+      renderData(currentPage);
+      document.getElementById('pagination').style.display = '';
     }
-  });
-
-  tableBody.innerHTML = html;
-  updateStatus();
-  document.getElementById('pagination').style.display = 'none';
-
-  if (searchInput.value === '') {
-    renderData(currentPage);
+  } else {
     document.getElementById('pagination').style.display = '';
+    document.getElementById('page-btn').style.display = 'none';
+    document.querySelector('.page-label').textContent = "Please select class!";
   }
+
 });
 
-
+// to remain on the same page after clearing the search using close btn
 searchInput.addEventListener('search', (event) => {
-  if (event.target.value === '') {
-    // The close button was clicked
-    renderData(currentPage);
+  var classId = document.getElementById('class-dropdown').value;
+  if (classId) {
+    if (event.target.value === '') {
+      // The close button was clicked
+      renderData(currentPage);
+      document.getElementById('pagination').style.display = '';
+    }
+  }
+  else {
     document.getElementById('pagination').style.display = '';
+    document.getElementById('page-btn').style.display = 'none';
+    document.querySelector('.page-label').textContent = "Please select class!";
   }
 });
 
 
 // -------------------------- buffering ---------------------------
 var bufferingElement = document.getElementById('buffering');
+
+
+// -------------------- export student's data to excel sheet ------------------
+function downloadExcel() {
+  // Create a new workbook & worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Sheet1');
+
+  // to center align the text - not working
+  // worksheet.properties.defaultCellStyle = {
+  //   alignment: { horizontal: 'center' }
+  // };
+
+  // Add title to worksheet
+  worksheet.mergeCells('A1:F1');
+  const titleCell = worksheet.getCell('B1');
+  titleCell.value = 'COLLEGE OF TECHNOLOGY AND ENGINEERING, UDAIPUR';
+  titleCell.font = { size: 16, bold: true };
+
+  // to include the class and session info
+  const selectClass = document.getElementById('class-dropdown');
+  const selectedIndex = selectClass.selectedIndex;
+  const selectedOption = selectClass.options[selectedIndex];
+  const now = new Date();
+  const currentYear = now.getFullYear() - selectClass.value;
+  const nextYear = currentYear + 1;
+
+  // add the title
+  worksheet.mergeCells('A2:F2');
+  const sub_titleCell = worksheet.getCell('B2');
+  sub_titleCell.value = 'B.Tech. ' + selectedOption.textContent.toLowerCase() + ' for the session ' + currentYear.toString() + '-' + nextYear.toString();
+  sub_titleCell.font = { size: 14, bold: false };
+
+  // Parse the HTML table and extract its data
+  const table = document.getElementById('students-table');
+  const rows = table.getElementsByTagName('tr');
+  const headerRow = Array.from(rows[0].children).slice(0, 5);
+
+  // Add header row to worksheet
+  const headerValues = headerRow.map((th) => th.textContent.trim());
+  worksheet.addRow(headerValues);
+
+  // set the column widths
+  const columnWidths = [];
+  for (let i = 0; i < headerRow.length; i++) {
+    const width = headerRow[i].offsetWidth;
+    columnWidths.push(width);
+  }
+  worksheet.columns.forEach((column, index) => {
+    column.width = columnWidths[index] / 7;
+  });
+
+  // parse the whole data of the selected class
+  const array = data.map(item => ([
+    item.enroll,
+    item.name,
+    item.email,
+    item.mobile,
+  ]));
+
+  // Add data rows to worksheet
+  array.forEach((row) => {
+    worksheet.addRow(row);
+  });
+
+  
+
+  // Save workbook as binary Excel file
+  workbook.xlsx.writeBuffer().then((buffer) => {
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'table.xlsx';
+    downloadLink.click();
+  });
+}

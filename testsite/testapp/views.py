@@ -141,23 +141,31 @@ def student(request):
         skipR = [0,1,2,4] + list(np.linspace(404,408,6, dtype=int))
         df = pd.read_excel(excel_file, skiprows=skipR, usecols='B:J')
         df = df.dropna(subset=['NAME'])
-        # print(df)
+        
+        dbEnrolls = list(Student.objects.all().values_list('enroll', flat=True))
+        dfEnrolls = df['Enrollment No.'].to_list()
+        # print()
 
         try:
-            for index, row in df.iterrows():
-                student, created = Student.objects.get_or_create(
-                    enroll = str(row['Enrollment No.']),
-                    defaults={
-                        'name': row['NAME'],
-                        'email': row['Email'],
-                        'mobile': str(int(row['Mobile']))
-                    }
-                )
-                if not created:
-                    student.name = row['NAME']
-                    student.email = row['Email']
-                    student.mobile = str(int(row['Mobile']))
-                    student.save()
+            if(len(dbEnrolls) > len(dfEnrolls)):    # to delete the missing enrolls in the uploaded sheet
+                enrolls_to_delete = [x for x in dbEnrolls if x not in dfEnrolls]
+                Student.objects.filter(enroll__in = enrolls_to_delete).delete()
+
+            else:       # to add or modify the present enrolls in the uploaded sheet
+                for index, row in df.iterrows():
+                    student, created = Student.objects.get_or_create(
+                        enroll = str(row['Enrollment No.']),
+                        defaults={
+                            'name': row['NAME'],
+                            'email': row['Email'],
+                            'mobile': str(int(row['Mobile']))
+                        }
+                    )
+                    if not created:
+                        student.name = row['NAME']
+                        student.email = row['Email']
+                        student.mobile = str(int(row['Mobile']))
+                        student.save()
 
             return JsonResponse({'success': True, 'message': 'Student details uploaded successfully.',})
         

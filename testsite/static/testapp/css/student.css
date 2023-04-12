@@ -446,3 +446,11 @@ td {
     transform: rotate(360deg);
   }
 }
+
+/* ------------- export-btn ----------------- */
+
+#export-btn {
+  display: none;
+  margin: 0 1rem;
+  width: auto;
+}

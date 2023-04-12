@@ -22,7 +22,7 @@ class Student(models.Model):
     mobile = models.CharField(max_length=15, default='+911234567890')
     encoding = models.CharField(max_length=2100)
     def __str__(self):
-        return self.name
+        return self.enroll
 
     # def save_encoding(self, float_array):
     #     # Convert the numpy array to JSON and save to JSONField
