@@ -152,9 +152,10 @@ navigator.mediaDevices
     console.log("Error accessing camera", error);
   });
 
-saveBtn.addEventListener("click", (event) => {
+function captureImage(event) {
   event.preventDefault();
 
+  // #this should be deleted
   video.style.display = "none";
 
   canvas.width = video.videoWidth;
@@ -162,7 +163,8 @@ saveBtn.addEventListener("click", (event) => {
 
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
+ 
+  // this should be deleted to not stop the camera after capture image
   const tracks = stream.getTracks();
   tracks.forEach((track) => {
     track.stop();
@@ -185,7 +187,7 @@ saveBtn.addEventListener("click", (event) => {
   };
 
   xhr.send(JSON.stringify({ class_image: class_image }));
-});
+}
 
 function RecogniseImage(event) {
   const files = event.target.files;
@@ -201,10 +203,17 @@ function RecogniseImage(event) {
   xhr.onreadystatechange = function () {
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       alert("Class Image saved successfully");
-    }
-    else {
-      console.error('Failed to upload image');
+    } else {
+      console.error("Failed to upload image");
     }
   };
-    xhr.send(formData);
+  xhr.send(formData);
 }
+
+//  for capture image using button
+saveBtn.addEventListener("click", function (event) {
+  captureImage(event);
+});
+
+// Call captureImage function every 5 seconds
+// setInterval(captureImage, 5000);

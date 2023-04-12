@@ -190,6 +190,8 @@ def get_encodings(image):
     # for (x,y,w,h) in faces:
     #     cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
     #     faceROI = image[y:y+h,x:x+w]
+    
+    # convert image from BGR (OpenCV ordering) to dlib ordering (RGB)
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     boxes = face_recognition.face_locations(rgb,model='cnn')
     enc = face_recognition.face_encodings(rgb,boxes)
@@ -219,7 +221,7 @@ def face_recognize(request):
         
         #need to fetch only particular year students 
         # all_students = Student.objects.all()
-        year = '2020'
+        year = '2021'
         all_students = Student.objects.filter(enroll__startswith=year)
         for obj in all_students:
             if obj.encoding is None or obj.encoding == '':
@@ -236,6 +238,9 @@ def face_recognize(request):
         
         # convert the input frame from BGR to RGB 
         rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
+        
+        # boxes = face_recognition.face_locations(rgb,model='cnn')
+        
         # the facial embeddings for face in input
         encodings = face_recognition.face_encodings(rgb)
         
@@ -264,7 +269,6 @@ def face_recognize(request):
                     
                 #set name which has highest count
                 enroll = max(counts, key=counts.get)
-                # enroll = [key for key, value in counts.items() if value == max(counts.values())]
                 
             # update the list of names
             enrolls.append(enroll)    
