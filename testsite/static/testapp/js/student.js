@@ -60,25 +60,25 @@ const saveBtn = document.getElementById("save-btn");
 let stream;
 
 //------------------ Capture image from video stream and display in canvas ---------------
-captureBtn.addEventListener("click", (event) => {
-  video.style.display = "none";
-  captureBtn.style.display = "none";
+// captureBtn.addEventListener("click", (event) => {
+//   video.style.display = "none";
+//   captureBtn.style.display = "none";
 
-  canvas.style.display = "block";
-  retakeBtn.style.display = "block";
-  saveBtn.style.display = "block";
+//   canvas.style.display = "block";
+//   retakeBtn.style.display = "block";
+//   saveBtn.style.display = "block";
 
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+//   canvas.width = video.videoWidth;
+//   canvas.height = video.videoHeight;
 
-  const context = canvas.getContext("2d");
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+//   const context = canvas.getContext("2d");
+//   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  const tracks = stream.getTracks();
-  tracks.forEach((track) => {
-    track.stop();
-  });
-});
+//   const tracks = stream.getTracks();
+//   tracks.forEach((track) => {
+//     track.stop();
+//   });
+// });
 
 
 // --------------------- retake button ---------------------------
@@ -135,13 +135,9 @@ function sregister() {
 // ------------------------------- Save Button ----------------------------------
 saveBtn.addEventListener("click", (event) => {
   event.preventDefault();
-  if (canvas.style.display != "block") {
-    alert("Please capture the student image first!");
-    return;
-  }
 
   // Convert the canvas to a base64 encoded string
-  const imageData = canvas.toDataURL("image/jpeg");
+  const imageData = finalCanvas.toDataURL("image/jpeg");
   const csrftoken = getCSRFToken();
 
   // Send the image data to the Django server using AJAX
@@ -485,7 +481,7 @@ function downloadExcel() {
     worksheet.addRow(row);
   });
 
-  
+
 
   // Save workbook as binary Excel file
   workbook.xlsx.writeBuffer().then((buffer) => {
@@ -495,4 +491,47 @@ function downloadExcel() {
     downloadLink.download = 'table.xlsx';
     downloadLink.click();
   });
+}
+
+
+// ====================testing=======================
+
+var imageCounter = 0;
+const finalCanvas = document.createElement('canvas');
+const finalContext = finalCanvas.getContext('2d');
+
+captureBtn.addEventListener('click', captureImage);
+finalCanvas.width = canvas.width * 3;
+finalCanvas.height = canvas.height * 2;
+
+function captureImage() {
+  const context = canvas.getContext('2d');
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  imageCounter++;
+
+  if (imageCounter <= 3) {
+    finalContext.drawImage(canvas, (imageCounter - 1)* canvas.width, 0, canvas.width, canvas.height);
+  }
+  if (imageCounter > 3 && imageCounter < 5) {
+    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
+  }
+  if (imageCounter === 5) {
+    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
+    imageCounter = 0;
+    saveBtn.style.display = "block";
+    video.style.display = 'none';
+    captureBtn.style.display = "none";
+
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => {
+      track.stop();
+    });
+
+    const finalImage = new Image();
+    finalImage.src = finalCanvas.toDataURL();
+
+    document.body.appendChild(finalImage);
+    alert('You have already captured the maximum number of images.');
+  }
+
 }

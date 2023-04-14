@@ -53,7 +53,7 @@ ul {
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: 12px;
   width: max-content;
   color: #d0b49f;
   background-color: #201a1e;
