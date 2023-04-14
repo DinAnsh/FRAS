@@ -20,12 +20,8 @@ import numpy as np
 import face_recognition
 import cv2
 import os
-
-
-cascPathface = os.path.dirname(
-    cv2.__file__) + "/data/haarcascade_frontalface_alt2.xml"
-
-faceCascade = cv2.CascadeClassifier(cascPathface)
+from .face import extract_face, get_embedding, train
+import matplotlib.pyplot as plt
 
 def home(request):
     team_data = Team.objects.all()
@@ -286,7 +282,12 @@ def face_recognize(request):
     else:
         return JsonResponse({"status":"There is some error!"})
                 
-
+def train_model(request):
+    year = request.GET.get("year")
+    X,y = get_embedding(year)
+    
+    s = train(X,y)
+    return JsonResponse({"status":s})
 
 @login_required(login_url='testapp:home')
 def upload_image(request):
@@ -295,6 +296,8 @@ def upload_image(request):
         json_data = json.loads(request.body)
         image_data = json_data.get('image_data')
         enroll_id = json_data.get('enrollId')
+        
+        year = enroll_id[0:5]
         
         # Decode the base64-encoded image data
         decoded_image_data = base64.b64decode(image_data.split(',')[1])
@@ -305,16 +308,36 @@ def upload_image(request):
         image_file = ContentFile(decoded_image_data, name=imgName)
         
         pil_img = Image.open(image_file)
-        opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
-        face_encoding = get_encodings(opencvImage)
+        opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
         
+        # face_encoding = get_encodings(opencvImage)
+        
+        faces = []
+        #need to pass list of 5 images
+        # for i in images:
+        face_array = extract_face(opencvImage)
+        faces.append(face_array)
+        
+        # if type(face_arrays) == str:
+        #     return JsonResponse({'status': 'No face Found!'}, status=200)
+        
+        # else:  
         # Save the image to a file or database
         student = Student.objects.get(enroll=enroll_id)
         student.img=image_file
-        
-        student.encoding = face_encoding
+        flatten_arr = np.asarray(faces).flatten()
+        flat_str = ''
+        for i in flatten_arr:
+            flat_str+=str(i) + " " 
+            
+        student.encoding = flat_str
         student.save()
+                
         
+        # print(f"------------------------{student.encoding}------------------------------")
+        # print(f"------------------------{float_array}------------------------------")
+        # print(f"-------------------------{len(float_array)}-----------------------")
+        # print(f"-------------------------{float_array.reshape(1,160,160,3)}-----------------------")
         # face_recognize(enroll_id)
         # print(student)
         return JsonResponse({'status': 'success'}, status=200)    

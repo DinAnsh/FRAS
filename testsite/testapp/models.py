@@ -20,7 +20,7 @@ class Student(models.Model):
     img = models.ImageField(upload_to='students/')   #here media is our base dir 
     email = models.EmailField(max_length=50, default='abc@example.com')
     mobile = models.CharField(max_length=15, default='+911234567890')
-    encoding = models.CharField(max_length=2100)
+    encoding = models.CharField(max_length=384050)
     def __str__(self):
         return self.enroll
 
