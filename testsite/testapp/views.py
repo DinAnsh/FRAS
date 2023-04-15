@@ -310,39 +310,26 @@ def upload_image(request):
         pil_img = Image.open(image_file)
         opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
         
-        # face_encoding = get_encodings(opencvImage)
-        
-        faces = []
-        #need to pass list of 5 images
-        # for i in images:
         face_array = extract_face(opencvImage)
-        faces.append(face_array)
-        
-        # if type(face_arrays) == str:
-        #     return JsonResponse({'status': 'No face Found!'}, status=200)
-        
-        # else:  
-        # Save the image to a file or database
-        student = Student.objects.get(enroll=enroll_id)
-        student.img=image_file
-        flatten_arr = np.asarray(faces).flatten()
-        flat_str = ''
-        for i in flatten_arr:
-            flat_str+=str(i) + " " 
-            
-        student.encoding = flat_str
-        student.save()
+      
+        #here we need to check if the extract_face returns the list having 5 faces(len(extract_face)==5)
+        if len(face_array==5):
+            # Save the image to a file or database
+            student = Student.objects.get(enroll=enroll_id)
+            student.img=image_file
+            flatten_arr = np.asarray(face_array).flatten()
+            flat_str = ''
+            for i in flatten_arr:
+                flat_str+=str(i) + " " 
                 
+            student.encoding = flat_str
+            student.save()
+            return JsonResponse({'status': 'success! Faces Stored Succesfully'}, status=200)   
         
-        # print(f"------------------------{student.encoding}------------------------------")
-        # print(f"------------------------{float_array}------------------------------")
-        # print(f"-------------------------{len(float_array)}-----------------------")
-        # print(f"-------------------------{float_array.reshape(1,160,160,3)}-----------------------")
-        # face_recognize(enroll_id)
-        # print(student)
-        return JsonResponse({'status': 'success'}, status=200)    
+        else:
+            return JsonResponse({"status": "failed to detect 5 faces"}, status=500) 
     else:
-        return JsonResponse({'status': 'fail'})
+        return JsonResponse({'status': 'fail!'}, status=405)
 
 def sort(request):
     return JsonResponse({"status":"success! sorted"})

@@ -10,19 +10,23 @@ from sklearn.svm import SVC
 
 
 def extract_face(image):
+    face_arr = []
     detector = MTCNN()
     try:
-        faces = detector.detect_faces(image)  #[]
-        x,y,w,h = faces[0]['box']   #there is only face in image
-        x,y = abs(x), abs(y)
-        face = image[y:y+h,x:x+w]
-        face_arr = cv2.resize(face,(160,160))
+        faces = detector.detect_faces(image)
+        for f in faces:
+            x,y,w,h = f['box']   #there is only face in image
+            x,y = abs(x), abs(y)
+            face = image[y:y+h,x:x+w]
+            crop_face_arr = cv2.resize(face,(160,160))      # 3d - (160x160x3)
+            face_arr.append(crop_face_arr)
         return face_arr
     except Exception as e:
-        return f"No face Found! {e}"
+        return "No face Found!"
     
     
 def get_embedding(year:str):
+    
     embedder = FaceNet()  
     
     # year = '2021'
@@ -37,7 +41,7 @@ def get_embedding(year:str):
             
         else:
             # Convert the string back to a NumPy array
-            float_array = np.fromstring(obj.encoding, dtype=np.uint8, sep=' ').reshape(1,160,160,3)
+            float_array = np.fromstring(obj.encoding, dtype=np.uint8, sep=' ').reshape(5,160,160,3)
             X.extend(float_array)
             y += [obj.enroll] * len(float_array)    
     
