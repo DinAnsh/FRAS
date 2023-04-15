@@ -253,7 +253,7 @@ td {
   border-radius: 5px;
   width: 100%;
   background-color: #c1bebe;
-  height: 38rem;
+  height: max-content;
 }
 
 .popup_inst {
@@ -279,6 +279,7 @@ td {
   background-color: rgba(0, 0, 0, 0.7);
   width: 270px;
   height: 200px;
+  display: block;
   /* display: flex;
   justify-content: center;
   align-items: center;
@@ -298,16 +299,15 @@ td {
 }
 
 #canvas1 {
-  /* display: none; */
   width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
 #canvas {
   display: none;
   width: 100%;
-  /* width: 270px;
-  height: 200px; */
+  height: 100%;
   object-fit: cover;
 }
 
@@ -325,6 +325,7 @@ td {
   font-size: 16px;
   cursor: pointer;
   margin: 1rem;
+  border-radius: 0.5rem;
 }
 
 #retake-btn {
@@ -336,7 +337,21 @@ td {
   font-size: 16px;
   cursor: pointer;
   margin: 1rem;
+  border-radius: 0.5rem;
 }
+
+#next-btn {
+  display: none;
+  padding: 10px 20px;
+  border: none;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 1rem;
+  border-radius: 0.5rem;
+}
+
 
 #save-btn {
   display: none;
@@ -347,6 +362,7 @@ td {
   font-size: 16px;
   cursor: pointer;
   margin: 1rem;
+  border-radius: 0.5rem;
 }
 
 
