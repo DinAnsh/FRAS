@@ -26,6 +26,11 @@ function closeModal3() {
   });
   video.srcObject = null;
   document.getElementById("myModal3").style.display = "none";
+
+  captureBtn.style.display = 'block';
+  retakeBtn.style.display = 'none';
+  nextBtn.style.display = 'none';
+  saveBtn.style.display = 'none';
 }
 
 function closeModal4() {
@@ -52,33 +57,46 @@ window.onclick = function (event) {
 };
 
 // Camera capture
+let stream;
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
+
 const captureBtn = document.getElementById("capture-btn");
 const retakeBtn = document.getElementById("retake-btn");
 const saveBtn = document.getElementById("save-btn");
-let stream;
+const nextBtn = document.getElementById("next-btn");
+
+let imageCounter = 0;
+const finalCanvas = document.createElement('canvas');
+const finalContext = finalCanvas.getContext('2d');
+finalCanvas.width = canvas.width * 3;
+finalCanvas.height = canvas.height * 2;
+
+const captureWindow = document.querySelector('.capture-window');
+const imageContainer = document.getElementById("image-container");
+const imgElement = document.createElement('img');
+
 
 //------------------ Capture image from video stream and display in canvas ---------------
-// captureBtn.addEventListener("click", (event) => {
-//   video.style.display = "none";
-//   captureBtn.style.display = "none";
+captureBtn.addEventListener("click", () => {
+  // canvas.width = video.videoWidth;
+  // canvas.height = video.videoHeight;
+  
+  const context = canvas.getContext('2d');
+  context.drawImage(video, 0, 0, 250, 150);
 
-//   canvas.style.display = "block";
-//   retakeBtn.style.display = "block";
-//   saveBtn.style.display = "block";
+  canvas.style.display = 'block';
+  video.style.display = 'none';
 
-//   canvas.width = video.videoWidth;
-//   canvas.height = video.videoHeight;
+  captureBtn.style.display = 'none';
+  nextBtn.style.display = 'block';
+  retakeBtn.style.display = 'block';
 
-//   const context = canvas.getContext("2d");
-//   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-//   const tracks = stream.getTracks();
-//   tracks.forEach((track) => {
-//     track.stop();
-//   });
-// });
+  const tracks = stream.getTracks();
+  tracks.forEach((track) => {
+    track.stop();
+  });
+});
 
 
 // --------------------- retake button ---------------------------
@@ -93,31 +111,87 @@ retakeBtn.addEventListener("click", () => {
     .catch((error) => {
       console.log("Error accessing camera", error);
     });
-  video.style.display = "block";
-  captureBtn.style.display = "block";
 
+  video.style.display = "block";
   canvas.style.display = "none";
-  saveBtn.style.display = "none";
+
+  captureBtn.style.display = "block";
+  nextBtn.style.display = "none";
   retakeBtn.style.display = "none";
+});
+
+
+// ------------------------- next button ---------------------------------
+nextBtn.addEventListener("click", () =>{
+  imageCounter++;
+
+  canvas.style.display = 'none';
+  video.style.display = 'block';
+
+  retakeBtn.style.display = 'none';
+  nextBtn.style.display = 'none';
+  captureBtn.style.display = 'block';
+
+  navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then((streamObj) => {
+      stream = streamObj;
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch((error) => {
+      console.log("Error accessing camera", error);
+    });
+
+  if (imageCounter < 4) {
+    finalContext.drawImage(canvas, (imageCounter - 1) * canvas.width, 0, canvas.width, canvas.height);
+  }
+  if (imageCounter > 3 && imageCounter < 5) {
+    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
+  }
+  if (imageCounter === 5) {
+    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
+    imageCounter = 0;
+    
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => {
+      track.stop();
+    });
+    
+    saveBtn.style.display = "block";
+    captureBtn.style.display = "none";
+    video.style.display = 'none';
+
+    captureWindow.style.display = 'none';
+    imageContainer.style.display = 'block';
+
+    imgElement.width = 500;
+    imgElement.height = 250;
+
+    imgElement.src = finalCanvas.toDataURL();
+    imageContainer.appendChild(imgElement);
+
+    alert("Well done! You've captured the required number of images.");
+  }
 });
 
 
 //----------------------- for student face register -------------------------
 let enrollId = null;
 function sregister() {
+  captureWindow.style.display = 'block';
+  imageContainer.style.display = 'none';
 
   const tdElement = this.parentElement.parentElement.firstElementChild;
   enrollId = tdElement.textContent;
-  // console.log('ID value:', enrollId);
-
 
   document.getElementById("myModal3").style.display = "block";
-  video.srcObject = null;
   canvas.style.display = "none";
   video.style.display = "block";
-
   bufferingElement.style.display = 'block';
+  
   // Get video stream from user's camera
+  video.srcObject = null;
   navigator.mediaDevices
     .getUserMedia({ video: true })
     .then((streamObj) => {
@@ -491,47 +565,4 @@ function downloadExcel() {
     downloadLink.download = 'table.xlsx';
     downloadLink.click();
   });
-}
-
-
-// ====================testing=======================
-
-var imageCounter = 0;
-const finalCanvas = document.createElement('canvas');
-const finalContext = finalCanvas.getContext('2d');
-
-captureBtn.addEventListener('click', captureImage);
-finalCanvas.width = canvas.width * 3;
-finalCanvas.height = canvas.height * 2;
-
-function captureImage() {
-  const context = canvas.getContext('2d');
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  imageCounter++;
-
-  if (imageCounter <= 3) {
-    finalContext.drawImage(canvas, (imageCounter - 1)* canvas.width, 0, canvas.width, canvas.height);
-  }
-  if (imageCounter > 3 && imageCounter < 5) {
-    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
-  }
-  if (imageCounter === 5) {
-    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
-    imageCounter = 0;
-    saveBtn.style.display = "block";
-    video.style.display = 'none';
-    captureBtn.style.display = "none";
-
-    const tracks = stream.getTracks();
-    tracks.forEach((track) => {
-      track.stop();
-    });
-
-    const finalImage = new Image();
-    finalImage.src = finalCanvas.toDataURL();
-
-    document.body.appendChild(finalImage);
-    alert('You have already captured the maximum number of images.');
-  }
-
 }
