@@ -75,15 +75,16 @@ finalCanvas.height = canvas.height * 2;
 const captureWindow = document.querySelector('.capture-window');
 const imageContainer = document.getElementById("image-container");
 const imgElement = document.createElement('img');
-
+const w = canvas.width;
+const h = canvas.height;
 
 //------------------ Capture image from video stream and display in canvas ---------------
 captureBtn.addEventListener("click", () => {
-  // canvas.width = video.videoWidth;
-  // canvas.height = video.videoHeight;
-  
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
   const context = canvas.getContext('2d');
-  context.drawImage(video, 0, 0, 250, 150);
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
   canvas.style.display = 'block';
   video.style.display = 'none';
@@ -122,7 +123,7 @@ retakeBtn.addEventListener("click", () => {
 
 
 // ------------------------- next button ---------------------------------
-nextBtn.addEventListener("click", () =>{
+nextBtn.addEventListener("click", () => {
   imageCounter++;
 
   canvas.style.display = 'none';
@@ -144,20 +145,20 @@ nextBtn.addEventListener("click", () =>{
     });
 
   if (imageCounter < 4) {
-    finalContext.drawImage(canvas, (imageCounter - 1) * canvas.width, 0, canvas.width, canvas.height);
+    finalContext.drawImage(canvas, (imageCounter - 1) * w, 0, w, h);
   }
   if (imageCounter > 3 && imageCounter < 5) {
-    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
+    finalContext.drawImage(canvas, (imageCounter - 4) * w, h, w, h);
   }
   if (imageCounter === 5) {
-    finalContext.drawImage(canvas, (imageCounter - 4) * canvas.width, canvas.height, canvas.width, canvas.height);
+    finalContext.drawImage(canvas, (imageCounter - 4) * w, h, w, h);
     imageCounter = 0;
-    
+
     const tracks = stream.getTracks();
     tracks.forEach((track) => {
       track.stop();
     });
-    
+
     saveBtn.style.display = "block";
     captureBtn.style.display = "none";
     video.style.display = 'none';
@@ -189,7 +190,7 @@ function sregister() {
   canvas.style.display = "none";
   video.style.display = "block";
   bufferingElement.style.display = 'block';
-  
+
   // Get video stream from user's camera
   video.srcObject = null;
   navigator.mediaDevices
@@ -310,6 +311,7 @@ function getStudents(page = 1) {
   // to display export button
   if (classId) {
     document.getElementById('export-btn').style.display = 'block';
+    document.getElementById('train-btn').style.display = 'block';
   }
 
   // Make an AJAX request to the Django view
@@ -590,3 +592,7 @@ function uploadGrid(event) {
   };
   xhr.send(formData);
 }
+
+
+// ---------------------- train the model -------------------------------------
+function trainModel() { }

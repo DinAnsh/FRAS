@@ -70,12 +70,15 @@
     <div id="pagination" class="pagination">
       <span class="page-label"></span>
       <div class="page-btn" id="page-btn">
-        <button type="button" class="common_btn button2" id="prev-link" style="display:none;">Previous</button>
-        <button type="button" class="common_btn button2" id="next-link" style="display:none;">Next</button>
+        <button type="button" class="common_btn button1" id="prev-link" style="display:none;">Previous</button>
+        <button type="button" class="common_btn button1" id="next-link" style="display:none;">Next</button>
       </div>
     </div>
+  </div>
 
-    <button id="export-btn" class="common_btn button1" onclick="downloadExcel()">Export to Excel</button>
+  <div class="export_train">
+    <button id="export-btn" class="common_btn button2" onclick="downloadExcel()">Export to Excel</button>
+    <button id="train-btn" class="common_btn button2" onclick="trainModel()">Train Model</button>
   </div>
 </div>
 
