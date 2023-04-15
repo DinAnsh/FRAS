@@ -292,20 +292,24 @@ def train_model(request):
 @login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
-        # Get the image data from the request
-        json_data = json.loads(request.body)
-        image_data = json_data.get('image_data')
-        enroll_id = json_data.get('enrollId')
+        if request.content_type == 'application/json':
+            # Get the image data from the request
+            json_data = json.loads(request.body)
+            image_data = json_data.get('image_data')
+            enroll_id = json_data.get('enrollId')
+            # Decode the base64-encoded image data
+            decoded_image_data = base64.b64decode(image_data.split(',')[1])
+            
+            imgName = enroll_id.replace('/', '')+".png"
+            
+            # Create a ContentFile from the decoded image data
+            image_file = ContentFile(decoded_image_data, name=imgName)
         
-        year = enroll_id[0:5]
+        else:
+            image_file = request.FILES.get('image')
+            enroll_id = request.POST.get('enrollId')
         
-        # Decode the base64-encoded image data
-        decoded_image_data = base64.b64decode(image_data.split(',')[1])
-        
-        imgName = enroll_id.replace('/', '')+".png"
-        
-        # Create a ContentFile from the decoded image data
-        image_file = ContentFile(decoded_image_data, name=imgName)
+        year = enroll_id[0:4]
         
         pil_img = Image.open(image_file)
         opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
@@ -313,7 +317,7 @@ def upload_image(request):
         face_array = extract_face(opencvImage)
       
         #here we need to check if the extract_face returns the list having 5 faces(len(extract_face)==5)
-        if len(face_array==5):
+        if (type(face_array)!= str) and (len(face_array)==5):
             # Save the image to a file or database
             student = Student.objects.get(enroll=enroll_id)
             student.img=image_file
@@ -324,12 +328,12 @@ def upload_image(request):
                 
             student.encoding = flat_str
             student.save()
-            return JsonResponse({'status': 'success! Faces Stored Succesfully'}, status=200)   
+            return JsonResponse({'status': 'Success! Faces Stored Succesfully'}, status=200)   
         
         else:
-            return JsonResponse({"status": "failed to detect 5 faces"}, status=500) 
+            return JsonResponse({"status": f"Failed to detect 5 faces or {len(face_array)} faces Found!"}, status=500) 
     else:
-        return JsonResponse({'status': 'fail!'}, status=405)
+        return JsonResponse({'status': 'Fail!'}, status=405)
 
 def sort(request):
     return JsonResponse({"status":"success! sorted"})

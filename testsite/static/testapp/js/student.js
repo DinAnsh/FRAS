@@ -566,3 +566,27 @@ function downloadExcel() {
     downloadLink.click();
   });
 }
+
+
+// -----------------------Upload Faces Grid---------------------------
+function uploadGrid(event) {
+  const files = event.target.files;
+  const file = files[0];
+
+  var formData = new FormData();
+  formData.append("image", file);
+  formData.append("enrollId", enrollId);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/testapp/upload_image/", true);
+  xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+
+  xhr.onreadystatechange = function () {
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      alert("Class Image saved successfully");
+    } else {
+      console.error("Failed to upload image");
+    }
+  };
+  xhr.send(formData);
+}
