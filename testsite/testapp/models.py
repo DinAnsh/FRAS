@@ -30,3 +30,13 @@ class Team(models.Model):
     image = models.ImageField(upload_to='team/')
     def __str__(self):
         return self.name
+    
+
+class Teacher(models.Model):
+    name = models.CharField(max_length=50)
+    id = models.CharField(primary_key=True, max_length=20)
+    email = models.EmailField(max_length=50, default='abc@example.com')
+    mobile = models.CharField(max_length=15, default='+911234567890')
+    subjects = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name

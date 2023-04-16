@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.paginator import Paginator
-from .models import System_Admin, Student, Team
+from .models import System_Admin, Student, Team, Teacher
 from django.http import JsonResponse
 import json
 import base64
@@ -211,8 +211,48 @@ def upload_image(request):
 
 @login_required(login_url='testapp:home')
 def teacher(request):
+    if request.method=='POST' and request.FILES['teacherDetails']:
+        excel_file = request.FILES['teacherDetails']
+
+        skipR = [0,1,2]
+        df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5])
+        df = df.dropna(subset=['NAME'])
+        # print(df)
+
+        dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
+        dfEmails = df['Email'].to_list()
+
+        try:
+            if(len(dbEmails) > len(dfEmails)):    # to delete the missing teachers in the uploaded sheet
+                emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+                Teacher.objects.filter(email__in = emails_to_delete).delete()
+
+            else:       # to add or modify the present teachers in the uploaded sheet
+                for index, row in df.iterrows():
+                    teacher, created = Teacher.objects.get_or_create(
+                        email = str(row['Email']),
+                        defaults={
+                            'name': row['NAME'],
+                            'id': int(row['S.N0']),
+                            'mobile': str(int(row['Mobile'])),
+                            'subjects': row['Subjects']
+                        }
+                    )
+                    if not created:
+                        teacher.name = row['NAME']
+                        teacher.id = int(row['S.N0'])
+                        teacher.mobile = str(int(row['Mobile']))
+                        teacher.subjects = row['Subjects']
+                        teacher.save()
+
+            return JsonResponse({'success': True, 'message': 'Teacher details uploaded successfully.',})
+        
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    teacherData = list(Teacher.objects.all().values_list())
+    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'teachers':teacherData})
     
 
 @login_required(login_url='testapp:home')
