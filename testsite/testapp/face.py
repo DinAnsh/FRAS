@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
 
+model = None
 
 def extract_face(image):
     face_arr = []
@@ -42,30 +43,53 @@ def get_embedding(year:str):
         else:
             # Convert the string back to a NumPy array
             float_array = np.fromstring(obj.encoding, dtype=np.uint8, sep=' ').reshape(5,160,160,3)
-            X.extend(float_array)
-            y += [obj.enroll] * len(float_array)    
+            X.extend(float_array)   #
+            en = "".join(obj.enroll.split("/")[0::2])
+            y += [en] * len(float_array)    
     
     
     EMBEDDED_X = []
     for img in X:
         face_img = img.astype('float32')  #3D(160X160X3)
-        face_img = np.expand_dims(face_img, axis=0)
-        #4D (NoneX160X160X3)
+        face_img = np.expand_dims(face_img, axis=0)   #4D (NoneX160X160X3)
+        yhat = embedder.embeddings(face_img)
+        
+        EMBEDDED_X.append(yhat[0])
+        
+    EMBEDDED_X= np.asarray(EMBEDDED_X)
+    # EMBEDDED_X= np.asarray(X)
+    y = np.asarray(y,dtype=int)
+    
+    return EMBEDDED_X, y
+
+
+def train(X,y):
+    # encoder = LabelEncoder()
+    # encoder.fit(y)
+    # Y_en = encoder.transform(y)
+    
+    global model
+    X_train, X_test, Y_train, Y_test = train_test_split(X,y, shuffle=True,random_state=17)
+    model = SVC(kernel='linear', probability=True)
+    model.fit(X_train,Y_train)
+    
+    return "Training done"
+
+def makePrediction(image):
+    embedder = FaceNet()
+    faces =  extract_face(image)   #list of faces
+    year = "2021"
+    
+    EMBEDDED_X = []
+    for img in faces:
+        face_img = img.astype('float32')  #3D(160X160X3)
+        face_img = np.expand_dims(face_img, axis=0)   #4D (NoneX160X160X3)
         yhat = embedder.embeddings(face_img)
         
         EMBEDDED_X.append(yhat[0])
         
     EMBEDDED_X= np.asarray(EMBEDDED_X)
     
-    return EMBEDDED_X, y
-
-
-def train(X,y):
-    encoder = LabelEncoder()
-    encoder.fit(y)
-    Y_en = encoder.transform(y)
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y_en, shuffle=True,random_state=17)
-    model = SVC(kernel='linear', probability=True)
-    model.fit(X_train,Y_train)
+    global model
+    return model.predict(EMBEDDED_X)
     
-    return "Training done"

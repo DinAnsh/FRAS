@@ -20,7 +20,7 @@ import numpy as np
 import face_recognition
 import cv2
 import os
-from .face import extract_face, get_embedding, train
+from .face import *
 import matplotlib.pyplot as plt
 
 def home(request):
@@ -217,77 +217,80 @@ def face_recognize(request):
             
         
         pil_img = Image.open(image_file)
-        # pil_img.show()
+        # # pil_img.show()
         
         
-        knownEncodings = []
-        knownEnroll = []
+        # knownEncodings = []
+        # knownEnroll = []
         
-        #need to fetch only particular year students 
-        # all_students = Student.objects.all()
-        year = '2021'
-        all_students = Student.objects.filter(enroll__startswith=year)
-        for obj in all_students:
-            if obj.encoding is None or obj.encoding == '':
-                continue
+        # #need to fetch only particular year students 
+        # # all_students = Student.objects.all()
+        # year = '2021'
+        # all_students = Student.objects.filter(enroll__startswith=year)
+        # for obj in all_students:
+        #     if obj.encoding is None or obj.encoding == '':
+        #         continue
             
-            else:
-                # Convert the string back to a NumPy array
-                float_array = np.fromstring(obj.encoding[1:-1], dtype=np.float64, sep=' ')
-                knownEncodings.append(float_array)
-                knownEnroll.append(obj.enroll)           
+        #     else:
+        #         # Convert the string back to a NumPy array
+        #         float_array = np.fromstring(obj.encoding[1:-1], dtype=np.float64, sep=' ')
+        #         knownEncodings.append(float_array)
+        #         knownEnroll.append(obj.enroll)           
             
-        #save encodings along with their names in dictionary data
-        data = {"encodings": knownEncodings, "enrollments": knownEnroll} 
+        # #save encodings along with their names in dictionary data
+        # data = {"encodings": knownEncodings, "enrollments": knownEnroll} 
         
-        # convert the input frame from BGR to RGB 
+        # # convert the input frame from BGR to RGB 
         rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
         
-        # boxes = face_recognition.face_locations(rgb,model='cnn')
+        # # boxes = face_recognition.face_locations(rgb,model='cnn')
         
-        # the facial embeddings for face in input
-        encodings = face_recognition.face_encodings(rgb)
+        # # the facial embeddings for face in input
+        # encodings = face_recognition.face_encodings(rgb)
         
-        enrolls = []
+        # enrolls = []
         
-        for encoding in encodings:
-        #Compare encodings with encodings in data["encodings"]
-        #Matches contain array of the same length of data["encodings"] with boolean values and True for the embeddings it matches closely and False for rest
-            matches = face_recognition.compare_faces(data["encodings"], encoding)
+        # for encoding in encodings:
+        # #Compare encodings with encodings in data["encodings"]
+        # #Matches contain array of the same length of data["encodings"] with boolean values and True for the embeddings it matches closely and False for rest
+        #     matches = face_recognition.compare_faces(data["encodings"], encoding)
             
-            #set name =inknown if no encoding matches
-            enroll = "Unknown"
+        #     #set name =inknown if no encoding matches
+        #     enroll = "Unknown"
             
-            # check to see if we have found a match
-            if True in matches:
-                #Find positions at which we get True and store them
-                matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+        #     # check to see if we have found a match
+        #     if True in matches:
+        #         #Find positions at which we get True and store them
+        #         matchedIdxs = [i for (i, b) in enumerate(matches) if b]
                 
-                counts = {}
-                for i in matchedIdxs:
-                    #Check the names at respective indexes we stored in matchedIdxs
-                    enroll = data["enrollments"][i]
+        #         counts = {}
+        #         for i in matchedIdxs:
+        #             #Check the names at respective indexes we stored in matchedIdxs
+        #             enroll = data["enrollments"][i]
                     
-                    #increase count for the name we got
-                    counts[enroll] = counts.get(enroll, 0) + 1
+        #             #increase count for the name we got
+        #             counts[enroll] = counts.get(enroll, 0) + 1
                     
-                #set name which has highest count
-                enroll = max(counts, key=counts.get)
+        #         #set name which has highest count
+        #         enroll = max(counts, key=counts.get)
                 
-            # update the list of names
-            enrolls.append(enroll)    
-            
+        #     # update the list of names
+        #     enrolls.append(enroll)    
+        enrolls = makePrediction(rgb).tolist()
+        print("------------------",enrolls)
         return JsonResponse({"enrolls":enrolls})
     
     else:
         return JsonResponse({"status":"There is some error!"})
+         
                 
 def train_model(request):
-    year = request.GET.get("year")
-    X,y = get_embedding(year)
-    
+    # year = request.GET.get("year")
+    X,y = get_embedding("2021")
+    print("-------------------------------Embeddings Done----------------- ",X.shape, y.dtype, y)
     s = train(X,y)
-    return JsonResponse({"status":s})
+    return JsonResponse({"status":[s, X.shape, y.shape]})
+
 
 @login_required(login_url='testapp:home')
 def upload_image(request):

@@ -595,4 +595,17 @@ function uploadGrid(event) {
 
 
 // ---------------------- train the model -------------------------------------
-function trainModel() { }
+function trainModel() { 
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "../students/train_model/", true);
+  xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+
+  xhr.onreadystatechange = function () {
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      alert("Model Trained Successfully");
+    } else {
+      console.error("Failed to Train Model");
+    }
+  };
+  xhr.send();
+}
