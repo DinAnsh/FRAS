@@ -229,13 +229,6 @@ header {
   height: var(--dl-size-size-xsmall);
 }
 
-.home-separator1 {
-  width: 100%;
-  height: 1px;
-  margin: 20px;
-  background-color: #201a1e;
-}
-
 .home-text58 {
   color: #201a1e;
   align-self: center;
