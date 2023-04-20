@@ -7,8 +7,10 @@ from .models import Student
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
+import pickle
 
-model = None
+# model = None
+# class_names = None
 
 def extract_face(image):
     face_arr = []
@@ -44,7 +46,7 @@ def get_embedding(year:str):
             # Convert the string back to a NumPy array
             float_array = np.fromstring(obj.encoding, dtype=np.uint8, sep=' ').reshape(5,160,160,3)
             X.extend(float_array)   #
-            en = "".join(obj.enroll.split("/")[0::2])
+            en = "".join(obj.enroll.split("/")[0::2])     #2019140
             y += [en] * len(float_array)    
     
     
@@ -60,6 +62,9 @@ def get_embedding(year:str):
     # EMBEDDED_X= np.asarray(X)
     y = np.asarray(y,dtype=int)
     
+    # global class_names              #need to store in a numpy file .npz
+    class_names = np.unique(y)
+    np.savez("Classes", array1=class_names)
     return EMBEDDED_X, y
 
 
@@ -73,6 +78,10 @@ def train(X,y):
     model = SVC(kernel='linear', probability=True)
     model.fit(X_train,Y_train)
     
+    filename = 'model.pkl'  # Specify the filename
+    with open(filename, 'wb') as file:
+        pickle.dump(model, file)
+        
     return "Training done"
 
 def makePrediction(image):
@@ -90,6 +99,30 @@ def makePrediction(image):
         
     EMBEDDED_X= np.asarray(EMBEDDED_X)
     
-    global model
-    return model.predict(EMBEDDED_X)
+    if EMBEDDED_X.ndim == 1:
+        return "No face Found!"
+    
+    # global model                #need to store using pickle
+    # global class_names
+    filename = 'model.pkl'   # Specify the filename
+    with open(filename, 'rb') as file:
+        model = pickle.load(file)
+        
+    class_names = np.load("Classes.npz")['array1']
+        
+    prob_scores = model.predict_proba(EMBEDDED_X) 
+    threshold = 0.25
+    predictions = []
+    for label_scores in prob_scores:
+        max_confidence = max(label_scores)
+        if max_confidence >= threshold:
+            pred_label = model.classes_[label_scores.argmax()]
+            predictions.append(class_names[pred_label])
+            
+        else:
+            pred_label = "Unknown"
+            predictions.append(pred_label)
+            
+
+    return predictions
     

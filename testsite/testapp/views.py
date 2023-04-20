@@ -1,6 +1,6 @@
 #This is where we have functions that handle requests and return responses
 
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
@@ -8,7 +8,6 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
-from django.core.paginator import Paginator
 from .models import System_Admin, Student, Team
 from django.http import JsonResponse
 import json
@@ -17,7 +16,7 @@ from django.core.files.base import ContentFile
 from PIL import Image
 import pandas as pd
 import numpy as np
-import face_recognition
+# import face_recognition
 import cv2
 import os
 from .face import *
@@ -186,20 +185,20 @@ def get_student_data(request):
 
 
 
-def get_encodings(image):
-    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
-    #                                     minNeighbors=6,
-    #                                     flags=cv2.CASCADE_SCALE_IMAGE)
-    # for (x,y,w,h) in faces:
-    #     cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
-    #     faceROI = image[y:y+h,x:x+w]
+# def get_encodings(image):
+#     # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#     # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
+#     #                                     minNeighbors=6,
+#     #                                     flags=cv2.CASCADE_SCALE_IMAGE)
+#     # for (x,y,w,h) in faces:
+#     #     cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
+#     #     faceROI = image[y:y+h,x:x+w]
     
-    # convert image from BGR (OpenCV ordering) to dlib ordering (RGB)
-    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    boxes = face_recognition.face_locations(rgb,model='cnn')
-    enc = face_recognition.face_encodings(rgb,boxes)
-    return enc[0]
+#     # convert image from BGR (OpenCV ordering) to dlib ordering (RGB)
+#     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+#     boxes = face_recognition.face_locations(rgb,model='cnn')
+#     enc = face_recognition.face_encodings(rgb,boxes)
+#     return enc[0]
 
 
 def face_recognize(request):
@@ -276,9 +275,9 @@ def face_recognize(request):
                 
         #     # update the list of names
         #     enrolls.append(enroll)    
-        enrolls = makePrediction(rgb).tolist()
+        enrolls = makePrediction(rgb)
         print("------------------",enrolls)
-        return JsonResponse({"enrolls":enrolls})
+        return JsonResponse({"enrolls":list(enrolls)})
     
     else:
         return JsonResponse({"status":"There is some error!"})
@@ -289,7 +288,7 @@ def train_model(request):
     X,y = get_embedding("2021")
     print("-------------------------------Embeddings Done----------------- ",X.shape, y.dtype, y)
     s = train(X,y)
-    return JsonResponse({"status":[s, X.shape, y.shape]})
+    return JsonResponse({"status":s})
 
 
 @login_required(login_url='testapp:home')

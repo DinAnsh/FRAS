@@ -922,7 +922,7 @@ nav a:is(:link, :active, :visited).active {
   display: grid;
   grid-gap: var(--dl-space-space-twounits);
   padding-top: var(--dl-space-space-twounits);
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4,auto);
 }
 
 .home-container21 {
@@ -1967,7 +1967,7 @@ nav a:is(:link, :active, :visited).active {
 
   .home-container20 {
     align-self: center;
-    grid-template-columns: 1fr;
+    grid-template-columns: auto auto;
   }
 
   .home-footer {
@@ -2139,6 +2139,11 @@ nav a:is(:link, :active, :visited).active {
     padding-right: 0px;
     padding-bottom: var(--dl-space-space-twounits);
   }
+
+  .home-container20 {
+    align-self: center;
+    grid-template-columns: auto;
+}
 
   .home-text29 {
     margin-left: 0px;

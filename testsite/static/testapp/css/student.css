@@ -77,6 +77,10 @@ td {
   font-size: 30px;
 }
 
+#student-list tr:hover{
+  background-color: rgb(238, 236, 236);
+}
+
 #searchId {
   height: 28px;
   padding: 0 10px;
