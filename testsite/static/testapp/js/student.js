@@ -15,10 +15,6 @@ function closeModal2() {
   document.getElementById("myModal2").style.display = "none";
 }
 
-function addcam() {
-  document.getElementById("myModal4").style.display = "block";
-}
-
 function closeModal3() {
   const tracks = stream.getTracks();
   tracks.forEach((track) => {
@@ -33,10 +29,6 @@ function closeModal3() {
   saveBtn.style.display = 'none';
 }
 
-function closeModal4() {
-  document.getElementById("myModal4").style.display = "none";
-}
-
 window.onclick = function (event) {
   // console.log(event.target)
   if (event.target == document.getElementById("cbtn")) {
@@ -48,11 +40,6 @@ window.onclick = function (event) {
     event.target == document.getElementById("content3")
   ) {
     closeModal3();
-  } else if (
-    event.target == document.getElementById("cbtn4") ||
-    event.target == document.getElementById("content4")
-  ) {
-    closeModal4();
   }
 };
 

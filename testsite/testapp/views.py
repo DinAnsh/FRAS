@@ -8,12 +8,13 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
-from .models import System_Admin, Student, Team
+from django.core.paginator import Paginator
+from .models import *
 from django.http import JsonResponse
-import json
-import base64
 from django.core.files.base import ContentFile
 from PIL import Image
+import base64
+import json
 import pandas as pd
 import numpy as np
 # import face_recognition
@@ -21,6 +22,9 @@ import cv2
 import os
 from .face import *
 import matplotlib.pyplot as plt
+from datetime import datetime
+
+
 
 def home(request):
     team_data = Team.objects.all()
@@ -179,7 +183,7 @@ def get_student_data(request):
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(selected_class))
-    student_data = Student.objects.filter(enroll__startswith=adm_year).values()
+    student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
     # print(list(student_data))     #list of dicts
     return JsonResponse({'data':list(student_data),}, safe=False)
 
@@ -343,17 +347,184 @@ def sort(request):
 
 @login_required(login_url='testapp:home')
 def teacher(request):
+    if request.method=='POST' and request.FILES['teacherDetails']:
+        excel_file = request.FILES['teacherDetails']
+
+        skipR = [0,1,2]
+        df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5], index_col='S.N0')
+        df = df.dropna(subset=['NAME'])
+        df.index = df.index.astype(int)
+
+        dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
+        dfEmails = df['Email'].to_list()
+
+        try:
+            if(len(dbEmails) > len(dfEmails)):    # to delete the missing teachers in the uploaded sheet
+                emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+                Teacher.objects.filter(email__in = emails_to_delete).delete()
+
+            else:       # to add or modify the present teachers in the uploaded sheet
+                for index, row in df.iterrows():
+                    teacher, created = Teacher.objects.get_or_create(
+                        email = str(row['Email']),
+                        defaults={
+                            'name': row['NAME'],
+                            'id': index,
+                            'mobile': str(int(row['Mobile'])),
+                            'subjects': row['Subjects']
+                        }
+                    )
+                    if not created:
+                        teacher.name = row['NAME']
+                        teacher.id = index
+                        teacher.mobile = str(int(row['Mobile']))
+                        teacher.subjects = row['Subjects']
+                        teacher.save()
+
+            save_subjects(df.loc[:,['Subjects']])   # to save relevant data to the Subject model
+            return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.',})
+        
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    teacherData = list(Teacher.objects.all().values_list())
+    teacherData.sort(key=lambda x: int(x[1]))
+    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'teachers':teacherData})
     
 
 @login_required(login_url='testapp:home')
 def schedule(request):
+    selected_class = request.GET.get('class')
+    if request.method=='POST' and request.FILES['timeTable']:
+        excel_file = request.FILES['timeTable']
+
+        skipR = [0,1,2,3,4]
+        df = pd.read_excel(excel_file, skiprows=skipR, usecols='A:I', index_col='Day')
+        df.fillna('-', inplace=True)
+
+        try:
+            db_entry = clean_schedule(df)
+            class_obj = Classroom.objects.get(class_id = selected_class)
+            
+            dict_data = [{'day_of_week': row[0], 'class_id': class_obj,
+                          'start_time': datetime.strptime(row[1], '%H').time(), 
+                          'end_time': datetime.strptime(row[2], '%H').time(), 
+                          'subject': row[3]} for row in db_entry]
+
+            # to delete old records
+            if Schedule.objects.filter(class_id__class_id = selected_class).values_list():
+                Schedule.objects.filter(class_id__class_id = selected_class).delete()
+            
+            # an efficient way to create multiple instances of a model at once
+            Schedule.objects.bulk_create([Schedule(**row) for row in dict_data])
+            return JsonResponse({'success': True, 'message': 'Schedule is uploaded successfully.'})           
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
+    schedule_data = []
+    if selected_class:
+        data = Schedule.objects.filter(class_id__class_id = selected_class).values_list()
+        if data:
+            try:
+                schedule_data = [row[-1] for row in list(data)]
+                schedule_data = [schedule_data[i:i+8] for i in range(0, len(schedule_data), 8)]
+                return JsonResponse({'success': True, 'schedule':schedule_data})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+        else:
+            return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
+
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
-    
+
 
 @login_required(login_url='testapp:home')
-def camera(request):
+def classroom(request):
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+
+
+# some extra helper functions
+def clean_schedule(df):
+    db_entry = []
+    for i in df.index:    #each day
+        for j in df.loc[i].index:    #each period
+
+            if j != '1-2':    #not a lunch time
+                if ('\n' in df.loc[i,j]) or ('/' in df.loc[i,j]):    #for multiple items
+                    row = [i, j.split('-')[0], j.split('-')[1]]
+                
+                    if '\n' in df.loc[i,j]:    #1st hour of two subjects
+                        row.append(df.loc[i,j].replace('\n',','))
+                    
+                    if '/' in df.loc[i,j]:    #1st hour of NCC/NSS/Scout
+                        row.append(df.loc[i,j].replace('/',' or '))
+                    
+                    db_entry.append(row)
+                    
+                    #for the subjects having 2hrs assigned
+                    start = j.split('-')[1]
+                    if int(start) < 5 or int(start) > 9:
+                        end = int(start) + 1
+                        if end > 12:
+                            end %= 12
+                        
+                        #to avoid the overriding the subject presents in the next period
+                        next_period = '-'.join([start, str(end)])
+                        if df.loc[i,next_period] == '-':
+                            if '\n' in df.loc[i,j]:    #2nd hour of two subjects
+                                df.loc[i,next_period] = df.loc[i,j].replace('\n',',')
+                            if '/' in df.loc[i,j]:    #2nd hour of NCC/NSS/Scout
+                                df.loc[i,next_period] = df.loc[i,j].replace('/',' or ')
+
+                else:    #single subject or no subject
+                    db_entry.append([
+                            i,
+                            j.split('-')[0],
+                            j.split('-')[1],
+                            df.loc[i,j],
+                        ])
+                    
+            else:    #lunch time
+                db_entry.append([
+                    i,
+                    j.split('-')[0],
+                    j.split('-')[1],
+                    'LUNCH',
+                ])
+    return db_entry
+
+
+def save_subjects(data):
+    res_dict = {}
+    try:
+        # to process the text
+        for row in data.iterrows():
+            sub_col = row[1].values[0]
+            if ',' in sub_col:    #for multiple subjects
+                subj = sub_col.split(',')
+                for sub in subj:
+                    res = [i.strip(')') for i in sub.split('(')]
+                    res_dict[res[1]] = [res[0], Teacher.objects.get(id=row[0])]
+            else:    #for single subject
+                res = [i.strip(')') for i in sub_col.split('(')]
+                res_dict[res[1]] = [res[0], Teacher.objects.get(id=row[0])]
+        
+        # to save the processed values
+        for key, value in res_dict.items():
+            subject, created = Subject.objects.get_or_create(
+                id = key,
+                defaults={
+                    'name': value[0].strip(),
+                    'teacher_id': value[1]
+                }
+            )
+            if not created:
+                subject.name = value[0].strip()
+                subject.teacher_id = value[1]
+                subject.save()
+
+    except Exception as e:
+        return f'There is an exception {e}'
+    return "Successfully saved the subjects!"

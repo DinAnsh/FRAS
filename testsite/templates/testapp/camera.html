@@ -2,133 +2,152 @@
 {% load static %}
 
 {% block title %}
-<title>Camera Setup | FRAS</title>
+<title>Classroom HQ | FRAS</title>
 {% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'testapp/css/student.css' %}">
-{% endblock  %}
+{% endblock %}
 {% block body %}
-    <div class="main-container">
-      <div class="main-part1">
-          <div class="part1-content">
-            <select name="department" id="" disabled>
-              <option value="cse">Computer Science and Engineering</option>
-            </select>
-          </div>
-  
-          <div class="part1-content">
-            <button class="comman_btn button2" onclick="addcam()">Add Camera</button>
-          </div>
-      </div>
-      <div class="main-part2">
-        <div class="btn-cont">
-          <div class="tabletitle">
-            <h2>
-              Camera Details
-            </h2>
-          </div>
-        </div>
-        <div class="part3-content">
-          <table>
-            <thead>
-              <tr>
-                <th class="ctcol1">Room No</th>
-                <th class="ctcol2">Camera</th>
-                <th class="ctcol3">Camera IP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                  <td>1</td>
-                  <td>John</td>
-                  <td>john@example.com</td>
-              </tr>
-              <tr>
-                  <td>2</td>
-                  <td>Jane</td>
-                  <td>jane@example.com</td>
-              </tr>
-              <tr>
-                  <td>3</td>
-                  <td>Bob</td>
-                  <td>bob@example.com</td>
-              </tr>
-              <tr>
-                  <td>4</td>
-                  <td>Alice</td>
-                  <td>alice@example.com</td>
-              </tr>
-
-          </tbody>
-          </table>
-        </div>
-      </div>
+<div class="main-container">
+  <div class="main-part1">
+    <div class="part1-content">
+      <select name="department" id="" disabled>
+        <option value="cse">Computer Science and Engineering</option>
+      </select>
     </div>
 
-    <div id="myModal3" class="modal3">
-      <div class="modal-content3" id="content3">
-        <div class="popup3">
-          <span class="close3" id="cbtn3">&times;</span>
-          <div class="popup_title3">
-            Register Student Face
-          </div>
-          <div class="popup_body3">
-            <div class="capture-window">
-              <div id="video1"><video id="video"></video></div>
-              <div id="canvas1"><canvas id="canvas"></canvas></div>
-              
-            </div>
-            <div class="takebtn">
-              <button id="capture-btn">Capture</button>
-              <button id="retake-btn">Retake</button>
-            </div>
-          </div>
-          <button id="save-btn">Save</button>
-          <div class="popup_inst">
-            <h2>Instructions:-</h2>
-            <ul>
-              <li>Ensure that you have a stable internet connection and a webcam or a front-facing camera on your device.</li>
-              <li>Position student face in center of designated area on the screen and hold still while the camera captures several images of your face from different angles.</li>
-              <li>Once you have captured the required images, the system will analyze and process them to create a digital representation of your face. This representation will be used to match your face with the images captured during attendance recording.</li>
-  
-            </ul>
-          </div>
-        </div>
-      </div>
+    <div class="part1-content">
+      <button class="custom-file-upload" onclick="addclass()">Assign Classroom</button>
     </div>
 
-    <div id="myModal4" class="modal4">
-      <div class="modal-content4" id="content4">
-        <div class="popup4">
-          <span class="close4" id="cbtn4">&times;</span>
-          <div class="popup_title4">
-            Provide Camera details
-          </div>
-          <div class="popup_body4">
-            <form class="popup_form2" action="#">
-  
-              <div class="in_div">
-                <label for="department" class="input_label">Department:</label>
-                <select name="dept" id="department" disabled>
-                  <option value="1">Computer Science and Engineering</option>
-                </select>
-              </div>
-  
-              <div class="in_div">
-                <label for="room" class="input_label">Room No.:</label>
-                <input type="text" id="room" name="room_no" class="in_field" required>
-              </div>
-              <div class="in_div">
-                <label for="ip" class="input_label">Camera IP:</label>
-                <input type="text" id="ip" name="password" class="in_field" required>
-              </div>
-              
-              <input type="submit" value="Add Camera" class="register_btn">
-            </form>
-        </div>
+    <div class="part1-content">
+      <button class="custom-file-upload" onclick="addcam()">Add Camera</button>
+    </div>
+  </div>
+  <div class="main-part2">
+    <div class="btn-cont" style="justify-content: center;">
+      <div class="tabletitle">
+        <h1>
+          Camera Details
+        </h1>
       </div>
     </div>
-  
+    <div class="part2-content">
+      <table>
+        <thead>
+          <tr>
+            <th class="ctcol2">Class</th>
+            <th class="ctcol1">Room No.</th>
+            <th class="ctcol3">Camera IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Second Year</td>
+            <td>101</td>
+            <td>120.45.65.2</td>
+          </tr>
+          <tr>
+            <td>Third Year</td>
+            <td>202</td>
+            <td>120.45.65.3</td>
+          </tr>
+          <tr>
+            <td>Final Year</td>
+            <td>303</td>
+            <td>120.45.65.4</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="myModal4" class="modal4">
+  <div class="modal-content4" id="content4">
+    <div class="popup4">
+      <span class="close4" id="cbtn4">&times;</span>
+      <div class="popup_title4">
+        Provide Camera Details
+      </div>
+      <div class="popup_body4">
+        <form class="popup_form2" action="#">
+
+          <!-- <div class="in_div">
+            <label for="class" class="input_label">Class</label>
+            <input type="text" id="class" name="room_no" class="in_field" required>
+          </div> -->
+
+          <div class="in_div">
+            <label for="room" class="input_label">Room No.</label>
+            <input type="text" id="room" name="room_no" class="in_field" required>
+          </div>
+          <div class="in_div">
+            <label for="ip" class="input_label">Camera IP</label>
+            <input type="text" id="ip" name="password" class="in_field" required>
+          </div>
+
+          <input type="submit" value="Add" class="register_btn">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="myModal5" class="modal4">
+  <div class="modal-content4" id="content5">
+    <div class="popup4">
+      <span class="close4" id="cbtn5">&times;</span>
+      <div class="popup_title4">
+        Provide Classroom Details
+      </div>
+      <div class="popup_body4">
+        <form class="popup_form2" action="#">
+
+          <div class="in_div">
+            <label for="class" class="input_label">Class</label>
+            <input type="text" id="class" name="room_no" class="in_field" required>
+          </div>
+
+          <div class="in_div">
+            <label for="room" class="input_label">Room No.</label>
+            <input type="text" id="room" name="room_no" class="in_field" required>
+          </div>
+          
+          <input type="submit" value="Assign" class="register_btn">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function addcam() {
+    document.getElementById("myModal4").style.display = "block";
+  }
+  function closeModal4() {
+    document.getElementById("myModal4").style.display = "none";
+  }
+  function addclass() {
+    document.getElementById("myModal5").style.display = "block";
+  }
+  function closeModal5() {
+    document.getElementById("myModal5").style.display = "none";
+  }
+  window.onclick = function (event) {
+    if (
+      event.target == document.getElementById("cbtn4") ||
+      event.target == document.getElementById("content4")
+    ) {
+      closeModal4();
+    } else if(
+      event.target == document.getElementById("cbtn5") ||
+      event.target == document.getElementById("content5")
+    ){
+      closeModal5();
+    }
+  };
+</script>
 
 {% endblock %}
