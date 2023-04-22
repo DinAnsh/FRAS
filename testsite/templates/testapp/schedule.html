@@ -75,8 +75,7 @@
     uploadBtn.disabled = false;
     uploadBtn.removeEventListener('click', uploadAlert);
     uploadBtn.addEventListener('change', uploadSchedule);
-    document.querySelector('.main-part2').style.display = '';
-
+    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '../schedule/?class=' + classId.value, true);
     xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
@@ -86,6 +85,7 @@
         const data = response.schedule;
         // console.log(data);
         if (response.success) {
+          document.querySelector('.main-part2').style.display = '';
           const tbody = document.getElementById('schedule-table');
           const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           tbody.innerHTML = '';

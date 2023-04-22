@@ -22,7 +22,7 @@
     </div>
 
     <div class="part1-content">
-      <button class="custom-file-upload" onclick="addcam()">Add Camera</button>
+      <button class="custom-file-upload" onclick="addcam()">Assign Camera</button>
     </div>
   </div>
   <div class="main-part2">
@@ -72,23 +72,24 @@
         Provide Camera Details
       </div>
       <div class="popup_body4">
-        <form class="popup_form2" action="#">
-
-          <!-- <div class="in_div">
-            <label for="class" class="input_label">Class</label>
-            <input type="text" id="class" name="room_no" class="in_field" required>
-          </div> -->
-
-          <div class="in_div">
-            <label for="room" class="input_label">Room No.</label>
-            <input type="text" id="room" name="room_no" class="in_field" required>
-          </div>
+        <form class="popup_form2" onsubmit="assignCamera(event)">
           <div class="in_div">
             <label for="ip" class="input_label">Camera IP</label>
-            <input type="text" id="ip" name="password" class="in_field" required>
+            <select name="camera_num" id="ip" class="in_field">
+              <option value="default">100</option>
+            </select>
           </div>
 
-          <input type="submit" value="Add" class="register_btn">
+          <div class="in_div">
+            <label for="class" class="input_label">Class</label>
+            <select class="in_field" id="class" name="class" required>
+              <option value="" disabled selected>Select Class</option>
+              <option value="2">Second year</option>
+              <option value="3">Third year</option>
+              <option value="4">Final year</option>
+            </select>
+          </div>
+          <input type="submit" value="Assign" class="register_btn">
         </form>
       </div>
     </div>
@@ -103,18 +104,23 @@
         Provide Classroom Details
       </div>
       <div class="popup_body4">
-        <form class="popup_form2" action="#">
-
-          <div class="in_div">
-            <label for="class" class="input_label">Class</label>
-            <input type="text" id="class" name="room_no" class="in_field" required>
-          </div>
+        <form class="popup_form2" onsubmit="assignClass(event)">
 
           <div class="in_div">
             <label for="room" class="input_label">Room No.</label>
-            <input type="text" id="room" name="room_no" class="in_field" required>
+            <input type="text" id="assign_room" name="room_no" class="in_field" required>
           </div>
-          
+
+          <div class="in_div">
+            <label for="assign_class" class="input_label">Class</label>
+            <select class="in_field" id="assign_class" name="class" required>
+              <option value="" disabled selected>Select Class</option>
+              <option value="2">Second year</option>
+              <option value="3">Third year</option>
+              <option value="4">Final year</option>
+            </select>
+          </div>
+
           <input type="submit" value="Assign" class="register_btn">
         </form>
       </div>
@@ -125,29 +131,109 @@
 <script>
   function addcam() {
     document.getElementById("myModal4").style.display = "block";
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+      let cameras = devices.filter(device => device.kind === 'videoinput');
+      // console.log(cameras)
+      const selector = document.querySelector("#ip");
+      for (let i = 101; i < cameras.length + 100; i++) {
+        const option = document.createElement('option');
+        option.value = `${i}`;
+        option.text = `${i}`;
+        selector.appendChild(option);
+      }
+    });
+
   }
+
   function closeModal4() {
     document.getElementById("myModal4").style.display = "none";
   }
+
   function addclass() {
     document.getElementById("myModal5").style.display = "block";
   }
+
   function closeModal5() {
     document.getElementById("myModal5").style.display = "none";
   }
+
   window.onclick = function (event) {
     if (
       event.target == document.getElementById("cbtn4") ||
       event.target == document.getElementById("content4")
     ) {
       closeModal4();
-    } else if(
+      const selector = document.querySelector("#ip");
+      while (selector.options.length > 1) {
+        selector.remove(1);
+      }
+    } else if (
       event.target == document.getElementById("cbtn5") ||
       event.target == document.getElementById("content5")
-    ){
+    ) {
       closeModal5();
     }
   };
+
+  function assignClass(event) {
+    event.preventDefault();
+    const cls = document.getElementById('assign_class').value;
+    const room = document.getElementById('assign_room').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../classroom/?assign_class=1&class=' + cls + '&room=' + room, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        if (response.success) {
+          alert(response.message);
+          closeModal5();
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  function assignCamera(event) {
+    event.preventDefault();
+    const cam_ip = document.getElementById('ip').value;
+    const cls = document.getElementById('class').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../classroom/?assign_camera=1&class=' + cls + '&cam_ip=' + cam_ip, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        if (response.success) {
+          alert(response.message);
+          closeModal4();
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  function getCSRFToken() {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        // The CSRF token cookie name may vary depending on the server-side framework
+        if (cookie.substring(0, 10) === 'csrftoken=') {
+          cookieValue = decodeURIComponent(cookie.substring(10));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 </script>
 
 {% endblock %}
