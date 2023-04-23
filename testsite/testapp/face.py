@@ -35,7 +35,7 @@ def get_embedding(year:str):
     current_year = timezone.now().strftime('%Y')
     # current_month = timezone.now().strftime('%m')
 
-    adm_year = str(int(current_year)-int(year))
+    adm_year = str(int(current_year)-int(year))  #2,3
     embedder = FaceNet()  
     
     # year = '2021'

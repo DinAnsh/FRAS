@@ -76,7 +76,7 @@ def user_login(request, reason=''):
             if user:
                 login(request, user)
                 if Camera.objects.all() and Classroom.objects.all():
-                    return JsonResponse({"message":"Successfully logged in"},status=200)
+                    return JsonResponse({"message":"Successfully logged in", 'status':'old_user'})
                 else:
                     if not Class.objects.exists():
                         instances = [

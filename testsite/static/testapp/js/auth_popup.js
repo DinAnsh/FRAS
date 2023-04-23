@@ -155,21 +155,13 @@ login_btn.addEventListener("click", function (event) {
   xhr.open("POST", "/testapp/login/", true);
   xhr.setRequestHeader("X-CSRFToken", csrftoken);
   xhr.onload = function () {
+    console.log(JSON.parse(this.responseText)["status"]);
+    console.log(xhr.status);
     if (xhr.status === 401) {
       document.querySelector("#lpassword").focus();
     } else if (xhr.status === 404) {
       document.querySelector("#username").focus();
-    } else if (xhr.status === 200) {
-      document.getElementsByClassName("loginWarn")[0].style.display = "none";
-      document.querySelector("#lsubmitBtn").style.marginTop = "20px";
-      var url = window.location.href;
-      if (url.includes("testapp")) {
-        window.location = "dashboard";
-      } else {
-        window.location = "testapp/dashboard";
-      }
-    }
-    if (JSON.parse(this.responseText)["status"] === 'first_time') {
+    } else if (JSON.parse(this.responseText)["status"] === 'first_time') {
       document.getElementsByClassName("loginWarn")[0].style.display = "none";
       document.querySelector("#lsubmitBtn").style.marginTop = "20px";
       var url = window.location.href;
@@ -177,6 +169,15 @@ login_btn.addEventListener("click", function (event) {
         window.location = "classroom";
       } else {
         window.location = "testapp/classroom";
+      }
+    }else if (JSON.parse(this.responseText)["status"] === 'old_user')  {
+      document.getElementsByClassName("loginWarn")[0].style.display = "none";
+      document.querySelector("#lsubmitBtn").style.marginTop = "20px";
+      var url = window.location.href;
+      if (url.includes("testapp")) {
+        window.location = "dashboard";
+      } else {
+        window.location = "testapp/dashboard";
       }
     }
     document.getElementsByClassName("loginWarn")[0].textContent = JSON.parse(this.responseText)["message"];
