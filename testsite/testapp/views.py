@@ -23,15 +23,7 @@ from datetime import datetime
 
 def home(request):
     team_data = Team.objects.all()
-    if request.user.is_authenticated:
-        if not Classroom.objects.exists():
-            instances = [
-                Class(id=2, name='Second Year'),
-                Class(id=3, name='Third Year'),
-                Class(id=4, name='Final Year'),
-            ]
-            Class.objects.bulk_create(instances)
-        
+    if request.user.is_authenticated:        
         user = User.objects.get(username=request.user)
         return render(request, 'testapp/home.html',{'tdata':team_data, 'logged':1, 'UserName': user.get_full_name(), 'UserMail': user.email})
     else:
@@ -78,16 +70,21 @@ def user_login(request, reason=''):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                # if request.GET.get('next',None):
-                #     return redirect(request.GET['next'])
-                # else:
-                return JsonResponse({"message":"Successfully logged in"},status=200)
+                if Camera.objects.all() and Classroom.objects.all():
+                    return JsonResponse({"message":"Successfully logged in"},status=200)
+                else:
+                    if not Class.objects.exists():
+                        instances = [
+                            Class(id=2, name='Second Year'),
+                            Class(id=3, name='Third Year'),
+                            Class(id=4, name='Final Year'),
+                        ]
+                        Class.objects.bulk_create(instances)
+                    return JsonResponse({"message":"Successfully logged in", 'status':'first_time'})
             else:
-                # messages.warning(request, "Looks like you've entered the wrong password!")
                 return JsonResponse({"message":"Looks like you've entered the wrong password"}, status=401)
 
         else:
-            # messages.warning(request, 'Looks like you are not registered!')
             return JsonResponse({"message":"Looks like you are not registered!"}, status=404)
     else:
         return render(request, 'testapp/home.html')
@@ -336,7 +333,7 @@ def classroom(request):
         try:
             cam_ip = request.GET.get('cam_ip')
             cls = request.GET.get('class')
-            
+
             camera, created = Camera.objects.get_or_create(
                 camera_ip = cam_ip, defaults={'class_id': Class.objects.get(id=cls)})
             if not created:
@@ -347,8 +344,18 @@ def classroom(request):
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
 
+    data = []
+    for obj in Camera.objects.all().values_list():
+        room_no = Classroom.objects.filter(class_id=Class.objects.get(id=obj[1])).values_list()
+        if room_no:
+            data += [{
+                'class': Class.objects.get(id=obj[1]),
+                'room': room_no[0][0],
+                'camera': obj[0]
+            }]
+
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
 
 
 # some extra helper functions

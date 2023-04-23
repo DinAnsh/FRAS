@@ -40,24 +40,17 @@
             <th class="ctcol2">Class</th>
             <th class="ctcol1">Room No.</th>
             <th class="ctcol3">Camera IP</th>
+            <!-- <th class="ctcol3">Status</th> -->
           </tr>
         </thead>
         <tbody>
+          {% for camera in data %}
           <tr>
-            <td>Second Year</td>
-            <td>101</td>
-            <td>120.45.65.2</td>
+            <td>{{ camera.class }}</td>
+            <td>{{ camera.room }}</td>
+            <td>{{ camera.camera }}</td>
           </tr>
-          <tr>
-            <td>Third Year</td>
-            <td>202</td>
-            <td>120.45.65.3</td>
-          </tr>
-          <tr>
-            <td>Final Year</td>
-            <td>303</td>
-            <td>120.45.65.4</td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -76,7 +69,7 @@
           <div class="in_div">
             <label for="ip" class="input_label">Camera IP</label>
             <select name="camera_num" id="ip" class="in_field">
-              <option value="default">100</option>
+              <!-- <option value="default">100</option> -->
             </select>
           </div>
 
@@ -135,7 +128,7 @@
       let cameras = devices.filter(device => device.kind === 'videoinput');
       // console.log(cameras)
       const selector = document.querySelector("#ip");
-      for (let i = 101; i < cameras.length + 100; i++) {
+      for (let i = 100; i < cameras.length + 100; i++) {
         const option = document.createElement('option');
         option.value = `${i}`;
         option.text = `${i}`;
@@ -211,6 +204,7 @@
         if (response.success) {
           alert(response.message);
           closeModal4();
+          location.reload();
         } else {
           alert(response.message);
         }
