@@ -129,58 +129,89 @@ svg
 
 const video = document.getElementById('video');
 const canvas = document.getElementById("canvas");
-const saveBtn = document.getElementById("save-btn");
+// const saveBtn = document.getElementById("save-btn");
 
-navigator.mediaDevices
-.getUserMedia({ video: true })
-.then((streamObj) => {
-  stream = streamObj;
-  video.srcObject = stream;
-  video.play();
-})
-.catch((error) => {
-  console.log("Error accessing camera", error);
-});
+// --------------testing-----------------
 
+navigator.mediaDevices.enumerateDevices()
+  .then(devices => {
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    console.log(videoDevices);
+    const c = document.querySelector('.adminrights-container18');
+    
+    for (let i = 0; i < videoDevices.length; i++) {
+      const deviceId = videoDevices[i].deviceId;
+      navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId } })
+        .then(stream => {
+          const live = document.createElement('div');
+          live.classList = 'live';
+          
+          const video = document.createElement('video');
+          video.style.transform = 'scaleX(-1)';
+          video.id = 'player'+i;
+          video.width = '600';
+          video.height = '400';
+          
+          const h = document.createElement('h3');
+          h.style.width = 'fit-content';
+          h.style.margin = '0 auto';
+          h.textContent = "Camera ID: "+String(100+i);
 
-saveBtn.addEventListener("click", (event) => {
-  event.preventDefault();
-
-  video.style.display = "none";
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  const context = canvas.getContext("2d");
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  const tracks = stream.getTracks();
-  tracks.forEach((track) => {
-    track.stop();
+          live.appendChild(video);
+          live.appendChild(h);
+          c.appendChild(live);
+          video.srcObject = stream;
+          video.play();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+  })
+  .catch(error => {
+    console.error(error);
   });
 
-  // Convert the canvas to a base64 encoded string
-  const class_image = canvas.toDataURL("image/jpeg");
-  const csrftoken = getCSRFToken();
+// +++++++++++++++++++testing+++++++++++++++++++++++++++
 
-  // Send the image data to the Django server using AJAX
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "/testapp/smaple_func/", true);
-  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+// saveBtn.addEventListener("click", (event) => {
+//   event.preventDefault();
 
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      
-      console.log(event);
-      
-      alert("Class Image saved successfully");
-      
-    }
-  };
+//   video.style.display = "none";
 
-  xhr.send(JSON.stringify({ 'class_image': class_image}));
-});
+//   canvas.width = video.videoWidth;
+//   canvas.height = video.videoHeight;
+
+//   const context = canvas.getContext("2d");
+//   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+//   const tracks = stream.getTracks();
+//   tracks.forEach((track) => {
+//     track.stop();
+//   });
+
+//   // Convert the canvas to a base64 encoded string
+//   const class_image = canvas.toDataURL("image/jpeg");
+//   const csrftoken = getCSRFToken();
+
+//   // Send the image data to the Django server using AJAX
+//   const xhr = new XMLHttpRequest();
+//   xhr.open("POST", "/testapp/smaple_func/", true);
+//   xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//   xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+//   xhr.onload = function () {
+//     if (xhr.status === 200) {
+
+//       console.log(event);
+
+//       alert("Class Image saved successfully");
+
+//     }
+//   };
+
+//   xhr.send(JSON.stringify({ 'class_image': class_image }));
+// });
 
 
 function getCSRFToken() {
