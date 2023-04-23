@@ -21,7 +21,7 @@ import numpy as np
 import cv2
 import os
 from .face import *
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from datetime import datetime
 
 
@@ -207,20 +207,36 @@ def get_student_data(request):
 
 def face_recognize(request):
     if request.method =='POST': 
-        if request.content_type == 'application/json':
-            json_data = json.loads(request.body)   
-            img = json_data.get('class_image')
+        # if request.content_type == 'application/json':
+        #     json_data = json.loads(request.body)   
+        #     img = json_data.get('class_image')
             
-            decoded_image_data = base64.b64decode(img.split(',')[1])
-            # Create a ContentFile from the decoded image data
-            image_file = ContentFile(decoded_image_data, name="Captured Image")
+        #     decoded_image_data = base64.b64decode(img.split(',')[1])
+        #     # Create a ContentFile from the decoded image data
+        #     image_file = ContentFile(decoded_image_data, name="Captured Image")
             
-        elif 'image' in request.FILES:
-            image_file = request.FILES['image']
+        # elif 'image' in request.FILES:
+        for img in request.FILES:
+            # print("-----------------",img)
+            image_file = request.FILES[img]
+            pil_img = Image.open(image_file)
+            pil_img.show()
+            rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
             
-        
-        pil_img = Image.open(image_file)
-        # # pil_img.show()
+            if "1" in img:
+                # process model1
+                class2_enrolls = makePrediction(rgb,"2")
+                
+            elif "2" in img:
+                class3_enrolls = makePrediction(rgb,"3")
+                # process model2
+                
+            elif "3" in img:
+                class4_enrolls = makePrediction(rgb,"4")
+                # process model3
+
+        # pil_img = Image.open(image_file)
+        # pil_img.show()
         
         
         # knownEncodings = []
@@ -244,7 +260,7 @@ def face_recognize(request):
         # data = {"encodings": knownEncodings, "enrollments": knownEnroll} 
         
         # # convert the input frame from BGR to RGB 
-        rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
+        # rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB) #--------------------------------------unline
         
         # # boxes = face_recognition.face_locations(rgb,model='cnn')
         
@@ -278,20 +294,30 @@ def face_recognize(request):
         #         enroll = max(counts, key=counts.get)
                 
         #     # update the list of names
-        #     enrolls.append(enroll)    
-        enrolls = makePrediction(rgb)
-        print("------------------",enrolls)
-        return JsonResponse({"enrolls":list(enrolls)})
+        #     enrolls.append(enroll)   
+         
+        # enrolls = makePrediction(rgb)
+        # print("------------------",enrolls)
+        
+        if len(request.FILES)==3:     
+            return JsonResponse({"2nd year":str(class2_enrolls),"3rd year":str(class3_enrolls), "4th year":str(class4_enrolls)})
+        
+        elif len(request.FILES)==2:     
+            return JsonResponse({"2nd year":str(class2_enrolls), "4th year":str(class4_enrolls)})
+        elif len(request.FILES)==1:     
+            return JsonResponse({"2nd year":str(class2_enrolls)})
     
     else:
         return JsonResponse({"status":"There is some error!"})
          
                 
 def train_model(request):
-    # year = request.GET.get("year")
-    X,y = get_embedding("2021")
+    json_data = json.loads(request.body)
+    year = json_data.get("year")
+    print("----------------year---------",year)
+    X,y = get_embedding(year)
     print("-------------------------------Embeddings Done----------------- ",X.shape, y.dtype, y)
-    s = train(X,y)
+    s = train(X,y,year)
     return JsonResponse({"status":s})
 
 
@@ -315,7 +341,7 @@ def upload_image(request):
             image_file = request.FILES.get('image')
             enroll_id = request.POST.get('enrollId')
         
-        year = enroll_id[0:4]
+        # year = enroll_id[0:4]
         
         pil_img = Image.open(image_file)
         opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)

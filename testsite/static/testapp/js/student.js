@@ -583,6 +583,8 @@ function uploadGrid(event) {
 
 // ---------------------- train the model -------------------------------------
 function trainModel() { 
+
+  var year = document.querySelector("#class-dropdown").value;
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "../students/train_model/", true);
   xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
@@ -594,5 +596,5 @@ function trainModel() {
       console.error("Failed to Train Model");
     }
   };
-  xhr.send();
+  xhr.send(JSON.stringify({"year":year}));
 }
