@@ -28,7 +28,7 @@ from datetime import datetime
 
 def home(request):
     team_data = Team.objects.all()
-    if request.user.is_authenticated:
+    if request.user.is_authenticated:        
         user = User.objects.get(username=request.user)
         return render(request, 'testapp/home.html',{'tdata':team_data, 'logged':1, 'UserName': user.get_full_name(), 'UserMail': user.email})
     else:
@@ -75,16 +75,21 @@ def user_login(request, reason=''):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                # if request.GET.get('next',None):
-                #     return redirect(request.GET['next'])
-                # else:
-                return JsonResponse({"message":"Successfully logged in"},status=200)
+                if Camera.objects.all() and Classroom.objects.all():
+                    return JsonResponse({"message":"Successfully logged in"},status=200)
+                else:
+                    if not Class.objects.exists():
+                        instances = [
+                            Class(id=2, name='Second Year'),
+                            Class(id=3, name='Third Year'),
+                            Class(id=4, name='Final Year'),
+                        ]
+                        Class.objects.bulk_create(instances)
+                    return JsonResponse({"message":"Successfully logged in", 'status':'first_time'})
             else:
-                # messages.warning(request, "Looks like you've entered the wrong password!")
                 return JsonResponse({"message":"Looks like you've entered the wrong password"}, status=401)
 
         else:
-            # messages.warning(request, 'Looks like you are not registered!')
             return JsonResponse({"message":"Looks like you are not registered!"}, status=404)
     else:
         return render(request, 'testapp/home.html')
@@ -431,7 +436,7 @@ def schedule(request):
 
         try:
             db_entry = clean_schedule(df)
-            class_obj = Classroom.objects.get(class_id = selected_class)
+            class_obj = Class.objects.get(id = selected_class)
             
             dict_data = [{'day_of_week': row[0], 'class_id': class_obj,
                           'start_time': datetime.strptime(row[1], '%H').time(), 
@@ -439,8 +444,8 @@ def schedule(request):
                           'subject': row[3]} for row in db_entry]
 
             # to delete old records
-            if Schedule.objects.filter(class_id__class_id = selected_class).values_list():
-                Schedule.objects.filter(class_id__class_id = selected_class).delete()
+            if Schedule.objects.filter(class_id = selected_class).values_list():
+                Schedule.objects.filter(class_id = selected_class).delete()
             
             # an efficient way to create multiple instances of a model at once
             Schedule.objects.bulk_create([Schedule(**row) for row in dict_data])
@@ -450,7 +455,7 @@ def schedule(request):
     
     schedule_data = []
     if selected_class:
-        data = Schedule.objects.filter(class_id__class_id = selected_class).values_list()
+        data = Schedule.objects.filter(class_id = selected_class).values_list()
         if data:
             try:
                 schedule_data = [row[-1] for row in list(data)]
@@ -458,7 +463,7 @@ def schedule(request):
                 return JsonResponse({'success': True, 'schedule':schedule_data})
             except Exception as e:
                 return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
-        else:
+        elif Schedule.objects.all().values_list():
             return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
 
     user = User.objects.get(username=request.user)
@@ -467,8 +472,51 @@ def schedule(request):
 
 @login_required(login_url='testapp:home')
 def classroom(request):
+    assign_class = request.GET.get('assign_class')
+    assign_camera = request.GET.get('assign_camera')
+    
+    if assign_class:
+        try:
+            cls = request.GET.get('class')
+            room = request.GET.get('room')
+            
+            classroom, created = Classroom.objects.get_or_create(
+                room = room, defaults={'class_id': Class.objects.get(id=cls)})
+            if not created:
+                classroom.class_id = Class.objects.get(id=cls)
+                classroom.save()
+        
+            return JsonResponse({'success': True, 'message': 'Classroom assigned successfully.',})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
+    if assign_camera:
+        try:
+            cam_ip = request.GET.get('cam_ip')
+            cls = request.GET.get('class')
+
+            camera, created = Camera.objects.get_or_create(
+                camera_ip = cam_ip, defaults={'class_id': Class.objects.get(id=cls)})
+            if not created:
+                camera.class_id = Class.objects.get(id=cls)
+                camera.save()
+        
+            return JsonResponse({'success': True, 'message': 'Camera assigned successfully.',})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+
+    data = []
+    for obj in Camera.objects.all().values_list():
+        room_no = Classroom.objects.filter(class_id=Class.objects.get(id=obj[1])).values_list()
+        if room_no:
+            data += [{
+                'class': Class.objects.get(id=obj[1]),
+                'room': room_no[0][0],
+                'camera': obj[0]
+            }]
+
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
 
 
 # some extra helper functions

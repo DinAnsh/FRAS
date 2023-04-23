@@ -54,13 +54,18 @@ class Teacher(models.Model):
         return self.id
     
 
+class Class(models.Model):
+    id = models.CharField(primary_key=True, max_length=5)
+    name = models.CharField(max_length=15)
+    def __str__(self) -> str:
+        return self.name
+
+
 class Classroom(models.Model):
-    room = models.CharField(max_length=5)
-    camera_ip = models.CharField(max_length=15, primary_key=True)
-    status = models.CharField(max_length=10)
-    class_id = models.CharField(max_length=5)
+    room = models.CharField(max_length=5, primary_key=True)
+    class_id = models.ForeignKey(Class, to_field='id',on_delete=models.CASCADE)
     def __str__(self):
-        return str(self.class_id)
+        return self.room
 
 
 class Subject(models.Model):
@@ -71,9 +76,17 @@ class Subject(models.Model):
         return self.name
 
 
+class Camera(models.Model):
+    camera_ip = models.CharField(max_length=15, primary_key=True)
+    class_id = models.ForeignKey(Class, to_field='id',on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, default='0')
+    def __str__(self):
+        return self.camera_ip
+
+
 class Schedule(models.Model):
     day_of_week = models.CharField(max_length=10)
-    class_id = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(Class, to_field='id', on_delete=models.CASCADE)
     start_time = models.TimeField()
     end_time = models.TimeField()
     subject = models.CharField(max_length=50)
