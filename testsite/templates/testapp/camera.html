@@ -37,8 +37,8 @@
       <table>
         <thead>
           <tr>
-            <th class="ctcol2">Class</th>
             <th class="ctcol1">Room No.</th>
+            <th class="ctcol2">Class</th>
             <th class="ctcol3">Camera ID</th>
             <!-- <th class="ctcol3">Status</th> -->
           </tr>
@@ -46,8 +46,8 @@
         <tbody>
           {% for camera in data %}
           <tr>
-            <td>{{ camera.class }}</td>
             <td>{{ camera.room }}</td>
+            <td>{{ camera.class }}</td>
             <td>{{ camera.camera }}</td>
           </tr>
           {% endfor %}
@@ -67,19 +67,28 @@
       <div class="popup_body4">
         <form class="popup_form2" onsubmit="assignCamera(event)">
           <div class="in_div">
-            <label for="ip" class="input_label">Camera ID</label>
-            <select name="camera_num" id="ip" class="in_field">
-              <!-- <option value="default">100</option> -->
-            </select>
-          </div>
-
-          <div class="in_div">
             <label for="class" class="input_label">Class</label>
             <select class="in_field" id="class" name="class" required>
               <option value="" disabled selected>Select Class</option>
               <option value="2">Second year</option>
               <option value="3">Third year</option>
               <option value="4">Final year</option>
+            </select>
+          </div>
+
+          <div class="in_div">
+            <label for="room_id" class="input_label">Room No.</label>
+            <select name="room_id" id="room_id" class="in_field">
+            </select>
+          </div>
+
+          <div class="in_div">
+            <label for="ip" class="input_label">Camera ID</label>
+            <select name="camera_num" id="ip" class="in_field">
+              <option value="101">101</option>
+              <option value="102">102</option>
+              <option value="103">103</option>
+              <option value="104">104</option>
             </select>
           </div>
           <input type="submit" value="Assign" class="register_btn">
@@ -194,9 +203,10 @@
     event.preventDefault();
     const cam_ip = document.getElementById('ip').value;
     const cls = document.getElementById('class').value;
+    const room_id = document.getElementById('room_id').value;
 
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '../classroom/?assign_camera=1&class=' + cls + '&cam_ip=' + cam_ip, true);
+    xhr.open('GET', '../classroom/?assign_camera=1&class=' + cls + '&cam_ip=' + cam_ip + '&room_id=' + room_id, true);
     xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
     xhr.onreadystatechange = function () {
       if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
@@ -212,6 +222,34 @@
     };
     xhr.send();
   }
+
+  const class_id = document.getElementById('class');
+  class_id.addEventListener('change', () => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../classroom/?class=' + class_id.value, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        console.log(response.rooms);
+        if (response.success) {
+          const selector = document.querySelector("#room_id");
+          while (selector.firstChild) {
+            selector.removeChild(selector.firstChild);
+          }
+          for (let i = 0; i < response.rooms.length; i++) {
+            const option = document.createElement('option');
+            option.value = `${response.rooms[i]}`;
+            option.text = `${response.rooms[i]}`;
+            selector.appendChild(option);
+          }
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  });
 
   function getCSRFToken() {
     var cookieValue = null;

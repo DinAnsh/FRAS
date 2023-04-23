@@ -75,7 +75,7 @@
     uploadBtn.disabled = false;
     uploadBtn.removeEventListener('click', uploadAlert);
     uploadBtn.addEventListener('change', uploadSchedule);
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '../schedule/?class=' + classId.value, true);
     xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
@@ -85,12 +85,14 @@
         const data = response.schedule;
         // console.log(data);
         if (response.success) {
-          document.querySelector('.main-part2').style.display = '';
-          const tbody = document.getElementById('schedule-table');
-          const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          tbody.innerHTML = '';
-          for (let i = 0; i < 6; i++) {
-            tbody.innerHTML += '<tr><td>' + days[i] + '</td><td>' + data[i][0] + '</td><td>' + data[i][1] + '</td><td>' + data[i][2] + '</td><td>' + data[i][3] + '</td><td>' + data[i][4] + '</td><td>' + data[i][5] + '</td><td>' + data[i][6] + '</td><td>' + data[i][7] + '</td></tr>';
+          if (data) {
+            document.querySelector('.main-part2').style.display = '';
+            const tbody = document.getElementById('schedule-table');
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            tbody.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+              tbody.innerHTML += '<tr><td>' + days[i] + '</td><td>' + data[i][0] + '</td><td>' + data[i][1] + '</td><td>' + data[i][2] + '</td><td>' + data[i][3] + '</td><td>' + data[i][4] + '</td><td>' + data[i][5] + '</td><td>' + data[i][6] + '</td><td>' + data[i][7] + '</td></tr>';
+            }
           }
         } else {
           alert(response.message);

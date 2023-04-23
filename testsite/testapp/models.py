@@ -67,6 +67,7 @@ class Subject(models.Model):
 class Camera(models.Model):
     camera_ip = models.CharField(max_length=15, primary_key=True)
     class_id = models.ForeignKey(Class, to_field='id',on_delete=models.CASCADE)
+    room_id = models.ForeignKey(Classroom, to_field='room',on_delete=models.CASCADE)
     status = models.CharField(max_length=10, default='0')
     def __str__(self):
         return self.camera_ip
