@@ -484,6 +484,8 @@ def schedule(request):
                 return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
         elif Schedule.objects.all().values_list():
             return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
+        else:
+            return JsonResponse({'success': True})
 
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
@@ -513,27 +515,39 @@ def classroom(request):
         try:
             cam_ip = request.GET.get('cam_ip')
             cls = request.GET.get('class')
+            room_id = request.GET.get('room_id')
 
             camera, created = Camera.objects.get_or_create(
-                camera_ip = cam_ip, defaults={'class_id': Class.objects.get(id=cls)})
+                camera_ip = cam_ip,
+                defaults={'class_id': Class.objects.get(id=cls),
+                          'room_id':Classroom.objects.get(room=room_id)
+                          })
             if not created:
                 camera.class_id = Class.objects.get(id=cls)
+                camera.room_id = Classroom.objects.get(room=room_id)
                 camera.save()
         
             return JsonResponse({'success': True, 'message': 'Camera assigned successfully.',})
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
 
-    data = []
-    for obj in Camera.objects.all().values_list():
-        room_no = Classroom.objects.filter(class_id=Class.objects.get(id=obj[1])).values_list()
-        if room_no:
-            data += [{
-                'class': Class.objects.get(id=obj[1]),
-                'room': room_no[0][0],
-                'camera': obj[0]
-            }]
+    if request.GET.get('class'):
+        try:
+            rooms = [val[0] for val in Classroom.objects.filter(class_id = Class.objects.get(id=request.GET.get('class'))).values_list(named=False)]
+            print(rooms)
+            return JsonResponse({'success': True, 'rooms': rooms})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
 
+    data = []
+    for room in Classroom.objects.all().values_list():
+        cameras = Camera.objects.filter(room_id=Classroom.objects.get(room=room[0])).values_list()
+        data += [{
+            'class': Class.objects.get(id=room[1]),
+            'room': room[0],
+            'camera': ', '.join([camera[0] for camera in cameras])
+        }]
+        # print()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
 
