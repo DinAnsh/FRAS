@@ -25,7 +25,6 @@ from .face import *
 from datetime import datetime
 
 
-
 def home(request):
     team_data = Team.objects.all()
     if request.user.is_authenticated:        
@@ -109,6 +108,26 @@ def user_logout(request):
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
+    cameras = Camera.objects.all()
+    # print("---------------------",cameras)
+    # if cameras:
+    #     # cam_list = {}
+    #     # for c in cameras:
+    #     #     cam = {'camera_ip':c.camera_ip, 'class_id':c.class_id}
+    #     #     cam_list[""]
+    #         # print("---------------------",c.camera_ip, c.class_id)
+    #     cam_list = {f'{int(c.camera_ip)}':f'{str(c.class_id)}' for c in cameras}
+    #     # print("---------------------",cam_list)
+    
+    if cameras and request.GET.get("get_class"):
+        cam = Camera.objects.get(camera_ip=request.GET.get("cam_id"))
+        # cam_list = {f'{int(c.camera_ip)}':f'{str(c.class_id)}' for c in cameras}
+        
+        print("--------------------",cam.class_id)
+        
+        return JsonResponse({"class": str(cam.class_id)}, status=200)
+        
+        
     return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 

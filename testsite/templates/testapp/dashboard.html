@@ -198,7 +198,7 @@
     <div class="adminrights-container17">
       <h1 class="adminrights-text18">Live</h1>
       <div class="adminrights-container18">
-        <div class="live">
+        {% comment %} <div class="live">
           <!-- <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video> -->
           <div id="videodiv1"><video style="transform: scaleX(-1); width: 30vw;" id="video1"></video></div>
           <div id="canvasdiv1"><canvas style="transform: scaleX(-1); width: 30vw;" id="canvas1"></canvas></div>
@@ -233,8 +233,10 @@
           <button id="switchCameraButton">Switch Camera</button>
           <input type="file" name="" id="" accept="image/*" onchange="RecogniseImage(event)"> 
           <button id="save-btn3">Save</button>
-        </div>
+        </div> {% endcomment %}
       </div>
+      <div id="my-data" data-my-variable="{{ cameras }}"></div>
+
       <button id="sendbtn">Send Images</button>
     </div>
   </div>

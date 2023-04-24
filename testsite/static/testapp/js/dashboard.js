@@ -136,101 +136,109 @@ function getCSRFToken() {
   }
   return cookieValue;
 }
+//-------------------------------- cctv-video -------------------------
+// test code
 
-const video1 = document.getElementById("video1");
-const video2 = document.getElementById("video2");
-const video3 = document.getElementById("video3");
-const canvas1 = document.getElementById("canvas1");
-const canvas2 = document.getElementById("canvas2");
-const canvas3 = document.getElementById("canvas3");
-const saveBtn1 = document.getElementById("save-btn1");
-const saveBtn2 = document.getElementById("save-btn2");
-const saveBtn3 = document.getElementById("save-btn3");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+// const saveBtn = document.getElementById("save-btn");
 
-// navigator.mediaDevices
-//   .getUserMedia({ video: true })
-//   .then((streamObj) => {
-//     stream = streamObj;
-//     video.srcObject = stream;
-//     video.play();
-//   })
-//   .catch((error) => {
-//     console.log("Error accessing camera", error);
-//   });
+// --------------testing-----------------
 
-// Get available cameras
-navigator.mediaDevices.enumerateDevices().then(devices => {
-  let cameras = devices.filter(device => device.kind === 'videoinput');
-  console.log(cameras)
-  // Switch to next camera
-  let currentCameraIndex = 0;
-  function switchCamera() {
-    currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
-  }
-  
-  // Start stream with selected camera
-  function startStream() {
-    let constraints = {
-      video: {
-        deviceId: cameras[currentCameraIndex].deviceId
+navigator.mediaDevices
+  .enumerateDevices()
+  .then((devices) => {
+    const videoDevices = devices.filter(
+      (device) => device.kind === "videoinput"
+    );
+    console.log(videoDevices);
+    const c = document.querySelector(".adminrights-container18");
+
+    for (let i = 0; i < videoDevices.length; i++) {
+      if (videoDevices[i].label.includes("OBS") || i > 2) {
+        break;
       }
-    };
-    navigator.mediaDevices.getUserMedia(constraints).then(streamObj => {
-      stream = streamObj;
-      video1.srcObject = stream;
-      video1.play();
-    });
-  }
-  function startStream2() {
-    switchCamera()
-    let constraints = {
-      video: {
-        deviceId: cameras[currentCameraIndex].deviceId
-      }
-    };
-    navigator.mediaDevices.getUserMedia(constraints).then(streamObj => {
-      stream = streamObj;
-      video2.srcObject = stream;
-      video2.play();
-    });
-  }
-  function startStream3() {
-    switchCamera()
-    let constraints = {
-      video: {
-        deviceId: cameras[currentCameraIndex].deviceId
-      }
-    };
-    navigator.mediaDevices.getUserMedia(constraints).then(streamObj => {
-      stream = streamObj;
-      video3.srcObject = stream;
-      video3.play();
-    });
-  }
-  // Call the function to start stream with default camera
-  startStream();
-  startStream2();
-  startStream3();
-  // Add event listener to switch camera on button click
-  document.getElementById('switchCameraButton').addEventListener('click', switchCamera);
-});
+      const deviceId = videoDevices[i].deviceId;
+      navigator.mediaDevices
+        .getUserMedia({ video: { deviceId: deviceId } })
+        .then((stream) => {
+          const live = document.createElement("div");
+          live.classList = "live";
 
+          const video = document.createElement("video");
+          video.style.transform = "scaleX(-1)";
+          video.id = "player" + i;
+          video.style.width = "100%";
+
+          const h = document.createElement("h3");
+          h.style.width = "fit-content";
+          h.style.margin = "0 auto";
+          h.textContent = "Camera ID: " + String(100 + i);
+          
+          var h2 = h.cloneNode(true);
+          
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET", "../dashboard/?get_class=1&cam_id="+String(100 + i), true);
+          xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+          xhr.onload = function () {
+            let resp = xhr.response;
+          
+            if (xhr.status === 200) {
+              resp = JSON.parse(resp);
+              h2.textContent = "Class: " + resp.class;
+            } else {
+              console.error("Failed to upload image");
+            }
+          };
+          xhr.send();
+          
+          live.appendChild(video);
+          live.appendChild(h);
+          live.appendChild(h2);
+
+          //Save btn to capture images(Can delete later)
+          const saveBtn = document.createElement("button");
+          saveBtn.textContent = "Save";
+          live.appendChild(saveBtn);
+
+          c.appendChild(live);
+          video.srcObject = stream;
+          video.play();
+
+
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+// var myVariable = document.getElementById("my-data").getAttribute("data-my-variable");
+// console.log(myVariable); // prints "Hello World"
+
+// console.log(myVariable["100"]);
+// var dict = JSON.parse(myVariable);   //string->dict
+// console.log(dict);
+// console.log(typeof(dict));
 
 var imagesPayload = new FormData();
 
 function captureImage(event, camnum) {
   event.preventDefault();
-  var video=null;
-  var canvas=null;
+  var video = null;
+  var canvas = null;
 
-  if( camnum===1 ){
+  if (camnum === 1) {
     video = video1;
     canvas = canvas1;
-  }else if( camnum===2){
-    video = video2; 
+  } else if (camnum === 2) {
+    video = video2;
     canvas = canvas2;
-  }else if( camnum===3){
-    video = video3;  
+  } else if (camnum === 3) {
+    video = video3;
     canvas = canvas3;
   }
 
@@ -242,7 +250,7 @@ function captureImage(event, camnum) {
 
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
- 
+
   // this should be deleted to not stop the camera after capture image
   const tracks = stream.getTracks();
   tracks.forEach((track) => {
@@ -251,20 +259,22 @@ function captureImage(event, camnum) {
 
   // Convert the canvas to a base64 encoded string
   const class_image = canvas.toDataURL("image/jpeg");
-  imagesPayload.append("image"+String(camnum), dataURItoBlob(class_image), "image"+String(camnum)+".jpg");
-  
+  imagesPayload.append(
+    "image" + String(camnum),
+    dataURItoBlob(class_image),
+    "image" + String(camnum) + ".jpg"
+  );
 }
-
 
 // Helper function to convert dataURI to Blob object
 function dataURItoBlob(dataURI) {
-  var byteString = atob(dataURI.split(',')[1]);
+  var byteString = atob(dataURI.split(",")[1]);
   var ab = new ArrayBuffer(byteString.length);
   var ia = new Uint8Array(ab);
   for (var i = 0; i < byteString.length; i++) {
     ia[i] = byteString.charCodeAt(i);
   }
-  return new Blob([ab], { type: 'image/jpeg' });
+  return new Blob([ab], { type: "image/jpeg" });
 }
 
 function RecogniseImage(event) {
@@ -306,22 +316,20 @@ function sendImages(data) {
 }
 
 //  for capture image using button
-saveBtn1.addEventListener("click", function (event) {
-  captureImage(event, 1);
-});
-saveBtn2.addEventListener("click", function (event) {
-  captureImage(event, 2);
-});
-saveBtn3.addEventListener("click", function (event) {
-  captureImage(event, 3);
-});
+// saveBtn1.addEventListener("click", function (event) {
+//   captureImage(event, 1);
+// });
+// saveBtn2.addEventListener("click", function (event) {
+//   captureImage(event, 2);
+// });
+// saveBtn3.addEventListener("click", function (event) {
+//   captureImage(event, 3);
+// });
 
 var sendBtn = document.querySelector("#sendbtn");
 sendBtn.addEventListener("click", function (event) {
   sendImages(imagesPayload);
 });
-
-
 
 // Call captureImage function every 5 seconds
 // setInterval(captureImage, 5000);
