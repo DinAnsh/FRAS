@@ -22,10 +22,12 @@ To set up the FRAS application, follow the steps below:
 
 ## Backend Framework
 FRAS is built on **Django**, a popular open-source Python web framework that follows the Model-View-Template (MVT) architecture. Django provides a high-level, efficient, and secure way to develop web applications. The framework comes with a built-in administrative interface, robust security features, and a wide range of tools and libraries for rapid development.
+
 <img src="https://user-images.githubusercontent.com/60287228/230828178-4297c75b-cd62-4461-8806-d73a8eedb231.png" alt="Django logo" width="300">
 
 ## Database
 FRAS uses **SQLite** database locally with Django. SQLite is a popular relational database management system that is lightweight, fast, and reliable.
+
 <img src="https://user-images.githubusercontent.com/60287228/230828466-449d335d-b435-4526-bfe9-63376806a1b5.png" alt="SQLite logo" width="300" >
 
 
