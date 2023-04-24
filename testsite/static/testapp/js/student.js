@@ -381,12 +381,12 @@ function updateStatus() {
 
   var okStatus = document.createElement("span");
   okStatus.innerHTML = '&#9745;';
-  okStatus.title = 'Registered!'
+  okStatus.title = 'Registered! (Click again if you want to re-register)';
 
   var okays = document.querySelectorAll('.okStatus');
   okays.forEach(function (element) {
     if (!element.hasChildNodes()) {
-      element.appendChild(okStatus.cloneNode(true));
+      element.appendChild(okStatus.cloneNode(true)).addEventListener('click', sregister);
     }
   });
 }
