@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.views.decorators.cache import never_cache
-from django.contrib import messages
+from django.contrib import messages, admin
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -23,7 +23,7 @@ import os
 from .face import *
 # import matplotlib.pyplot as plt
 from datetime import datetime
-
+from django.db import models
 
 def home(request):
     team_data = Team.objects.all()
@@ -79,6 +79,7 @@ def user_login(request, reason=''):
                 else:
                     if not Class.objects.exists():
                         instances = [
+                            Class(id=0, name='None'),
                             Class(id=2, name='Second Year'),
                             Class(id=3, name='Third Year'),
                             Class(id=4, name='Final Year'),
@@ -201,6 +202,14 @@ def get_student_data(request):
     adm_year = str(int(current_year)-int(selected_class))
     student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
     # print(list(student_data))     #list of dicts
+
+    #attendance model ------------------------------- testing ----------------------------
+    if Student.objects.exists() and Subject.objects.exists():
+        sub_dict = {'SecondYear':[], 'ThirdYear':[], 'FinalYear':[]}
+        
+
+        # print(sub_dict)
+
     return JsonResponse({'data':list(student_data),}, safe=False)
 
 
@@ -534,12 +543,14 @@ def save_subjects(data):
                 id = key,
                 defaults={
                     'name': value[0].strip(),
-                    'teacher_id': value[1]
+                    'teacher_id': value[1],
+                    'class_id': Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
                 }
             )
             if not created:
                 subject.name = value[0].strip()
                 subject.teacher_id = value[1]
+                subject.class_id = Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
                 subject.save()
 
     except Exception as e:
