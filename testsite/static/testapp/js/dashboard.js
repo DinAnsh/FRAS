@@ -136,22 +136,16 @@ function getCSRFToken() {
   }
   return cookieValue;
 }
+
 //-------------------------------- cctv-video -------------------------
-// test code
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-// const saveBtn = document.getElementById("save-btn");
-
-// --------------testing-----------------
-
+//---------------To show all cameras Except the default--------------
 navigator.mediaDevices
   .enumerateDevices()
   .then((devices) => {
     const videoDevices = devices.filter(
       (device) => device.kind === "videoinput"
     );
-    console.log(videoDevices);
     const c = document.querySelector(".adminrights-container18");
 
     // i=1 need to be 0 if you want to show default(laptop) camera
@@ -166,61 +160,63 @@ navigator.mediaDevices
           const live = document.createElement("div");
           live.classList = "live";
 
+          //Video element
           const video = document.createElement("video");
           video.style.transform = "scaleX(-1)";
           video.id = "player" + i;
           video.style.width = "100%";
+
+          //Canvas
           const canvas = document.createElement("canvas");
           canvas.style.transform = "scaleX(-1)";
           canvas.id = "can" + i;
           canvas.style.width = "0";
-          // canvas.style.display = 'none';
 
+          //camear id heading
           const h = document.createElement("h3");
           h.style.width = "fit-content";
           h.style.margin = "0 auto";
           h.textContent = "Camera ID: " + String(100 + i);
+
           live.appendChild(video);
           live.appendChild(canvas);
           live.appendChild(h);
-          
-          var h2 = h.cloneNode(true);
 
+          //class heading
+          var h2 = h.cloneNode(true);
           var data = {
-            "get_class" : 1,
-            "cam_id" : String(100 + i)
-          }
+            get_class: 1,
+            cam_id: String(100 + i),
+          };
           var xhr = new XMLHttpRequest();
           xhr.open("POST", "../dashboard/", true);
           xhr.setRequestHeader("Content-Type", "application/json");
           xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
           xhr.onload = function () {
             let resp = xhr.response;
-          
             if (xhr.status === 200) {
               resp = JSON.parse(resp);
               h2.textContent = "Class: " + resp.class;
+              h2.classList.add("classes");
               live.appendChild(h2);
             } else {
-              
             }
           };
           xhr.send(JSON.stringify(data));
 
           c.appendChild(live);
 
-          document.querySelector("#player"+String(i)).srcObject = stream;
-          document.querySelector("#player"+String(i)).play();
+          document.querySelector("#player" + String(i)).srcObject = stream;
+          document.querySelector("#player" + String(i)).play();
         })
         .catch((error) => {
-          console.error('Error accessing user media: ',error);
+          console.error("Error accessing user media: ", error);
         });
     }
   })
   .catch((error) => {
     console.error(error);
   });
-
 
 // var imagesPayload = new FormData();
 
@@ -296,125 +292,156 @@ function dataURItoBlob(dataURI) {
 //   xhr.send(formData);
 // }
 
-// function sendImages(data) {
-//   const csrftoken = getCSRFToken();
-//   console.log(data);
-//   if (data.entries.length === 0){
-//     alert("Cameras Not working");
-//     return;
-//   }
-//   // Send the image data to the Django server using AJAX
-//   const xhr = new XMLHttpRequest();
-//   xhr.open("POST", "../dashboard/face_recognize/", true);
-//   // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-//   xhr.setRequestHeader("X-CSRFToken", csrftoken);
+function sendImages(data) {
+  const csrftoken = getCSRFToken();
 
-//   xhr.onload = function () {
-//     if (xhr.status === 200) {
-//       alert("Class Image Captured successfully");
-//     }
-//   };
-//   xhr.send(data);
-// }
+  // Send the image data to the Django server using AJAX
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "../dashboard/face_recognize/", true);
+  // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhr.setRequestHeader("X-CSRFToken", csrftoken);
 
-// //  for capture image using button
-// // saveBtn1.addEventListener("click", function (event) {
-// //   captureImage(event, 1);
-// // });
-// // saveBtn2.addEventListener("click", function (event) {
-// //   captureImage(event, 2);
-// // });
-// // saveBtn3.addEventListener("click", function (event) {
-// //   captureImage(event, 3);
-// // });
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Class Image Captured successfully");
+    }
+  };
+  xhr.send(data);
+}
 
-
-// //when click on send images all cameras images will be captured and send to server
-// var imagesPayload = new FormData();
-// var sendBtn = document.querySelector("#sendbtn");
-// sendBtn.addEventListener("click", function (event) {
-//   navigator.mediaDevices.enumerateDevices().then(devices => {
-//     let cameras = devices.filter(device => device.kind === 'videoinput');
-    
-//     for (let i = 1; i < cameras.length; i++) {
-//       if (cameras[i].label.includes("OBS")) {
-//         continue;
-//       }
-
-//       var video = document.querySelector("#player"+String(i));
-//       var canvas = document.querySelector("#can"+String(i));
-    
-//       // #this should be deleted
-//       video.style.display = "none";
-//       canvas.width = video.videoWidth;
-//       canvas.height = video.videoHeight;
-      
-//       var context = canvas.getContext("2d");
-//       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//       canvas.style.width = "100%";
-    
-//       // this should be deleted to not stop the camera after capture image
-//       // const tracks = stream.getTracks();
-//       // tracks.forEach((track) => {
-//       //   track.stop();
-//       // });
-    
-//       // Convert the canvas to a base64 encoded string
-//       const class_image = canvas.toDataURL("image/jpeg");
-//       console.log(class_image);
-//       //need to add class id with image to know which image is for which class
-//       imagesPayload.append(
-//         "image" + String(i),        
-//         dataURItoBlob(class_image),
-//         "image" + String(i) + ".jpg"
-//       );
-//     }
-//   });
-//   console.log(imagesPayload);
-//   // sendImages(imagesPayload);
+//  for capture image using button
+// saveBtn1.addEventListener("click", function (event) {
+//   captureImage(event, 1);
+// });
+// saveBtn2.addEventListener("click", function (event) {
+//   captureImage(event, 2);
+// });
+// saveBtn3.addEventListener("click", function (event) {
+//   captureImage(event, 3);
 // });
 
-// Call captureImage function every 5 seconds
-// setInterval(captureImage, 5000);
+// //when click on send images all cameras images will be captured and send to server
 
-let imagesPayload = new FormData();
-let datad = {};
+function get_classes(start) {
+  var elements = document.getElementsByClassName("classes");
 
-let sendBtn = document.querySelector("#sendbtn");
-sendBtn.addEventListener("click", async function (event) {
-  let cameras = await navigator.mediaDevices.enumerateDevices().then((devices) => {
-    return devices.filter((device) => device.kind === "videoinput");
-  });
-
-  let promises = cameras.map((camera, i) => {
-    if (camera.label.includes("OBS")) {
-      return Promise.resolve(null);
-    }
-
-    let video = document.querySelector("#player" + String(i));
-    let canvas = document.querySelector("#can" + String(i));
-
-    video.style.display = "none";
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    let context = canvas.getContext("2d");
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.style.width = "100%";
-
-    return new Promise((resolve) => {
-      canvas.toBlob(function (blob) {
-        datad["image" + String(i)] = blob;
-        resolve();
-      }, "image/jpg");
-    });
-  });
-
-  await Promise.all(promises);
-  
-  for (let key in datad) {
-    imagesPayload.append(key, datad[key]);
+  if (elements[start].textContent.includes("Final Year")) {
+    var num = "4";
+  } else if (elements[start].textContent.includes("Third Year")) {
+    var num = "3";
   }
+  if (elements[start].textContent.includes("Second Year")) {
+    var num = "2";
+  }
+
+  return num;
+}
+
+function capture_images() {
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    const videoDevices = devices.filter(
+      (device) => device.kind === "videoinput"
+    );
+    for (let i = 1; i < videoDevices.length; i++) {
+      if (videoDevices[i].label.includes("OBS")) {
+        continue;
+      }
+
+      var video = document.querySelector("#player" + String(i));
+      var canvas = document.querySelector("#can" + String(i));
+
+      // #this should be deleted
+      video.style.display = "none";
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      var context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.style.width = "100%";
+
+      // Convert the canvas to a base64 encoded string
+      const class_image = canvas.toDataURL("image/jpeg");
+      //because default camera has no class assigned
+      if (i!=0){
+        var class_id = get_classes(i-1);    
+      }
+      else{
+        var class_id = "0";
+      }
   
-  console.log(imagesPayload);
-});
+      //need to add class id with image to know which image is for which class
+      imagesPayload.append(
+        "image_" + class_id,
+        dataURItoBlob(class_image),
+        "image" + String(i) + ".jpg"
+      );
+
+      console.log("Image of class " + class_id + " Captured");
+    }
+  });
+}
+
+function sendImagesreq(event) {
+  // console.log(imagesPayload);
+  sendImages(imagesPayload);
+}
+
+const imagesPayload = new FormData(); //FormData needs some time to load the data into it
+
+// Call captureImage function every 1 minute
+
+// setInterval(function () {
+//   capture_images();
+
+//   //wait for 5 sec
+//   setTimeout(function () {
+//     sendImages(imagesPayload);
+//   }, 5000);
+
+//   // Reset the imagesPayload object for the next interval
+//   imagesPayload = new FormData();
+// }, 60000);
+
+//-------------------------------------------------END-----------------------------------------------------------
+
+// let imagesPayload = new FormData();
+// let datad = {};
+
+// let sendBtn = document.querySelector("#sendbtn");
+// sendBtn.addEventListener("click", async function (event) {
+//   let cameras = await navigator.mediaDevices.enumerateDevices().then((devices) => {
+//     return devices.filter((device) => device.kind === "videoinput");
+//   });
+
+//   let promises = cameras.map((camera, i) => {
+//     if (camera.label.includes("OBS")) {
+//       return Promise.resolve(null);
+//     }
+
+//     let video = document.querySelector("#player" + String(i));
+//     let canvas = document.querySelector("#can" + String(i));
+
+//     video.style.display = "none";
+//     canvas.width = video.videoWidth;
+//     canvas.height = video.videoHeight;
+
+//     let context = canvas.getContext("2d");
+//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+//     canvas.style.width = "100%";
+
+//     return new Promise((resolve) => {
+//       canvas.toBlob(function (blob) {
+//         datad["image" + String(i)] = blob;
+//         resolve();
+//       }, "image/jpg");
+//     });
+//   });
+
+//   await Promise.all(promises);
+
+//   for (let key in datad) {
+//     imagesPayload.append(key, datad[key]);
+//   }
+
+//   console.log(imagesPayload);
+// });

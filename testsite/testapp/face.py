@@ -93,7 +93,8 @@ def makePrediction(image, class_year):
     embedder = FaceNet()
     faces =  extract_face(image)   #list of faces
     year = class_year
-    
+    # print("------------------------------------",year)
+    # print("------------------------------------",faces)
     EMBEDDED_X = []
     for img in faces:
         face_img = img.astype('float32')  #3D(160X160X3)
@@ -122,8 +123,8 @@ def makePrediction(image, class_year):
     threshold = 0.2
     predictions = []
     for label_scores in prob_scores:
-        print("-------------------",label_scores)
-        print("-------------------",model.classes_)
+        # print("-------------------",label_scores)
+        # print("-------------------",model.classes_)
         max_confidence = max(label_scores)
         if max_confidence >= threshold:
             pred_label = model.classes_[label_scores.argmax()]

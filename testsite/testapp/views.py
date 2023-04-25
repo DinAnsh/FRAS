@@ -114,7 +114,6 @@ def dashboard(request, reason=''):
             cameras = Camera.objects.all()
             if cameras and payload.get("get_class"):
                 cam = Camera.objects.get(camera_ip=payload.get("cam_id"))
-                print("--------------------",cam.class_id)
                 
                 return JsonResponse({"class": str(cam.class_id)}, status=200)
             elif payload.get("get_class"):
@@ -208,39 +207,40 @@ def get_student_data(request):
 def face_recognize(request):
     if request.method =='POST': 
         try:
+            pred = {}
             for img in request.FILES:
+                # image_class -> image_3
                 print("-----------------",img)
+                class_id = img.split("_")[-1]
+                print("-----------------",class_id)
+                
                 image_file = request.FILES[img]
                 pil_img = Image.open(image_file)
-                pil_img.show()
+                # pil_img.show()
                 rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
                 
-                if "1" in img:
-                    # process model1
+                if class_id == "0":
+                    pass                #need to decide what to do with default
+                
+                if class_id == "2":
                     class2_enrolls = makePrediction(rgb,"2")
+                    pred["2nd year"] = str(class2_enrolls)
                     
-                elif "2" in img:
+                elif class_id == "3":
                     class3_enrolls = makePrediction(rgb,"3")
-                    # process model2
+                    pred["3rd year"] = str(class3_enrolls)
                     
-                elif "3" in img:
+                elif class_id == "4":
                     class4_enrolls = makePrediction(rgb,"4")
-                    # process model3
+                    pred["4th year"] = str(class4_enrolls)
 
             # pil_img = Image.open(image_file)
             # pil_img.show()
+            return JsonResponse(pred)
             
-            if len(request.FILES)==3:     
-                return JsonResponse({"2nd year":str(class2_enrolls),"3rd year":str(class3_enrolls), "4th year":str(class4_enrolls)})
-            
-            elif len(request.FILES)==2:     
-                return JsonResponse({"2nd year":str(class2_enrolls), "4th year":str(class4_enrolls)})
-            elif len(request.FILES)==1:     
-                return JsonResponse({"2nd year":str(class2_enrolls)})
         except:
             return JsonResponse({"status":"We think images were not sent by cameras!"})
             
-    
     else:
         return JsonResponse({"status":"There is request error!"})
          
@@ -248,9 +248,9 @@ def face_recognize(request):
 def train_model(request):
     json_data = json.loads(request.body)
     year = json_data.get("year")
-    print("----------------year---------",year)
+    
     X,y = get_embedding(year)
-    print("-------------------------------Embeddings Done----------------- ",X.shape, y.dtype, y)
+    print("-------------------------------Embeddings Done----------------- ")
     s = train(X,y,year)
     return JsonResponse({"status":s})
 

@@ -236,8 +236,10 @@
         </div> {% endcomment %}
       </div>
       <div id="my-data" data-my-variable="{{ cameras }}"></div>
-
-      <button id="sendbtn">Send Images</button>
+      <div class="center">
+        <button id="sendbtn" class="cmn-btn" onclick="sendImagesreq()">Send Images</button>
+        <button id="capbtn" class="cmn-btn" onclick="capture_images()">Capture Images</button>
+      </div>
     </div>
   </div>
 </div>
