@@ -60,6 +60,7 @@ class Subject(models.Model):
     id = models.CharField(primary_key=True, max_length=5)
     name = models.CharField(max_length=50)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(Class, to_field='id', on_delete=models.CASCADE)
     def __str__(self):
         return self.name
 
