@@ -135,9 +135,20 @@
     document.getElementById("myModal4").style.display = "block";
     navigator.mediaDevices.enumerateDevices().then(devices => {
       let cameras = devices.filter(device => device.kind === 'videoinput');
-      // console.log(cameras)
+      console.log(cameras)
       const selector = document.querySelector("#ip");
       for (let i = 100; i < cameras.length + 100; i++) {
+        if (i==100) {
+          const option = document.createElement('option');
+          option.disabled = true;
+          option.value = `${i}`;
+          option.text = `${i} (Default Cam)`;
+          selector.appendChild(option);
+          continue;
+        }
+        if (cameras[i%100].label.includes("OBS")) {
+          break;
+        }
         const option = document.createElement('option');
         option.value = `${i}`;
         option.text = `${i}`;
@@ -189,7 +200,7 @@
       if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
         var response = JSON.parse(this.responseText);
         if (response.success) {
-          alert(response.message);
+          //alert(response.message);
           closeModal5();
           location.reload();
         } else {
@@ -213,7 +224,7 @@
       if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
         var response = JSON.parse(this.responseText);
         if (response.success) {
-          alert(response.message);
+          //alert(response.message);
           closeModal4();
           location.reload();
         } else {

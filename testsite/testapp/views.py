@@ -108,26 +108,19 @@ def user_logout(request):
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
-    cameras = Camera.objects.all()
-    # print("---------------------",cameras)
-    # if cameras:
-    #     # cam_list = {}
-    #     # for c in cameras:
-    #     #     cam = {'camera_ip':c.camera_ip, 'class_id':c.class_id}
-    #     #     cam_list[""]
-    #         # print("---------------------",c.camera_ip, c.class_id)
-    #     cam_list = {f'{int(c.camera_ip)}':f'{str(c.class_id)}' for c in cameras}
-    #     # print("---------------------",cam_list)
-    
-    if cameras and request.GET.get("get_class"):
-        cam = Camera.objects.get(camera_ip=request.GET.get("cam_id"))
-        # cam_list = {f'{int(c.camera_ip)}':f'{str(c.class_id)}' for c in cameras}
-        
-        print("--------------------",cam.class_id)
-        
-        return JsonResponse({"class": str(cam.class_id)}, status=200)
-        
-        
+    if request.method == 'POST':
+        if request.content_type == 'application/json':
+            payload = json.loads(request.body)
+            cameras = Camera.objects.all()
+            if cameras and payload.get("get_class"):
+                cam = Camera.objects.get(camera_ip=payload.get("cam_id"))
+                print("--------------------",cam.class_id)
+                
+                return JsonResponse({"class": str(cam.class_id)}, status=200)
+            elif payload.get("get_class"):
+                return JsonResponse({"status":"success"},status=307)
+            
+            
     return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 
@@ -212,127 +205,44 @@ def get_student_data(request):
     return JsonResponse({'data':list(student_data),}, safe=False)
 
 
-
-# def get_encodings(image):
-#     # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#     # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
-#     #                                     minNeighbors=6,
-#     #                                     flags=cv2.CASCADE_SCALE_IMAGE)
-#     # for (x,y,w,h) in faces:
-#     #     cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
-#     #     faceROI = image[y:y+h,x:x+w]
-    
-#     # convert image from BGR (OpenCV ordering) to dlib ordering (RGB)
-#     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-#     boxes = face_recognition.face_locations(rgb,model='cnn')
-#     enc = face_recognition.face_encodings(rgb,boxes)
-#     return enc[0]
-
-
 def face_recognize(request):
     if request.method =='POST': 
-        # if request.content_type == 'application/json':
-        #     json_data = json.loads(request.body)   
-        #     img = json_data.get('class_image')
-            
-        #     decoded_image_data = base64.b64decode(img.split(',')[1])
-        #     # Create a ContentFile from the decoded image data
-        #     image_file = ContentFile(decoded_image_data, name="Captured Image")
-            
-        # elif 'image' in request.FILES:
-        for img in request.FILES:
-            # print("-----------------",img)
-            image_file = request.FILES[img]
-            pil_img = Image.open(image_file)
-            pil_img.show()
-            rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
-            
-            if "1" in img:
-                # process model1
-                class2_enrolls = makePrediction(rgb,"2")
+        try:
+            for img in request.FILES:
+                print("-----------------",img)
+                image_file = request.FILES[img]
+                pil_img = Image.open(image_file)
+                pil_img.show()
+                rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
                 
-            elif "2" in img:
-                class3_enrolls = makePrediction(rgb,"3")
-                # process model2
-                
-            elif "3" in img:
-                class4_enrolls = makePrediction(rgb,"4")
-                # process model3
+                if "1" in img:
+                    # process model1
+                    class2_enrolls = makePrediction(rgb,"2")
+                    
+                elif "2" in img:
+                    class3_enrolls = makePrediction(rgb,"3")
+                    # process model2
+                    
+                elif "3" in img:
+                    class4_enrolls = makePrediction(rgb,"4")
+                    # process model3
 
-        # pil_img = Image.open(image_file)
-        # pil_img.show()
-        
-        
-        # knownEncodings = []
-        # knownEnroll = []
-        
-        # #need to fetch only particular year students 
-        # # all_students = Student.objects.all()
-        # year = '2021'
-        # all_students = Student.objects.filter(enroll__startswith=year)
-        # for obj in all_students:
-        #     if obj.encoding is None or obj.encoding == '':
-        #         continue
+            # pil_img = Image.open(image_file)
+            # pil_img.show()
             
-        #     else:
-        #         # Convert the string back to a NumPy array
-        #         float_array = np.fromstring(obj.encoding[1:-1], dtype=np.float64, sep=' ')
-        #         knownEncodings.append(float_array)
-        #         knownEnroll.append(obj.enroll)           
+            if len(request.FILES)==3:     
+                return JsonResponse({"2nd year":str(class2_enrolls),"3rd year":str(class3_enrolls), "4th year":str(class4_enrolls)})
             
-        # #save encodings along with their names in dictionary data
-        # data = {"encodings": knownEncodings, "enrollments": knownEnroll} 
-        
-        # # convert the input frame from BGR to RGB 
-        # rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB) #--------------------------------------unline
-        
-        # # boxes = face_recognition.face_locations(rgb,model='cnn')
-        
-        # # the facial embeddings for face in input
-        # encodings = face_recognition.face_encodings(rgb)
-        
-        # enrolls = []
-        
-        # for encoding in encodings:
-        # #Compare encodings with encodings in data["encodings"]
-        # #Matches contain array of the same length of data["encodings"] with boolean values and True for the embeddings it matches closely and False for rest
-        #     matches = face_recognition.compare_faces(data["encodings"], encoding)
+            elif len(request.FILES)==2:     
+                return JsonResponse({"2nd year":str(class2_enrolls), "4th year":str(class4_enrolls)})
+            elif len(request.FILES)==1:     
+                return JsonResponse({"2nd year":str(class2_enrolls)})
+        except:
+            return JsonResponse({"status":"We think images were not sent by cameras!"})
             
-        #     #set name =inknown if no encoding matches
-        #     enroll = "Unknown"
-            
-        #     # check to see if we have found a match
-        #     if True in matches:
-        #         #Find positions at which we get True and store them
-        #         matchedIdxs = [i for (i, b) in enumerate(matches) if b]
-                
-        #         counts = {}
-        #         for i in matchedIdxs:
-        #             #Check the names at respective indexes we stored in matchedIdxs
-        #             enroll = data["enrollments"][i]
-                    
-        #             #increase count for the name we got
-        #             counts[enroll] = counts.get(enroll, 0) + 1
-                    
-        #         #set name which has highest count
-        #         enroll = max(counts, key=counts.get)
-                
-        #     # update the list of names
-        #     enrolls.append(enroll)   
-         
-        # enrolls = makePrediction(rgb)
-        # print("------------------",enrolls)
-        
-        if len(request.FILES)==3:     
-            return JsonResponse({"2nd year":str(class2_enrolls),"3rd year":str(class3_enrolls), "4th year":str(class4_enrolls)})
-        
-        elif len(request.FILES)==2:     
-            return JsonResponse({"2nd year":str(class2_enrolls), "4th year":str(class4_enrolls)})
-        elif len(request.FILES)==1:     
-            return JsonResponse({"2nd year":str(class2_enrolls)})
     
     else:
-        return JsonResponse({"status":"There is some error!"})
+        return JsonResponse({"status":"There is request error!"})
          
                 
 def train_model(request):

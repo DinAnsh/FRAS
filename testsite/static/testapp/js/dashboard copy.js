@@ -144,13 +144,11 @@ const canvas = document.getElementById("canvas");
 // const saveBtn = document.getElementById("save-btn");
 
 // --------------testing-----------------
-
+var videoDevices;
 navigator.mediaDevices
   .enumerateDevices()
   .then((devices) => {
-    const videoDevices = devices.filter(
-      (device) => device.kind === "videoinput"
-    );
+    videoDevices = devices.filter((device) => device.kind === "videoinput");
     console.log(videoDevices);
     const c = document.querySelector(".adminrights-container18");
 
@@ -183,44 +181,42 @@ navigator.mediaDevices
           live.appendChild(video);
           live.appendChild(canvas);
           live.appendChild(h);
-          
+
           var h2 = h.cloneNode(true);
 
           var data = {
-            "get_class" : 1,
-            "cam_id" : String(100 + i)
-          }
+            get_class: 1,
+            cam_id: String(100 + i),
+          };
           var xhr = new XMLHttpRequest();
           xhr.open("POST", "../dashboard/", true);
           xhr.setRequestHeader("Content-Type", "application/json");
           xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
           xhr.onload = function () {
             let resp = xhr.response;
-          
+
             if (xhr.status === 200) {
               resp = JSON.parse(resp);
               h2.textContent = "Class: " + resp.class;
               live.appendChild(h2);
             } else {
-              
             }
           };
           xhr.send(JSON.stringify(data));
 
           c.appendChild(live);
 
-          document.querySelector("#player"+String(i)).srcObject = stream;
-          document.querySelector("#player"+String(i)).play();
+          document.querySelector("#player" + String(i)).srcObject = stream;
+          document.querySelector("#player" + String(i)).play();
         })
         .catch((error) => {
-          console.error('Error accessing user media: ',error);
+          console.error("Error accessing user media: ", error);
         });
     }
   })
   .catch((error) => {
     console.error(error);
   });
-
 
 // var imagesPayload = new FormData();
 
@@ -275,6 +271,8 @@ function dataURItoBlob(dataURI) {
   return new Blob([ab], { type: "image/jpeg" });
 }
 
+// let imageBlob = await new Promise(resolve => canvasElem.toBlob(resolve, 'image/png'));
+
 // function RecogniseImage(event) {
 //   const files = event.target.files;
 //   const file = files[0];
@@ -296,125 +294,84 @@ function dataURItoBlob(dataURI) {
 //   xhr.send(formData);
 // }
 
-// function sendImages(data) {
-//   const csrftoken = getCSRFToken();
-//   console.log(data);
-//   if (data.entries.length === 0){
-//     alert("Cameras Not working");
-//     return;
-//   }
-//   // Send the image data to the Django server using AJAX
-//   const xhr = new XMLHttpRequest();
-//   xhr.open("POST", "../dashboard/face_recognize/", true);
-//   // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-//   xhr.setRequestHeader("X-CSRFToken", csrftoken);
+function sendImages(data) {
+  const csrftoken = getCSRFToken();
+  console.log(data);
+  // if (data.entries.length === 0) {
+  //   alert("Cameras Not working");
+  //   return;
+  // }
+  // Send the image data to the Django server using AJAX
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "../dashboard/face_recognize/", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.setRequestHeader("X-CSRFToken", csrftoken);
 
-//   xhr.onload = function () {
-//     if (xhr.status === 200) {
-//       alert("Class Image Captured successfully");
-//     }
-//   };
-//   xhr.send(data);
-// }
+  // xhr.onload = function () {
+  //   if (xhr.status === 200) {
+  //     alert("Class Image Captured successfully");
+  //   }
+  // };
+  xhr.send(JSON.stringify(data));
+}
 
-// //  for capture image using button
-// // saveBtn1.addEventListener("click", function (event) {
-// //   captureImage(event, 1);
-// // });
-// // saveBtn2.addEventListener("click", function (event) {
-// //   captureImage(event, 2);
-// // });
-// // saveBtn3.addEventListener("click", function (event) {
-// //   captureImage(event, 3);
-// // });
-
-
-// //when click on send images all cameras images will be captured and send to server
-// var imagesPayload = new FormData();
-// var sendBtn = document.querySelector("#sendbtn");
-// sendBtn.addEventListener("click", function (event) {
-//   navigator.mediaDevices.enumerateDevices().then(devices => {
-//     let cameras = devices.filter(device => device.kind === 'videoinput');
-    
-//     for (let i = 1; i < cameras.length; i++) {
-//       if (cameras[i].label.includes("OBS")) {
-//         continue;
-//       }
-
-//       var video = document.querySelector("#player"+String(i));
-//       var canvas = document.querySelector("#can"+String(i));
-    
-//       // #this should be deleted
-//       video.style.display = "none";
-//       canvas.width = video.videoWidth;
-//       canvas.height = video.videoHeight;
-      
-//       var context = canvas.getContext("2d");
-//       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//       canvas.style.width = "100%";
-    
-//       // this should be deleted to not stop the camera after capture image
-//       // const tracks = stream.getTracks();
-//       // tracks.forEach((track) => {
-//       //   track.stop();
-//       // });
-    
-//       // Convert the canvas to a base64 encoded string
-//       const class_image = canvas.toDataURL("image/jpeg");
-//       console.log(class_image);
-//       //need to add class id with image to know which image is for which class
-//       imagesPayload.append(
-//         "image" + String(i),        
-//         dataURItoBlob(class_image),
-//         "image" + String(i) + ".jpg"
-//       );
-//     }
-//   });
-//   console.log(imagesPayload);
-//   // sendImages(imagesPayload);
+//  for capture image using button
+// saveBtn1.addEventListener("click", function (event) {
+//   captureImage(event, 1);
+// });
+// saveBtn2.addEventListener("click", function (event) {
+//   captureImage(event, 2);
+// });
+// saveBtn3.addEventListener("click", function (event) {
+//   captureImage(event, 3);
 // });
 
-// Call captureImage function every 5 seconds
-// setInterval(captureImage, 5000);
-
+//when click on send images all cameras images will be captured and send to server
 let imagesPayload = new FormData();
-let datad = {};
 
-let sendBtn = document.querySelector("#sendbtn");
-sendBtn.addEventListener("click", async function (event) {
-  let cameras = await navigator.mediaDevices.enumerateDevices().then((devices) => {
-    return devices.filter((device) => device.kind === "videoinput");
-  });
+var datad = {};
 
-  let promises = cameras.map((camera, i) => {
-    if (camera.label.includes("OBS")) {
-      return Promise.resolve(null);
+var sendBtn = document.querySelector("#sendbtn");
+function problem(event) {
+  for (let i = 1; i < videoDevices.length; i++) {
+    if (videoDevices[i].label.includes("OBS")) {
+      continue;
     }
 
-    let video = document.querySelector("#player" + String(i));
-    let canvas = document.querySelector("#can" + String(i));
+    var video = document.querySelector("#player" + String(i));
+    var canvas = document.querySelector("#can" + String(i));
 
+    // #this should be deleted
     video.style.display = "none";
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    let context = canvas.getContext("2d");
+    var context = canvas.getContext("2d");
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.style.width = "100%";
 
-    return new Promise((resolve) => {
-      canvas.toBlob(function (blob) {
-        datad["image" + String(i)] = blob;
-        resolve();
-      }, "image/jpg");
-    });
-  });
+    // this should be deleted to not stop the camera after capture image
+    // const tracks = stream.getTracks();
+    // tracks.forEach((track) => {
+    //   track.stop();
+    // });
 
-  await Promise.all(promises);
-  
-  for (let key in datad) {
-    imagesPayload.append(key, datad[key]);
+    // Convert the canvas to a base64 encoded string
+    // const class_image = canvas.toDataURL("image/jpeg");
+    canvas.toBlob(function (blob) {
+      // console.log(blob);
+      datad["image" + String(i)] = blob;
+    }, "image/jpg");
+    //need to add class id with image to know which image is for which class
   }
+  // console.log(datad);
   
-  console.log(imagesPayload);
-});
+  
+
+  // console.log(imagesPayload);
+  sendImages(datad);
+};
+// Call captureImage function every 5 seconds
+// setInterval(captureImage, 5000);
+
+
