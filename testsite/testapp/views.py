@@ -23,8 +23,9 @@ import os
 from .face import *
 # import matplotlib.pyplot as plt
 from datetime import datetime
-from django.db import models
+from django.apps import apps
 
+sub_map = {}
 year2 = set()
 year3 = set()
 year4 = set()
@@ -167,25 +168,26 @@ def student(request):
         # print()
 
         try:
-            if(len(dbEnrolls) > len(dfEnrolls)):    # to delete the missing enrolls in the uploaded sheet
-                enrolls_to_delete = [x for x in dbEnrolls if x not in dfEnrolls]
+            # to delete the missing enrolls in the uploaded sheet
+            enrolls_to_delete = [x for x in dbEnrolls if x not in dfEnrolls]
+            if len(enrolls_to_delete):
                 Student.objects.filter(enroll__in = enrolls_to_delete).delete()
 
-            else:       # to add or modify the present enrolls in the uploaded sheet
-                for index, row in df.iterrows():
-                    student, created = Student.objects.get_or_create(
-                        enroll = str(row['Enrollment No.']),
-                        defaults={
-                            'name': row['NAME'],
-                            'email': row['Email'],
-                            'mobile': str(int(row['Mobile']))
-                        }
-                    )
-                    if not created:
-                        student.name = row['NAME']
-                        student.email = row['Email']
-                        student.mobile = str(int(row['Mobile']))
-                        student.save()
+            # to add or modify the present enrolls in the uploaded sheet
+            for index, row in df.iterrows():
+                student, created = Student.objects.get_or_create(
+                    enroll = str(row['Enrollment No.']),
+                    defaults={
+                        'name': row['NAME'],
+                        'email': row['Email'],
+                        'mobile': str(int(row['Mobile']))
+                    }
+                )
+                if not created:
+                    student.name = row['NAME']
+                    student.email = row['Email']
+                    student.mobile = str(int(row['Mobile']))
+                    student.save()
 
             return JsonResponse({'success': True, 'message': 'Student details uploaded successfully.',})
         
@@ -201,18 +203,63 @@ def get_student_data(request):
     selected_class = request.GET.get('class')
 
     current_year = timezone.now().strftime('%Y')
-    # current_month = timezone.now().strftime('%m')
+    current_month = timezone.now().strftime('%m')
 
-    adm_year = str(int(current_year)-int(selected_class))
-    student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
-    # print(list(student_data))     #list of dicts
+    if int(current_month) <= 6:
+        adm_year = str(int(current_year)-int(selected_class))
+    else:
+        adm_year = str(int(current_year)+1-int(selected_class))
+    
+    try:
+        student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
+    except Exception as e:
+        return JsonResponse({'success': True, 'message': 'Student details are not uplaoded for the selected class.'})
 
     #attendance model ------------------------------- testing ----------------------------
     if Student.objects.exists() and Subject.objects.exists():
-        sub_dict = {'SecondYear':[], 'ThirdYear':[], 'FinalYear':[]}
+        # select only those classes for which subjects are already uploaded
+        cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
         
-        # print(sub_dict)
+        for cls in cls_inDB:
+            try:
+                if cls != 'None':
+                    cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
+                    
+                    # populate the empty class model with relevant enrolls
+                    if not cls_model.objects.exists():
+                        if int(current_month) <= 6:
+                            stu_obj = Student.objects.filter(enroll__startswith = str(int(current_year) - int(Class.objects.get(name=cls).id)))
+                        else:
+                            stu_obj = Student.objects.filter(enroll__startswith = str(int(current_year) + 1 - int(Class.objects.get(name=cls).id)))
+                        
+                        for s in stu_obj:
+                            cls_model.objects.create(enroll_id=s)
 
+                    subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
+                    fields = cls_model._meta.get_fields()[2:]
+                    global sub_map
+                    if cls in sub_map.keys():
+                        # for adding new subjects
+                        new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
+                        new_key = [key for key in fields if key not in sub_map[cls].keys()]
+                        for sub,key in zip(new_sub, new_key):
+                            sub_map[cls][key] = sub
+
+                        # for deleting subjects
+                        del_sub = [sub for sub in sub_map[cls].values() if sub not in subjects]
+                        del_key = []
+                        for sub in del_sub:
+                            del_key += [key for key, value in sub_map[cls].items() if value == sub]
+                        for key in del_key:
+                            del sub_map[cls][key]            
+
+                    else:
+                        sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+            
+                    mark_attendance()
+            except Exception as e:
+                print(f'There is an exception {e}')
+            
     return JsonResponse({'data':list(student_data),}, safe=False)
 
 
@@ -602,3 +649,37 @@ def save_subjects(data):
     except Exception as e:
         return f'There is an exception {e}'
     return "Successfully saved the subjects!"
+
+
+# <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
+def mark_attendance(data={'Second Year':['2021/CTAE/497','2021/CTAE/498']}):
+    current_sub = get_subjects()
+    for cls, enrolls in data.items():
+        cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
+        
+        for k,v in sub_map[cls].items():
+            if v in current_sub[cls]:
+                cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
+
+    print(current_sub)
+
+
+def get_subjects():
+    now = datetime.now()
+    hour = now.hour % 12
+    weekday_name = now.strftime("%A")
+    
+    curr_subj = {}
+    for obj in Schedule.objects.filter(class_id_id = 2):
+        if hour == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
+            curr_subj['Second Year'] = obj.subject
+    
+    for obj in Schedule.objects.filter(class_id_id = 3):
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
+            curr_subj['Third Year'] = obj.subject
+
+    for obj in Schedule.objects.filter(class_id_id = 4):
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
+            curr_subj['Final Year'] = obj.subject
+
+    return curr_subj

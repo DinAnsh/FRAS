@@ -51,7 +51,7 @@ class Teacher(models.Model):
     mobile = models.CharField(max_length=15, default='+911234567890')
     subjects = models.CharField(max_length=100)
     def __str__(self):
-        return self.id
+        return self.name
     
 
 class Class(models.Model):
@@ -95,3 +95,50 @@ class Schedule(models.Model):
     def __str__(self):
         return self.class_id.__str__()
     
+
+class Second_Year(models.Model):
+    enroll_id = models.OneToOneField(Student, to_field='enroll', on_delete=models.CASCADE)
+    sub1 = models.IntegerField(default=0)
+    sub2 = models.IntegerField(default=0)
+    sub3 = models.IntegerField(default=0)
+    sub4 = models.IntegerField(default=0)
+    sub5 = models.IntegerField(default=0)
+    sub6 = models.IntegerField(default=0)
+    sub7 = models.IntegerField(default=0)
+    sub8 = models.IntegerField(default=0)
+    sub9 = models.IntegerField(default=0)
+    sub10 = models.IntegerField(default=0)
+    def __str__(self):
+        return self.enroll_id.__str__()
+
+
+class Third_Year(models.Model):
+    enroll_id = models.OneToOneField(Student, to_field='enroll', on_delete=models.CASCADE)
+    sub1 = models.IntegerField(default=0)
+    sub2 = models.IntegerField(default=0)
+    sub3 = models.IntegerField(default=0)
+    sub4 = models.IntegerField(default=0)
+    sub5 = models.IntegerField(default=0)
+    sub6 = models.IntegerField(default=0)
+    sub7 = models.IntegerField(default=0)
+    sub8 = models.IntegerField(default=0)
+    sub9 = models.IntegerField(default=0)
+    sub10 = models.IntegerField(default=0)
+    def __str__(self):
+        return self.enroll_id
+
+
+class Final_Year(models.Model):
+    enroll_id = models.OneToOneField(Student, to_field='enroll', on_delete=models.CASCADE)
+    sub1 = models.IntegerField(default=0)
+    sub2 = models.IntegerField(default=0)
+    sub3 = models.IntegerField(default=0)
+    sub4 = models.IntegerField(default=0)
+    sub5 = models.IntegerField(default=0)
+    sub6 = models.IntegerField(default=0)
+    sub7 = models.IntegerField(default=0)
+    sub8 = models.IntegerField(default=0)
+    sub9 = models.IntegerField(default=0)
+    sub10 = models.IntegerField(default=0)
+    def __str__(self):
+        return self.enroll_id
