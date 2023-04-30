@@ -362,13 +362,12 @@ function capture_images() {
       // Convert the canvas to a base64 encoded string
       const class_image = canvas.toDataURL("image/jpeg");
       //because default camera has no class assigned
-      if (i!=0){
-        var class_id = get_classes(i-1);    
-      }
-      else{
+      if (i != 0) {
+        var class_id = get_classes(i - 1);
+      } else {
         var class_id = "0";
       }
-  
+
       //need to add class id with image to know which image is for which class
       imagesPayload.append(
         "image_" + class_id,
@@ -386,7 +385,32 @@ function sendImagesreq(event) {
   sendImages(imagesPayload);
 }
 
-const imagesPayload = new FormData(); //FormData needs some time to load the data into it
+// Define a callback function to run every minute
+function checkTime() {
+  // Get the current time
+  var now = new Date();
+  var currentHour = now.getHours();
+  if (currentHour == 19) {
+    console.log("Current hour is 1 PM, skipping action.");
+    return; // exit function if current hour is not 1 PM
+  }
+  // Check if the current minute is one of the target minutes
+  var minute = now.getMinutes();
+  // 15 30 45 50
+  if (minute == 25 || minute == 27 || minute == 29 || minute == 31) {
+    // Perform the desired action
+    capture_images();
+    setTimeout(function () {
+      sendImages(imagesPayload);
+    }, 5000);
+    imagesPayload = new FormData();
+    console.log("Performing action at " + now.toLocaleString());
+  }
+}
+
+// Run the callback function every minute
+var imagesPayload = new FormData(); //FormData needs some time to load the data into it
+setInterval(checkTime, 60 * 1000);
 
 // Call captureImage function every 1 minute
 
@@ -403,45 +427,3 @@ const imagesPayload = new FormData(); //FormData needs some time to load the dat
 // }, 60000);
 
 //-------------------------------------------------END-----------------------------------------------------------
-
-// let imagesPayload = new FormData();
-// let datad = {};
-
-// let sendBtn = document.querySelector("#sendbtn");
-// sendBtn.addEventListener("click", async function (event) {
-//   let cameras = await navigator.mediaDevices.enumerateDevices().then((devices) => {
-//     return devices.filter((device) => device.kind === "videoinput");
-//   });
-
-//   let promises = cameras.map((camera, i) => {
-//     if (camera.label.includes("OBS")) {
-//       return Promise.resolve(null);
-//     }
-
-//     let video = document.querySelector("#player" + String(i));
-//     let canvas = document.querySelector("#can" + String(i));
-
-//     video.style.display = "none";
-//     canvas.width = video.videoWidth;
-//     canvas.height = video.videoHeight;
-
-//     let context = canvas.getContext("2d");
-//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//     canvas.style.width = "100%";
-
-//     return new Promise((resolve) => {
-//       canvas.toBlob(function (blob) {
-//         datad["image" + String(i)] = blob;
-//         resolve();
-//       }, "image/jpg");
-//     });
-//   });
-
-//   await Promise.all(promises);
-
-//   for (let key in datad) {
-//     imagesPayload.append(key, datad[key]);
-//   }
-
-//   console.log(imagesPayload);
-// });

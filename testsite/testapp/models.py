@@ -94,3 +94,4 @@ class Schedule(models.Model):
     subject = models.CharField(max_length=50)
     def __str__(self):
         return self.class_id.__str__()
+    

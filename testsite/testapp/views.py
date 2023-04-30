@@ -25,6 +25,10 @@ from .face import *
 from datetime import datetime
 from django.db import models
 
+year2 = set()
+year3 = set()
+year4 = set()
+
 def home(request):
     team_data = Team.objects.all()
     if request.user.is_authenticated:        
@@ -207,7 +211,6 @@ def get_student_data(request):
     if Student.objects.exists() and Subject.objects.exists():
         sub_dict = {'SecondYear':[], 'ThirdYear':[], 'FinalYear':[]}
         
-
         # print(sub_dict)
 
     return JsonResponse({'data':list(student_data),}, safe=False)
@@ -216,36 +219,68 @@ def get_student_data(request):
 def face_recognize(request):
     if request.method =='POST': 
         try:
-            pred = {}
-            for img in request.FILES:
-                # image_class -> image_3
-                print("-----------------",img)
-                class_id = img.split("_")[-1]
-                print("-----------------",class_id)
+            # if today is in holiday_list or currunt_time == 1-2pm :
+            # return nothing
+            current_min = datetime.now().strftime("%M")
+        
+            global year2, year3, year4
+            if int(current_min) in list(range(23,30)):  #this time will be 10, 50
                 
-                image_file = request.FILES[img]
-                pil_img = Image.open(image_file)
-                # pil_img.show()
-                rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
-                
-                if class_id == "0":
-                    pass                #need to decide what to do with default
-                
-                if class_id == "2":
-                    class2_enrolls = makePrediction(rgb,"2")
-                    pred["2nd year"] = str(class2_enrolls)
+                for img in request.FILES:
+                    # image_class -> image_3
+                    print("-----------------",img)
+                    class_id = img.split("_")[-1]
+                    print("-----------------",class_id)
                     
-                elif class_id == "3":
-                    class3_enrolls = makePrediction(rgb,"3")
-                    pred["3rd year"] = str(class3_enrolls)
+                    image_file = request.FILES[img]
+                    pil_img = Image.open(image_file)
+                    # pil_img.show()
+                    rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
                     
-                elif class_id == "4":
-                    class4_enrolls = makePrediction(rgb,"4")
-                    pred["4th year"] = str(class4_enrolls)
+                    if class_id == "0":
+                        pass                #need to decide what to do with default
+                    
+                    if class_id == "2":
+                        class2_enrolls = makePrediction(rgb,"2")
+                        if type(class2_enrolls) != str:
+                            # for e in class2_enrolls:
+                            #     if e not in year2:
+                            #         year2.append(e)
+                            year2.update(class2_enrolls)
+                        
+                    elif class_id == "3":
+                        class3_enrolls = makePrediction(rgb,"3")
+                        if type(class3_enrolls) != str:
+                            # for e in class3_enrolls:
+                            #     if e not in year3:
+                            #         year3.append(e)
+                            year3.update(class3_enrolls)
+                        
+                    elif class_id == "4":
+                        class4_enrolls = makePrediction(rgb,"4")
+                        if type(class4_enrolls) != str:
+                            # for e in class4_enrolls:
+                            #     if e not in year4:
+                            #         year4.append(e)
+                            year4.update(class4_enrolls)
+                    
+                return JsonResponse({"status":"attendance recorded!"})
 
+            else:
             # pil_img = Image.open(image_file)
             # pil_img.show()
-            return JsonResponse(pred)
+                pred = {}
+    
+                pred["2nd year"] = str(year2)
+                pred["3rd year"] = str(year3)
+                pred["4th year"] = str(year4)
+                
+                year2 = []
+                year3 = []
+                year4 = []
+                
+                
+                return JsonResponse(pred)
             
         except:
             return JsonResponse({"status":"We think images were not sent by cameras!"})
@@ -253,6 +288,17 @@ def face_recognize(request):
     else:
         return JsonResponse({"status":"There is request error!"})
          
+         
+# def markattendance(request):
+#     global year_2, year_3, year4
+#     pred = {}
+    
+#     pred["2nd year"] = str(year2)
+#     pred["3rd year"] = str(year3)
+#     pred["4th year"] = str(year4)
+        
+#     return JsonResponse(pred)
+ 
                 
 def train_model(request):
     json_data = json.loads(request.body)
