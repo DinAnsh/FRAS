@@ -262,7 +262,7 @@ def get_student_data(request):
             
     return JsonResponse({'data':list(student_data),}, safe=False)
 
-
+@login_required(login_url='testapp:home')
 def face_recognize(request):
     if request.method =='POST': 
         try:
@@ -271,7 +271,7 @@ def face_recognize(request):
             current_min = datetime.now().strftime("%M")
         
             global year2, year3, year4
-            if int(current_min) in list(range(23,30)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,28)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -290,26 +290,31 @@ def face_recognize(request):
                     if class_id == "2":
                         class2_enrolls = makePrediction(rgb,"2")
                         if type(class2_enrolls) != str:
-                            # for e in class2_enrolls:
+                            for e in class2_enrolls:
                             #     if e not in year2:
                             #         year2.append(e)
-                            year2.update(class2_enrolls)
+                                e = str(e)
+                                year2.add(e[:4]+"/CTAE/"+e[4:])
+
                         
                     elif class_id == "3":
                         class3_enrolls = makePrediction(rgb,"3")
                         if type(class3_enrolls) != str:
-                            # for e in class3_enrolls:
+                            for e in class3_enrolls:
                             #     if e not in year3:
                             #         year3.append(e)
-                            year3.update(class3_enrolls)
+                                e = str(e)
+                                year3.add(e[:4]+"/CTAE/"+e[4:])
+
                         
                     elif class_id == "4":
                         class4_enrolls = makePrediction(rgb,"4")
                         if type(class4_enrolls) != str:
-                            # for e in class4_enrolls:
+                            for e in class4_enrolls:
                             #     if e not in year4:
                             #         year4.append(e)
-                            year4.update(class4_enrolls)
+                                e = str(e)
+                                year4.add(e[:4]+"/CTAE/"+e[4:])
                     
                 return JsonResponse({"status":"attendance recorded!"})
 
@@ -318,19 +323,22 @@ def face_recognize(request):
             # pil_img.show()
                 pred = {}
     
-                pred["2nd year"] = str(year2)
-                pred["3rd year"] = str(year3)
-                pred["4th year"] = str(year4)
+                pred["Second Year"] = year2
+                pred["Third Year"] = year3
+                pred["Final Year"] = year4
                 
                 year2 = []
                 year3 = []
                 year4 = []
                 
-                
-                return JsonResponse(pred)
+                print("-----------------",pred)
+                mark_attendance(pred)
+                return JsonResponse({"status":"successfully attendance marked"})
             
-        except:
-            return JsonResponse({"status":"We think images were not sent by cameras!"})
+        except Exception as e:
+            # return JsonResponse({"status":"We think images were not sent by cameras!"})
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>",e)
+            return JsonResponse({"status":"Exception got handle carefully"})
             
     else:
         return JsonResponse({"status":"There is request error!"})
@@ -652,26 +660,31 @@ def save_subjects(data):
 
 
 # <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
-def mark_attendance(data={'Second Year':['2021/CTAE/497','2021/CTAE/498']}):
+# {'Second Year':{'2021/CTAE/497','2021/CTAE/498'}, 'Third Year':set(), 'Final Year':set()}
+def mark_attendance(data):
     current_sub = get_subjects()
+    print("XXXXXXXXXXXXXXXX",current_sub)
     for cls, enrolls in data.items():
         cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
-        
-        for k,v in sub_map[cls].items():
-            if v in current_sub[cls]:
-                cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
+        if len(enrolls) != 0:
+            print("---------------------------",sub_map)
+            for k,v in sub_map[cls].items():
+                if v in current_sub[cls]:
+                    # enrolls = list(enrolls)
+                    cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
 
+    print(sub_map)
     print(current_sub)
 
 
 def get_subjects():
-    now = datetime.now()
-    hour = now.hour % 12
-    weekday_name = now.strftime("%A")
+    now = datetime.now()   #YYYY-MM-DD HH:MM:SS.ssssss
+    hour = now.hour % 12      #12 hour formate
+    weekday_name = now.strftime("%A")   #output will be a string that represents the current day of the week,
     
     curr_subj = {}
     for obj in Schedule.objects.filter(class_id_id = 2):
-        if hour == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
+        if 10 == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
             curr_subj['Second Year'] = obj.subject
     
     for obj in Schedule.objects.filter(class_id_id = 3):

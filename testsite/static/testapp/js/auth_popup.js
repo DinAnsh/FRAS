@@ -175,9 +175,9 @@ login_btn.addEventListener("click", function (event) {
       document.querySelector("#lsubmitBtn").style.marginTop = "20px";
       var url = window.location.href;
       if (url.includes("testapp")) {
-        window.location = "dashboard";
+        window.location = "students";
       } else {
-        window.location = "testapp/dashboard";
+        window.location = "testapp/students/";
       }
     }
     document.getElementsByClassName("loginWarn")[0].textContent = JSON.parse(this.responseText)["message"];

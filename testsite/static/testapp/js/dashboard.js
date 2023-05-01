@@ -390,14 +390,14 @@ function checkTime() {
   // Get the current time
   var now = new Date();
   var currentHour = now.getHours();
-  if (currentHour == 19) {
-    console.log("Current hour is 1 PM, skipping action.");
-    return; // exit function if current hour is not 1 PM
-  }
+  // if (currentHour == 19) {
+  //   console.log("Current hour is 1 PM, skipping action.");
+  //   return; // exit function if current hour is not 1 PM
+  // }
   // Check if the current minute is one of the target minutes
   var minute = now.getMinutes();
   // 15 30 45 50
-  if (minute == 25 || minute == 27 || minute == 29 || minute == 31) {
+  if (minute == 23 || minute == 25 || minute == 27 || minute == 28) {
     // Perform the desired action
     capture_images();
     setTimeout(function () {
