@@ -30,6 +30,8 @@ year2 = set()
 year3 = set()
 year4 = set()
 
+# SESSION_KEY = '_auth_user_id'
+
 def home(request):
     team_data = Team.objects.all()
     if request.user.is_authenticated:        
@@ -255,8 +257,6 @@ def get_student_data(request):
 
                     else:
                         sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
-            
-                    mark_attendance()
             except Exception as e:
                 print(f'There is an exception {e}')
             
