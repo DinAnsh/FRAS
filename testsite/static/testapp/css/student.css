@@ -147,11 +147,11 @@ td {
 }
 
 .ctcol1 {
-  width: 15%;
+  width: 25%;
 }
 
 .ctcol2 {
-  width: 23%;
+  width: 25%;
 }
 
 .pagination {
@@ -436,7 +436,7 @@ td {
   border-radius: 5px;
   width: 100%;
   background-color: #c1bebe;
-  height: 360px;
+  height: max-content;
 }
 
 .home-container41 {

@@ -5,26 +5,36 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.views.decorators.cache import never_cache
-from django.contrib import messages
+from django.contrib import messages, admin
 from django.http import JsonResponse
 from django.utils import timezone
-from .models import System_Admin, Student, Team
+from django.core.paginator import Paginator
+from .models import *
 from django.http import JsonResponse
-import json
-import base64
 from django.core.files.base import ContentFile
 from PIL import Image
+import base64
+import json
 import pandas as pd
 import numpy as np
 # import face_recognition
 import cv2
 import os
 from .face import *
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+from datetime import datetime
+from django.apps import apps
+
+sub_map = {}
+year2 = set()
+year3 = set()
+year4 = set()
+
+# SESSION_KEY = '_auth_user_id'
 
 def home(request):
     team_data = Team.objects.all()
-    if request.user.is_authenticated:
+    if request.user.is_authenticated:        
         user = User.objects.get(username=request.user)
         return render(request, 'testapp/home.html',{'tdata':team_data, 'logged':1, 'UserName': user.get_full_name(), 'UserMail': user.email})
     else:
@@ -71,16 +81,22 @@ def user_login(request, reason=''):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                # if request.GET.get('next',None):
-                #     return redirect(request.GET['next'])
-                # else:
-                return JsonResponse({"message":"Successfully logged in"},status=200)
+                if Camera.objects.all() and Classroom.objects.all():
+                    return JsonResponse({"message":"Successfully logged in", 'status':'old_user'})
+                else:
+                    if not Class.objects.exists():
+                        instances = [
+                            Class(id=0, name='None'),
+                            Class(id=2, name='Second Year'),
+                            Class(id=3, name='Third Year'),
+                            Class(id=4, name='Final Year'),
+                        ]
+                        Class.objects.bulk_create(instances)
+                    return JsonResponse({"message":"Successfully logged in", 'status':'first_time'})
             else:
-                # messages.warning(request, "Looks like you've entered the wrong password!")
                 return JsonResponse({"message":"Looks like you've entered the wrong password"}, status=401)
 
         else:
-            # messages.warning(request, 'Looks like you are not registered!')
             return JsonResponse({"message":"Looks like you are not registered!"}, status=404)
     else:
         return render(request, 'testapp/home.html')
@@ -100,6 +116,18 @@ def user_logout(request):
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
+    if request.method == 'POST':
+        if request.content_type == 'application/json':
+            payload = json.loads(request.body)
+            cameras = Camera.objects.all()
+            if cameras and payload.get("get_class"):
+                cam = Camera.objects.get(camera_ip=payload.get("cam_id"))
+                
+                return JsonResponse({"class": str(cam.class_id)}, status=200)
+            elif payload.get("get_class"):
+                return JsonResponse({"status":"success"},status=307)
+            
+            
     return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
 
@@ -142,25 +170,26 @@ def student(request):
         # print()
 
         try:
-            if(len(dbEnrolls) > len(dfEnrolls)):    # to delete the missing enrolls in the uploaded sheet
-                enrolls_to_delete = [x for x in dbEnrolls if x not in dfEnrolls]
+            # to delete the missing enrolls in the uploaded sheet
+            enrolls_to_delete = [x for x in dbEnrolls if x not in dfEnrolls]
+            if len(enrolls_to_delete):
                 Student.objects.filter(enroll__in = enrolls_to_delete).delete()
 
-            else:       # to add or modify the present enrolls in the uploaded sheet
-                for index, row in df.iterrows():
-                    student, created = Student.objects.get_or_create(
-                        enroll = str(row['Enrollment No.']),
-                        defaults={
-                            'name': row['NAME'],
-                            'email': row['Email'],
-                            'mobile': str(int(row['Mobile']))
-                        }
-                    )
-                    if not created:
-                        student.name = row['NAME']
-                        student.email = row['Email']
-                        student.mobile = str(int(row['Mobile']))
-                        student.save()
+            # to add or modify the present enrolls in the uploaded sheet
+            for index, row in df.iterrows():
+                student, created = Student.objects.get_or_create(
+                    enroll = str(row['Enrollment No.']),
+                    defaults={
+                        'name': row['NAME'],
+                        'email': row['Email'],
+                        'mobile': str(int(row['Mobile']))
+                    }
+                )
+                if not created:
+                    student.name = row['NAME']
+                    student.email = row['Email']
+                    student.mobile = str(int(row['Mobile']))
+                    student.save()
 
             return JsonResponse({'success': True, 'message': 'Student details uploaded successfully.',})
         
@@ -176,118 +205,163 @@ def get_student_data(request):
     selected_class = request.GET.get('class')
 
     current_year = timezone.now().strftime('%Y')
-    # current_month = timezone.now().strftime('%m')
+    current_month = timezone.now().strftime('%m')
 
-    adm_year = str(int(current_year)-int(selected_class))
-    student_data = Student.objects.filter(enroll__startswith=adm_year).values()
-    # print(list(student_data))     #list of dicts
+    if int(current_month) <= 6:
+        adm_year = str(int(current_year)-int(selected_class))
+    else:
+        adm_year = str(int(current_year)+1-int(selected_class))
+    
+    try:
+        student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
+    except Exception as e:
+        return JsonResponse({'success': True, 'message': 'Student details are not uplaoded for the selected class.'})
+
+    #attendance model ------------------------------- testing ----------------------------
+    if Student.objects.exists() and Subject.objects.exists():
+        # select only those classes for which subjects are already uploaded
+        cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
+        
+        for cls in cls_inDB:
+            try:
+                if cls != 'None':
+                    cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
+                    
+                    # populate the empty class model with relevant enrolls
+                    if not cls_model.objects.exists():
+                        if int(current_month) <= 6:
+                            stu_obj = Student.objects.filter(enroll__startswith = str(int(current_year) - int(Class.objects.get(name=cls).id)))
+                        else:
+                            stu_obj = Student.objects.filter(enroll__startswith = str(int(current_year) + 1 - int(Class.objects.get(name=cls).id)))
+                        
+                        for s in stu_obj:
+                            cls_model.objects.create(enroll_id=s)
+
+                    subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
+                    fields = cls_model._meta.get_fields()[2:]
+                    global sub_map
+                    if cls in sub_map.keys():
+                        # for adding new subjects
+                        new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
+                        new_key = [key for key in fields if key not in sub_map[cls].keys()]
+                        for sub,key in zip(new_sub, new_key):
+                            sub_map[cls][key] = sub
+
+                        # for deleting subjects
+                        del_sub = [sub for sub in sub_map[cls].values() if sub not in subjects]
+                        del_key = []
+                        for sub in del_sub:
+                            del_key += [key for key, value in sub_map[cls].items() if value == sub]
+                        for key in del_key:
+                            del sub_map[cls][key]            
+
+                    else:
+                        sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+            except Exception as e:
+                print(f'There is an exception {e}')
+            
     return JsonResponse({'data':list(student_data),}, safe=False)
 
-
-
-# def get_encodings(image):
-#     # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#     # faces = faceCascade.detectMultiScale(gray,scaleFactor=1.05,
-#     #                                     minNeighbors=6,
-#     #                                     flags=cv2.CASCADE_SCALE_IMAGE)
-#     # for (x,y,w,h) in faces:
-#     #     cv2.rectangle(image, (x, y), (x + w, y + h),(0,255,0), 2)
-#     #     faceROI = image[y:y+h,x:x+w]
-    
-#     # convert image from BGR (OpenCV ordering) to dlib ordering (RGB)
-#     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-#     boxes = face_recognition.face_locations(rgb,model='cnn')
-#     enc = face_recognition.face_encodings(rgb,boxes)
-#     return enc[0]
-
-
+@login_required(login_url='testapp:home')
 def face_recognize(request):
     if request.method =='POST': 
-        if request.content_type == 'application/json':
-            json_data = json.loads(request.body)   
-            img = json_data.get('class_image')
-            
-            decoded_image_data = base64.b64decode(img.split(',')[1])
-            # Create a ContentFile from the decoded image data
-            image_file = ContentFile(decoded_image_data, name="Captured Image")
-            
-        elif 'image' in request.FILES:
-            image_file = request.FILES['image']
-            
+        try:
+            # if today is in holiday_list or currunt_time == 1-2pm :
+            # return nothing
+            current_min = datetime.now().strftime("%M")
         
-        pil_img = Image.open(image_file)
-        # # pil_img.show()
-        
-        
-        # knownEncodings = []
-        # knownEnroll = []
-        
-        # #need to fetch only particular year students 
-        # # all_students = Student.objects.all()
-        # year = '2021'
-        # all_students = Student.objects.filter(enroll__startswith=year)
-        # for obj in all_students:
-        #     if obj.encoding is None or obj.encoding == '':
-        #         continue
-            
-        #     else:
-        #         # Convert the string back to a NumPy array
-        #         float_array = np.fromstring(obj.encoding[1:-1], dtype=np.float64, sep=' ')
-        #         knownEncodings.append(float_array)
-        #         knownEnroll.append(obj.enroll)           
-            
-        # #save encodings along with their names in dictionary data
-        # data = {"encodings": knownEncodings, "enrollments": knownEnroll} 
-        
-        # # convert the input frame from BGR to RGB 
-        rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
-        
-        # # boxes = face_recognition.face_locations(rgb,model='cnn')
-        
-        # # the facial embeddings for face in input
-        # encodings = face_recognition.face_encodings(rgb)
-        
-        # enrolls = []
-        
-        # for encoding in encodings:
-        # #Compare encodings with encodings in data["encodings"]
-        # #Matches contain array of the same length of data["encodings"] with boolean values and True for the embeddings it matches closely and False for rest
-        #     matches = face_recognition.compare_faces(data["encodings"], encoding)
-            
-        #     #set name =inknown if no encoding matches
-        #     enroll = "Unknown"
-            
-        #     # check to see if we have found a match
-        #     if True in matches:
-        #         #Find positions at which we get True and store them
-        #         matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+            global year2, year3, year4
+            if int(current_min) in list(range(0,28)):  #this time will be 10, 50
                 
-        #         counts = {}
-        #         for i in matchedIdxs:
-        #             #Check the names at respective indexes we stored in matchedIdxs
-        #             enroll = data["enrollments"][i]
+                for img in request.FILES:
+                    # image_class -> image_3
+                    print("-----------------",img)
+                    class_id = img.split("_")[-1]
+                    print("-----------------",class_id)
                     
-        #             #increase count for the name we got
-        #             counts[enroll] = counts.get(enroll, 0) + 1
+                    image_file = request.FILES[img]
+                    pil_img = Image.open(image_file)
+                    # pil_img.show()
+                    rgb = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
                     
-        #         #set name which has highest count
-        #         enroll = max(counts, key=counts.get)
-                
-        #     # update the list of names
-        #     enrolls.append(enroll)    
-        enrolls = makePrediction(rgb)
-        print("------------------",enrolls)
-        return JsonResponse({"enrolls":list(enrolls)})
+                    if class_id == "0":
+                        pass                #need to decide what to do with default
+                    
+                    if class_id == "2":
+                        class2_enrolls = makePrediction(rgb,"2")
+                        if type(class2_enrolls) != str:
+                            for e in class2_enrolls:
+                            #     if e not in year2:
+                            #         year2.append(e)
+                                e = str(e)
+                                year2.add(e[:4]+"/CTAE/"+e[4:])
+
+                        
+                    elif class_id == "3":
+                        class3_enrolls = makePrediction(rgb,"3")
+                        if type(class3_enrolls) != str:
+                            for e in class3_enrolls:
+                            #     if e not in year3:
+                            #         year3.append(e)
+                                e = str(e)
+                                year3.add(e[:4]+"/CTAE/"+e[4:])
+
+                        
+                    elif class_id == "4":
+                        class4_enrolls = makePrediction(rgb,"4")
+                        if type(class4_enrolls) != str:
+                            for e in class4_enrolls:
+                            #     if e not in year4:
+                            #         year4.append(e)
+                                e = str(e)
+                                year4.add(e[:4]+"/CTAE/"+e[4:])
+                    
+                return JsonResponse({"status":"attendance recorded!"})
+
+            else:
+            # pil_img = Image.open(image_file)
+            # pil_img.show()
+                pred = {}
     
+                pred["Second Year"] = year2
+                pred["Third Year"] = year3
+                pred["Final Year"] = year4
+                
+                year2 = []
+                year3 = []
+                year4 = []
+                
+                print("-----------------",pred)
+                mark_attendance(pred)
+                return JsonResponse({"status":"successfully attendance marked"})
+            
+        except Exception as e:
+            # return JsonResponse({"status":"We think images were not sent by cameras!"})
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>",e)
+            return JsonResponse({"status":"Exception got handle carefully"})
+            
     else:
-        return JsonResponse({"status":"There is some error!"})
+        return JsonResponse({"status":"There is request error!"})
          
+         
+# def markattendance(request):
+#     global year_2, year_3, year4
+#     pred = {}
+    
+#     pred["2nd year"] = str(year2)
+#     pred["3rd year"] = str(year3)
+#     pred["4th year"] = str(year4)
+        
+#     return JsonResponse(pred)
+ 
                 
 def train_model(request):
-    # year = request.GET.get("year")
-    X,y = get_embedding("2021")
-    print("-------------------------------Embeddings Done----------------- ",X.shape, y.dtype, y)
-    s = train(X,y)
+    json_data = json.loads(request.body)
+    year = json_data.get("year")
+    
+    X,y = get_embedding(year)
+    print("-------------------------------Embeddings Done----------------- ")
+    s = train(X,y,year)
     return JsonResponse({"status":s})
 
 
@@ -311,7 +385,7 @@ def upload_image(request):
             image_file = request.FILES.get('image')
             enroll_id = request.POST.get('enrollId')
         
-        year = enroll_id[0:4]
+        # year = enroll_id[0:4]
         
         pil_img = Image.open(image_file)
         opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
@@ -343,17 +417,282 @@ def sort(request):
 
 @login_required(login_url='testapp:home')
 def teacher(request):
+    if request.method=='POST' and request.FILES['teacherDetails']:
+        excel_file = request.FILES['teacherDetails']
+
+        skipR = [0,1,2]
+        df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5], index_col='S.N0')
+        df = df.dropna(subset=['NAME'])
+        df.index = df.index.astype(int)
+
+        dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
+        dfEmails = df['Email'].to_list()
+
+        try:
+            if(len(dbEmails) > len(dfEmails)):    # to delete the missing teachers in the uploaded sheet
+                emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+                Teacher.objects.filter(email__in = emails_to_delete).delete()
+
+            else:       # to add or modify the present teachers in the uploaded sheet
+                for index, row in df.iterrows():
+                    teacher, created = Teacher.objects.get_or_create(
+                        email = str(row['Email']),
+                        defaults={
+                            'name': row['NAME'],
+                            'id': index,
+                            'mobile': str(int(row['Mobile'])),
+                            'subjects': row['Subjects']
+                        }
+                    )
+                    if not created:
+                        teacher.name = row['NAME']
+                        teacher.id = index
+                        teacher.mobile = str(int(row['Mobile']))
+                        teacher.subjects = row['Subjects']
+                        teacher.save()
+
+            save_subjects(df.loc[:,['Subjects']])   # to save relevant data to the Subject model
+            return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.',})
+        
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    teacherData = list(Teacher.objects.all().values_list())
+    teacherData.sort(key=lambda x: int(x[1]))
+    return render(request, 'testapp/teacher.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'teachers':teacherData})
     
 
 @login_required(login_url='testapp:home')
 def schedule(request):
+    selected_class = request.GET.get('class')
+    if request.method=='POST' and request.FILES['timeTable']:
+        excel_file = request.FILES['timeTable']
+
+        skipR = [0,1,2,3,4]
+        df = pd.read_excel(excel_file, skiprows=skipR, usecols='A:I', index_col='Day')
+        df.fillna('-', inplace=True)
+
+        try:
+            db_entry = clean_schedule(df)
+            class_obj = Class.objects.get(id = selected_class)
+            
+            dict_data = [{'day_of_week': row[0], 'class_id': class_obj,
+                          'start_time': datetime.strptime(row[1], '%H').time(), 
+                          'end_time': datetime.strptime(row[2], '%H').time(), 
+                          'subject': row[3]} for row in db_entry]
+
+            # to delete old records
+            if Schedule.objects.filter(class_id = selected_class).values_list():
+                Schedule.objects.filter(class_id = selected_class).delete()
+            
+            # an efficient way to create multiple instances of a model at once
+            Schedule.objects.bulk_create([Schedule(**row) for row in dict_data])
+            return JsonResponse({'success': True, 'message': 'Schedule is uploaded successfully.'})           
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
+    schedule_data = []
+    if selected_class:
+        data = Schedule.objects.filter(class_id = selected_class).values_list()
+        if data:
+            try:
+                schedule_data = [row[-1] for row in list(data)]
+                schedule_data = [schedule_data[i:i+8] for i in range(0, len(schedule_data), 8)]
+                return JsonResponse({'success': True, 'schedule':schedule_data})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+        elif Schedule.objects.all().values_list():
+            return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
+        else:
+            return JsonResponse({'success': True})
+
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
-    
+
 
 @login_required(login_url='testapp:home')
-def camera(request):
+def classroom(request):
+    assign_class = request.GET.get('assign_class')
+    assign_camera = request.GET.get('assign_camera')
+    
+    if assign_class:
+        try:
+            cls = request.GET.get('class')
+            room = request.GET.get('room')
+            
+            classroom, created = Classroom.objects.get_or_create(
+                room = room, defaults={'class_id': Class.objects.get(id=cls)})
+            if not created:
+                classroom.class_id = Class.objects.get(id=cls)
+                classroom.save()
+        
+            return JsonResponse({'success': True, 'message': 'Classroom assigned successfully.',})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+    
+    if assign_camera:
+        try:
+            cam_ip = request.GET.get('cam_ip')
+            cls = request.GET.get('class')
+            room_id = request.GET.get('room_id')
+
+            camera, created = Camera.objects.get_or_create(
+                camera_ip = cam_ip,
+                defaults={'class_id': Class.objects.get(id=cls),
+                          'room_id':Classroom.objects.get(room=room_id)
+                          })
+            if not created:
+                camera.class_id = Class.objects.get(id=cls)
+                camera.room_id = Classroom.objects.get(room=room_id)
+                camera.save()
+        
+            return JsonResponse({'success': True, 'message': 'Camera assigned successfully.',})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+
+    if request.GET.get('class'):
+        try:
+            rooms = [val[0] for val in Classroom.objects.filter(class_id = Class.objects.get(id=request.GET.get('class'))).values_list(named=False)]
+            print(rooms)
+            return JsonResponse({'success': True, 'rooms': rooms})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+
+    data = []
+    for room in Classroom.objects.all().values_list():
+        cameras = Camera.objects.filter(room_id=Classroom.objects.get(room=room[0])).values_list()
+        data += [{
+            'class': Class.objects.get(id=room[1]),
+            'room': room[0],
+            'camera': ', '.join([camera[0] for camera in cameras])
+        }]
+        # print()
     user = User.objects.get(username=request.user)
-    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
+
+
+# some extra helper functions
+def clean_schedule(df):
+    db_entry = []
+    for i in df.index:    #each day
+        for j in df.loc[i].index:    #each period
+
+            if j != '1-2':    #not a lunch time
+                if ('\n' in df.loc[i,j]) or ('/' in df.loc[i,j]):    #for multiple items
+                    row = [i, j.split('-')[0], j.split('-')[1]]
+                
+                    if '\n' in df.loc[i,j]:    #1st hour of two subjects
+                        row.append(df.loc[i,j].replace('\n',','))
+                    
+                    if '/' in df.loc[i,j]:    #1st hour of NCC/NSS/Scout
+                        row.append(df.loc[i,j].replace('/',' or '))
+                    
+                    db_entry.append(row)
+                    
+                    #for the subjects having 2hrs assigned
+                    start = j.split('-')[1]
+                    if int(start) < 5 or int(start) > 9:
+                        end = int(start) + 1
+                        if end > 12:
+                            end %= 12
+                        
+                        #to avoid the overriding the subject presents in the next period
+                        next_period = '-'.join([start, str(end)])
+                        if df.loc[i,next_period] == '-':
+                            if '\n' in df.loc[i,j]:    #2nd hour of two subjects
+                                df.loc[i,next_period] = df.loc[i,j].replace('\n',',')
+                            if '/' in df.loc[i,j]:    #2nd hour of NCC/NSS/Scout
+                                df.loc[i,next_period] = df.loc[i,j].replace('/',' or ')
+
+                else:    #single subject or no subject
+                    db_entry.append([
+                            i,
+                            j.split('-')[0],
+                            j.split('-')[1],
+                            df.loc[i,j],
+                        ])
+                    
+            else:    #lunch time
+                db_entry.append([
+                    i,
+                    j.split('-')[0],
+                    j.split('-')[1],
+                    'LUNCH',
+                ])
+    return db_entry
+
+
+def save_subjects(data):
+    res_dict = {}
+    try:
+        # to process the text
+        for row in data.iterrows():
+            sub_col = row[1].values[0]
+            if ',' in sub_col:    #for multiple subjects
+                subj = sub_col.split(',')
+                for sub in subj:
+                    res = [i.strip(')') for i in sub.split('(')]
+                    res_dict[res[1]] = [res[0], Teacher.objects.get(id=row[0])]
+            else:    #for single subject
+                res = [i.strip(')') for i in sub_col.split('(')]
+                res_dict[res[1]] = [res[0], Teacher.objects.get(id=row[0])]
+        
+        # to save the processed values
+        for key, value in res_dict.items():
+            subject, created = Subject.objects.get_or_create(
+                id = key,
+                defaults={
+                    'name': value[0].strip(),
+                    'teacher_id': value[1],
+                    'class_id': Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
+                }
+            )
+            if not created:
+                subject.name = value[0].strip()
+                subject.teacher_id = value[1]
+                subject.class_id = Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
+                subject.save()
+
+    except Exception as e:
+        return f'There is an exception {e}'
+    return "Successfully saved the subjects!"
+
+
+# <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
+# {'Second Year':{'2021/CTAE/497','2021/CTAE/498'}, 'Third Year':set(), 'Final Year':set()}
+def mark_attendance(data):
+    current_sub = get_subjects()
+    print("XXXXXXXXXXXXXXXX",current_sub)
+    for cls, enrolls in data.items():
+        cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
+        if len(enrolls) != 0:
+            print("---------------------------",sub_map)
+            for k,v in sub_map[cls].items():
+                if v in current_sub[cls]:
+                    # enrolls = list(enrolls)
+                    cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
+
+    print(sub_map)
+    print(current_sub)
+
+
+def get_subjects():
+    now = datetime.now()   #YYYY-MM-DD HH:MM:SS.ssssss
+    hour = now.hour % 12      #12 hour formate
+    weekday_name = now.strftime("%A")   #output will be a string that represents the current day of the week,
+    
+    curr_subj = {}
+    for obj in Schedule.objects.filter(class_id_id = 2):
+        if 10 == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
+            curr_subj['Second Year'] = obj.subject
+    
+    for obj in Schedule.objects.filter(class_id_id = 3):
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
+            curr_subj['Third Year'] = obj.subject
+
+    for obj in Schedule.objects.filter(class_id_id = 4):
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
+            curr_subj['Final Year'] = obj.subject
+
+    return curr_subj

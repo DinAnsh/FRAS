@@ -15,10 +15,6 @@ function closeModal2() {
   document.getElementById("myModal2").style.display = "none";
 }
 
-function addcam() {
-  document.getElementById("myModal4").style.display = "block";
-}
-
 function closeModal3() {
   const tracks = stream.getTracks();
   tracks.forEach((track) => {
@@ -33,10 +29,6 @@ function closeModal3() {
   saveBtn.style.display = 'none';
 }
 
-function closeModal4() {
-  document.getElementById("myModal4").style.display = "none";
-}
-
 window.onclick = function (event) {
   // console.log(event.target)
   if (event.target == document.getElementById("cbtn")) {
@@ -48,11 +40,6 @@ window.onclick = function (event) {
     event.target == document.getElementById("content3")
   ) {
     closeModal3();
-  } else if (
-    event.target == document.getElementById("cbtn4") ||
-    event.target == document.getElementById("content4")
-  ) {
-    closeModal4();
   }
 };
 
@@ -394,12 +381,12 @@ function updateStatus() {
 
   var okStatus = document.createElement("span");
   okStatus.innerHTML = '&#9745;';
-  okStatus.title = 'Registered!'
+  okStatus.title = 'Registered! (Click again if you want to re-register)';
 
   var okays = document.querySelectorAll('.okStatus');
   okays.forEach(function (element) {
     if (!element.hasChildNodes()) {
-      element.appendChild(okStatus.cloneNode(true));
+      element.appendChild(okStatus.cloneNode(true)).addEventListener('click', sregister);
     }
   });
 }
@@ -596,6 +583,8 @@ function uploadGrid(event) {
 
 // ---------------------- train the model -------------------------------------
 function trainModel() { 
+
+  var year = document.querySelector("#class-dropdown").value;
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "../students/train_model/", true);
   xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
@@ -607,5 +596,5 @@ function trainModel() {
       console.error("Failed to Train Model");
     }
   };
-  xhr.send();
+  xhr.send(JSON.stringify({"year":year}));
 }
