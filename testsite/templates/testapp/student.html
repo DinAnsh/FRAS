@@ -20,7 +20,7 @@
     </div>
 
     <div class="part1-content">
-      <select class="" id="class-dropdown" name="class" onchange="getStudents()">
+      <select class="" id="class-dropdown" name="class" onchange="changeDetails()">
         <option value="" disabled selected>Select Class</option>
         <option value="2">Second year</option>
         <option value="3">Third year</option>
@@ -40,9 +40,12 @@
   <div class="main-part2">
     <div class="btn-cont">
       <div class="tabletitle">
-        <h1>
-          Student Details
-        </h1>
+        <h2>
+          <select class="" id="all-details" name="details" onchange="changeDetails()" style="background-color: transparent; width: 12rem;">
+            <option value="0" selected>Student Details</option>
+            <option value="1">Attendance Details</option>
+          </select>
+        </h2>
       </div>
 
       <div class="searchright">
@@ -59,7 +62,6 @@
             <th class="tcol2">Name</th>
             <th class="tcol3">Email</th>
             <th class="tcol4">Mobile</th>
-            <th class="tcol5">Attendance</th>
             <th class="tcol6">Status</th>
           </tr>
         </thead>

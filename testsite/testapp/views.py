@@ -201,6 +201,40 @@ def get_student_data(request):
 
 
 @login_required(login_url='testapp:home')
+def get_attendance_data(request):
+    selected_class = request.GET.get('class')
+
+    # current_year = timezone.now().strftime('%Y')
+    # current_month = timezone.now().strftime('%m')
+
+    # if int(current_month) <= 6:
+    #     adm_year = str(int(current_year)-int(selected_class))
+    # else:
+    #     adm_year = str(int(current_year)+1-int(selected_class))
+    
+
+    try:
+        # student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
+        if selected_class == '2':
+            fields = ['enroll_id'] + list(sub_map['Second Year'].keys())
+            header = list(sub_map['Second Year'].values())
+            data = Second_Year.objects.values_list(*fields)
+        elif selected_class == '3':
+            fields = ['enroll_id'] + list(sub_map['Third Year'].keys())
+            header = list(sub_map['Third Year'].values())
+            data = Third_Year.objects.values_list(*fields)
+        elif selected_class == '4':
+            fields = ['enroll_id'] + list(sub_map['Final Year'].keys())
+            header = list(sub_map['Final Year'].values())
+            data = Final_Year.objects.values_list(*fields)
+
+        return JsonResponse({'data':list(data), 'header':header, 'success': True}, safe=False)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'There are no subjects for the selected class - {selected_class}'})
+    
+
+
+@login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
         # Get the image data from the request
