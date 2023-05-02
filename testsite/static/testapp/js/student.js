@@ -297,7 +297,7 @@ function getStudents(page = 1) {
 
   // to display export button
   if (classId) {
-    document.getElementById('export-btn').style.display = 'block';
+    document.getElementById('export-btn').style.display = 'none';
     document.getElementById('train-btn').style.display = 'block';
   }
 
@@ -310,6 +310,8 @@ function getStudents(page = 1) {
       // currentPage = 1;
       var response = JSON.parse(xhr.responseText);
       data = response.data;
+
+      headers.innerHTML = "<th class='tcol1'>Enrollment ID</th><th class='tcol2'>Name</th><th class='tcol3'>Email</th><th class='tcol4'>Mobile</th><th class='tcol6'>Status</th>"
       renderData(page);
     }
   };
@@ -329,9 +331,9 @@ function renderData(page) {
 
   pageData.forEach(student => {
     if (!student.img) {
-      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
+      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + "</td><td class='sregisterBtn'>" + '</td></tr>';
     } else {
-      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+      html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + "</td><td class='okStatus'>" + '</td></tr>';
     }
   });
 
@@ -436,9 +438,9 @@ searchInput.addEventListener('keyup', function () {
 
     searchData.forEach(student => {
       if (!student.img) {
-        html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='sregisterBtn'>" + '</td></tr>';
+        html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + "</td><td class='sregisterBtn'>" + '</td></tr>';
       } else {
-        html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + '</td><td>' + "</td><td class='okStatus'>" + '</td></tr>';
+        html += '<tr><td>' + student.enroll + '</td><td>' + student.name + '</td><td>' + student.email + '</td><td>' + student.mobile + "</td><td class='okStatus'>" + '</td></tr>';
       }
     });
 
@@ -509,38 +511,38 @@ function downloadExcel() {
   // add the title
   worksheet.mergeCells('A2:F2');
   const sub_titleCell = worksheet.getCell('B2');
-  sub_titleCell.value = 'B.Tech. ' + selectedOption.textContent.toLowerCase() + ' for the session ' + currentYear.toString() + '-' + nextYear.toString();
+  sub_titleCell.value = 'B.Tech. ' + selectedOption.textContent + ' Attendance Sheet';  // + currentYear.toString() + '-' + nextYear.toString();
   sub_titleCell.font = { size: 14, bold: false };
 
   // Parse the HTML table and extract its data
   const table = document.getElementById('students-table');
   const rows = table.getElementsByTagName('tr');
-  const headerRow = Array.from(rows[0].children).slice(0, 5);
+  const headerRow = Array.from(rows[0].children);
 
   // Add header row to worksheet
   const headerValues = headerRow.map((th) => th.textContent.trim());
   worksheet.addRow(headerValues);
 
   // set the column widths
-  const columnWidths = [];
-  for (let i = 0; i < headerRow.length; i++) {
-    const width = headerRow[i].offsetWidth;
-    columnWidths.push(width);
-  }
+  // const columnWidths = [];
+  // for (let i = 0; i < headerRow.length; i++) {
+  //   const width = headerRow[i].offsetWidth;
+  //   columnWidths.push(width);
+  // }
   worksheet.columns.forEach((column, index) => {
-    column.width = columnWidths[index] / 7;
+    column.width = 15;
   });
 
   // parse the whole data of the selected class
-  const array = data.map(item => ([
-    item.enroll,
-    item.name,
-    item.email,
-    item.mobile,
-  ]));
+  // const array = data.map(item => ([
+  //   item.enroll,
+  //   item.name,
+  //   item.email,
+  //   item.mobile,
+  // ]));
 
   // Add data rows to worksheet
-  array.forEach((row) => {
+  attd.forEach((row) => {
     worksheet.addRow(row);
   });
 
@@ -582,19 +584,112 @@ function uploadGrid(event) {
 
 
 // ---------------------- train the model -------------------------------------
-function trainModel() { 
+function trainModel() { }
 
-  var year = document.querySelector("#class-dropdown").value;
+
+// ---------------------------- change details table --------------------------
+function changeDetails() {
+  var classId = document.getElementById('class-dropdown').value;
+  var detailsVal = document.getElementById('all-details').value;
+
+  if (classId && detailsVal) {
+    if (detailsVal == '0') {
+      getStudents();
+    } else if (detailsVal == '1') {
+      getAttendance();
+    }
+  }
+}
+
+
+// --------------------------------- get attendance and pagination -----------------------------
+let attd = [];
+let header = [];
+var headers = document.querySelector('thead').firstElementChild;
+function getAttendance(page = 1) {
+  // Get the class ID from the select box
+  var classId = document.getElementById('class-dropdown').value;
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", "../students/train_model/", true);
-  xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
 
-  xhr.onreadystatechange = function () {
-    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-      alert("Model Trained Successfully");
-    } else {
-      console.error("Failed to Train Model");
+  // to display export button
+  if (classId) {
+    document.getElementById('export-btn').style.display = 'block';
+    document.getElementById('train-btn').style.display = 'none';
+  }
+
+  // Make an AJAX request to the Django view
+  xhr.open('GET', '../students/get-attendance-data/?class=' + classId, true);
+  xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      if (response.success) {
+        attd = response.data;
+        header = response.header;
+
+        headers.innerHTML = '';
+        let html = '<tr><th>Enrollment ID</th>';
+
+        header.forEach(heading => {
+          html += '<th>' + heading + '</th>';
+        });
+
+        headers.innerHTML = html + '</tr>';
+
+        renderAttendance(page);
+      } else {
+        alert(response.message);
+      }
     }
   };
-  xhr.send(JSON.stringify({"year":year}));
+  xhr.send();
+}
+
+
+function renderAttendance(page) {
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const pageData = attd.slice(startIndex, endIndex);
+  currentPage = page;
+
+  tableBody.innerHTML = '';
+  let html = '';
+
+  pageData.forEach(student => {     // alter this
+    html += '<tr><td>' + student[0] + '</td>';
+
+    for (let i = 1; i < student.length; i++) {
+      html += '<td>' + student[i] + '</td>';
+    }
+
+    html += '</tr>';
+  });
+
+  tableBody.innerHTML = html;
+
+  // update the previous and next buttons
+  const totalPages = Math.ceil(attd.length / itemsPerPage);
+  var prevLink = document.getElementById('prev-link');
+  var nextLink = document.getElementById('next-link');
+
+  const pageLabel = 'Page ' + currentPage + ' of ' + totalPages;
+  const pageElement = document.querySelector('.page-label');
+  pageElement.textContent = pageLabel;
+
+
+  if (currentPage > 1) {
+    previous_page = currentPage - 1;
+    prevLink.setAttribute('onclick', 'renderAttendance(' + previous_page + ')');
+    prevLink.style.display = 'inline-block';
+  } else {
+    prevLink.style.display = 'none';
+  }
+  if (currentPage < totalPages) {
+    next_page = currentPage + 1;
+    nextLink.setAttribute('onclick', 'renderAttendance(' + next_page + ')');
+    nextLink.style.display = 'inline-block';
+  } else {
+    nextLink.style.display = 'none';
+  }
 }

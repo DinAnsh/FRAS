@@ -108,13 +108,14 @@ def user_logout(request):
         logout(request)
         student_data = Student.objects.all()
         team_data = Team.objects.all()
-        # request.session['logged']=0
+        check_subMap()
         return redirect('testapp:home')
 
 
 #if we can provide other data from here to the page then we can show a message to the user 'Login first'
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
+    check_subMap()
     user = User.objects.get(username=request.user)
     if request.method == 'POST':
         if request.content_type == 'application/json':
@@ -196,6 +197,7 @@ def student(request):
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
 
+    check_subMap()
     user = User.objects.get(username=request.user)   
     return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email,})
 
@@ -216,50 +218,7 @@ def get_student_data(request):
         student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
     except Exception as e:
         return JsonResponse({'success': True, 'message': 'Student details are not uplaoded for the selected class.'})
-
-    #attendance model ------------------------------- testing ----------------------------
-    if Student.objects.exists() and Subject.objects.exists():
-        # select only those classes for which subjects are already uploaded
-        cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
-        
-        for cls in cls_inDB:
-            try:
-                if cls != 'None':
-                    cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
-                    
-                    # populate the empty class model with relevant enrolls
-                    if not cls_model.objects.exists():
-                        if int(current_month) <= 6:
-                            stu_obj = Student.objects.filter(enroll__startswith = str(int(current_year) - int(Class.objects.get(name=cls).id)))
-                        else:
-                            stu_obj = Student.objects.filter(enroll__startswith = str(int(current_year) + 1 - int(Class.objects.get(name=cls).id)))
-                        
-                        for s in stu_obj:
-                            cls_model.objects.create(enroll_id=s)
-
-                    subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
-                    fields = cls_model._meta.get_fields()[2:]
-                    global sub_map
-                    if cls in sub_map.keys():
-                        # for adding new subjects
-                        new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
-                        new_key = [key for key in fields if key not in sub_map[cls].keys()]
-                        for sub,key in zip(new_sub, new_key):
-                            sub_map[cls][key] = sub
-
-                        # for deleting subjects
-                        del_sub = [sub for sub in sub_map[cls].values() if sub not in subjects]
-                        del_key = []
-                        for sub in del_sub:
-                            del_key += [key for key, value in sub_map[cls].items() if value == sub]
-                        for key in del_key:
-                            del sub_map[cls][key]            
-
-                    else:
-                        sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
-            except Exception as e:
-                print(f'There is an exception {e}')
-            
+    
     return JsonResponse({'data':list(student_data),}, safe=False)
 
 @login_required(login_url='testapp:home')
@@ -366,6 +325,40 @@ def train_model(request):
 
 
 @login_required(login_url='testapp:home')
+def get_attendance_data(request):
+    selected_class = request.GET.get('class')
+
+    # current_year = timezone.now().strftime('%Y')
+    # current_month = timezone.now().strftime('%m')
+
+    # if int(current_month) <= 6:
+    #     adm_year = str(int(current_year)-int(selected_class))
+    # else:
+    #     adm_year = str(int(current_year)+1-int(selected_class))
+    
+
+    try:
+        # student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
+        if selected_class == '2':
+            fields = ['enroll_id'] + list(sub_map['Second Year'].keys())
+            header = list(sub_map['Second Year'].values())
+            data = Second_Year.objects.values_list(*fields)
+        elif selected_class == '3':
+            fields = ['enroll_id'] + list(sub_map['Third Year'].keys())
+            header = list(sub_map['Third Year'].values())
+            data = Third_Year.objects.values_list(*fields)
+        elif selected_class == '4':
+            fields = ['enroll_id'] + list(sub_map['Final Year'].keys())
+            header = list(sub_map['Final Year'].values())
+            data = Final_Year.objects.values_list(*fields)
+
+        return JsonResponse({'data':list(data), 'header':header, 'success': True}, safe=False)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'There are no subjects for the selected class - {selected_class}'})
+    
+
+
+@login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
         if request.content_type == 'application/json':
@@ -451,12 +444,13 @@ def teacher(request):
                         teacher.subjects = row['Subjects']
                         teacher.save()
 
-            save_subjects(df.loc[:,['Subjects']])   # to save relevant data to the Subject model
-            return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.',})
+            return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.'})
         
         except Exception as e:
-            return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
+            return JsonResponse({'success': False, 'message': f'There is an exception - {e}'})
     
+    check_subMap()
+    check_subjects()
     user = User.objects.get(username=request.user)
     teacherData = list(Teacher.objects.all().values_list())
     teacherData.sort(key=lambda x: int(x[1]))
@@ -507,6 +501,8 @@ def schedule(request):
         else:
             return JsonResponse({'success': True})
 
+    check_subMap()
+    check_subjects()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
 
@@ -567,7 +563,8 @@ def classroom(request):
             'room': room[0],
             'camera': ', '.join([camera[0] for camera in cameras])
         }]
-        # print()
+    
+    check_subMap()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
 
@@ -623,42 +620,6 @@ def clean_schedule(df):
     return db_entry
 
 
-def save_subjects(data):
-    res_dict = {}
-    try:
-        # to process the text
-        for row in data.iterrows():
-            sub_col = row[1].values[0]
-            if ',' in sub_col:    #for multiple subjects
-                subj = sub_col.split(',')
-                for sub in subj:
-                    res = [i.strip(')') for i in sub.split('(')]
-                    res_dict[res[1]] = [res[0], Teacher.objects.get(id=row[0])]
-            else:    #for single subject
-                res = [i.strip(')') for i in sub_col.split('(')]
-                res_dict[res[1]] = [res[0], Teacher.objects.get(id=row[0])]
-        
-        # to save the processed values
-        for key, value in res_dict.items():
-            subject, created = Subject.objects.get_or_create(
-                id = key,
-                defaults={
-                    'name': value[0].strip(),
-                    'teacher_id': value[1],
-                    'class_id': Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
-                }
-            )
-            if not created:
-                subject.name = value[0].strip()
-                subject.teacher_id = value[1]
-                subject.class_id = Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
-                subject.save()
-
-    except Exception as e:
-        return f'There is an exception {e}'
-    return "Successfully saved the subjects!"
-
-
 # <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
 # {'Second Year':{'2021/CTAE/497','2021/CTAE/498'}, 'Third Year':set(), 'Final Year':set()}
 def mark_attendance(data):
@@ -696,3 +657,78 @@ def get_subjects():
             curr_subj['Final Year'] = obj.subject
 
     return curr_subj
+
+
+def check_subMap():
+    if Subject.objects.exists():
+        # select only those classes for which subjects are already uploaded
+        cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
+        
+        try:
+            for cls in cls_inDB:
+                if cls != 'None':
+                    cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
+                    subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
+                    fields = cls_model._meta.get_fields()[2:]
+                    
+                    global sub_map
+                    if cls in sub_map.keys():
+                        # for adding new subjects in map
+                        new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
+                        new_key = [key for key in fields if key not in sub_map[cls].keys()]
+                        for sub,key in zip(new_sub, new_key):
+                            sub_map[cls][key] = sub
+
+                        # for deleting subjects in map
+                        del_sub = [sub for sub in sub_map[cls].values() if sub not in subjects]
+                        del_key = []
+                        for sub in del_sub:
+                            del_key += [key for key, value in sub_map[cls].items() if value == sub]
+                        for key in del_key:
+                            del sub_map[cls][key]            
+
+                    else:
+                        sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+
+            print('...........sub_map updated successfully!.........')
+        except Exception as e:
+            print(f'There is an exception {e}')
+
+
+def check_subjects():
+    if Schedule.objects.exists() and Teacher.objects.exists():      # for subject model
+        data = Teacher.objects.all().values_list('id','subjects')
+        
+        try:
+            res_dict = {}
+            for val in data:        # to process the text
+                if ',' in val[1]:   # for multiple subjects
+                    subj = val[1].split(',')
+                    
+                    for sub in subj:
+                        res = [i.strip(')') for i in sub.split('(')]
+                        res_dict[res[1]] = [res[0], Teacher.objects.get(id=val[0])]
+                
+                else:    #for single subject
+                    res = [i.strip(')') for i in val[1].split('(')]
+                    res_dict[res[1]] = [res[0], Teacher.objects.get(id=val[0])]
+            
+            for key, value in res_dict.items():     # to save the processed values
+                subject, created = Subject.objects.get_or_create(
+                    id = key,
+                    defaults={
+                        'name': value[0].strip(),
+                        'teacher_id': value[1],
+                        'class_id': Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
+                    }
+                )
+                if not created:
+                    subject.name = value[0].strip()
+                    subject.teacher_id = value[1]
+                    subject.class_id = Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
+                    subject.save()
+            
+            print("..........Successfully saved the subjects!............")
+        
+        except Exception as e:
+            print(f'There is an exception - {e}')

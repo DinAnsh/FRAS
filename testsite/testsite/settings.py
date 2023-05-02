@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'testapp.middleware.AutoLogoutMiddleware',
+    'testapp.middleware.Subjects_and_Students'
 ]
 
 ROOT_URLCONF = 'testsite.urls'
