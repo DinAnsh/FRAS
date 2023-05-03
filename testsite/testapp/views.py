@@ -24,6 +24,7 @@ from .face import *
 # import matplotlib.pyplot as plt
 from datetime import datetime
 from django.apps import apps
+import os.path
 
 sub_map = {}
 year2 = set()
@@ -92,6 +93,8 @@ def user_login(request, reason=''):
                             Class(id=4, name='Final Year'),
                         ]
                         Class.objects.bulk_create(instances)
+
+                        Sub_Tracker.objects.bulk_create([Sub_Tracker(class_id_id='2'), Sub_Tracker(class_id_id='3'), Sub_Tracker(class_id_id='4')])
                     return JsonResponse({"message":"Successfully logged in", 'status':'first_time'})
             else:
                 return JsonResponse({"message":"Looks like you've entered the wrong password"}, status=401)
@@ -309,36 +312,39 @@ def train_model(request):
 
 @login_required(login_url='testapp:home')
 def get_attendance_data(request):
-    selected_class = request.GET.get('class')
-
-    # current_year = timezone.now().strftime('%Y')
-    # current_month = timezone.now().strftime('%m')
-
-    # if int(current_month) <= 6:
-    #     adm_year = str(int(current_year)-int(selected_class))
-    # else:
-    #     adm_year = str(int(current_year)+1-int(selected_class))
-    
+    selected_class = request.GET.get('class')    
 
     try:
-        # student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
         if selected_class == '2':
             fields = ['enroll_id'] + list(sub_map['Second Year'].keys())
             header = list(sub_map['Second Year'].values())
-            data = Second_Year.objects.values_list(*fields)
+            attd = Second_Year.objects.values_list(*fields)
+            data = np.array(Sub_Tracker.objects.filter(class_id_id='2').values_list(*list(sub_map['Second Year'].keys()))[0]).astype(float)
+
         elif selected_class == '3':
             fields = ['enroll_id'] + list(sub_map['Third Year'].keys())
             header = list(sub_map['Third Year'].values())
-            data = Third_Year.objects.values_list(*fields)
+            attd = Third_Year.objects.values_list(*fields)
+            data = np.array(Sub_Tracker.objects.filter(class_id_id='3').values_list(*list(sub_map['Third Year'].keys()))[0]).astype(float)
+
         elif selected_class == '4':
             fields = ['enroll_id'] + list(sub_map['Final Year'].keys())
             header = list(sub_map['Final Year'].values())
-            data = Final_Year.objects.values_list(*fields)
+            attd = Final_Year.objects.values_list(*fields)
+            data = np.array(Sub_Tracker.objects.filter(class_id_id='4').values_list(*list(sub_map['Final Year'].keys()))[0]).astype(float)
 
-        return JsonResponse({'data':list(data), 'header':header, 'success': True}, safe=False)
+        res = []
+        for student in attd:
+            arr_a = np.array(student[1:]).astype(float)
+            result = np.divide(arr_a, data, out=np.zeros_like(arr_a), where=data!=0)
+            pct = (result*100).tolist()
+            res.append([student[0]] + pct)
+        
+        return JsonResponse({'data':res, 'header':header, 'success': True}, safe=False)
     except Exception as e:
-        return JsonResponse({'success': False, 'message': f'There are no subjects for the selected class - {selected_class}'})
-    
+        print(f'There is an exception -- {e}')
+        return JsonResponse({'success': False, 'message': f'There are no subjects for the selected class - {selected_class}'})    
+
 
 
 #Called when student face is registered or saved
@@ -603,8 +609,6 @@ def clean_schedule(df):
                 ])
     return db_entry
 
-
-# <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
 # {'Second Year':{'2021/CTAE/497','2021/CTAE/498'}, 'Third Year':set(), 'Final Year':set()}
 def mark_attendance(data):
     current_sub = get_subjects()
@@ -613,11 +617,17 @@ def mark_attendance(data):
         cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
         if len(enrolls) != 0:
             print("---------------------------",sub_map)
-            for k,v in sub_map[cls].items():
-                if v in current_sub[cls]:
-                    # enrolls = list(enrolls)
-                    cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
-
+            try:
+                for k,v in sub_map[cls].items():
+                    if v in current_sub[cls]:
+                        # enrolls = list(enrolls)
+                        cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
+                        # to keep the track of the subjects
+                        Sub_Tracker.objects.filter(class_id=Class.objects.get(name=cls)).update(**{k: models.F(k) + 1})
+                
+                print('...............attendance marked successfully..................')
+            except Exception as e:
+                print(f'There is an exception -- {e}')
     print(sub_map)
     print(current_sub)
 
@@ -645,17 +655,26 @@ def get_subjects():
 
 def check_subMap():
     if Subject.objects.exists():
-        # select only those classes for which subjects are already uploaded
-        cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
-        
         try:
+            # select only those classes for which subjects are already uploaded
+            cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
             for cls in cls_inDB:
                 if cls != 'None':
+                    
+                    # for updating the map according to the current subjects
                     cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
                     subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
-                    fields = cls_model._meta.get_fields()[2:]
+                    fields = [f.name for f in cls_model._meta.get_fields()[2:]]
                     
+                    # to update the sub_map with the existing map
                     global sub_map
+                    if os.path.exists('submap.json'):
+                        with open('submap.json', 'r') as json_file:
+                            sub_map = json.load(json_file)
+                    else:
+                        with open('submap.json', 'w') as json_file:
+                            json.dump(sub_map, json_file)
+
                     if cls in sub_map.keys():
                         # for adding new subjects in map
                         new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
@@ -673,6 +692,10 @@ def check_subMap():
 
                     else:
                         sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+
+                    with open('submap.json', 'r+') as json_file:
+                        json_file.truncate()
+                        json.dump(sub_map, json_file)
 
             print('...........sub_map updated successfully!.........')
         except Exception as e:

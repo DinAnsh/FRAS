@@ -282,3 +282,9 @@ header {
   background-color: rgb(23, 23, 23);
   cursor: pointer;
 }
+
+#note {
+  text-align: center;
+  margin: 1rem 0;
+  display: none;
+}

@@ -301,6 +301,7 @@ function getStudents(page = 1) {
   if (classId) {
     document.getElementById('export-btn').style.display = 'none';
     document.getElementById('train-btn').style.display = 'block';
+    document.getElementById('note').style.display = 'block';
   }
 
   // Make an AJAX request to the Django view
@@ -617,6 +618,7 @@ function getAttendance(page = 1) {
   if (classId) {
     document.getElementById('export-btn').style.display = 'block';
     document.getElementById('train-btn').style.display = 'none';
+    document.getElementById('note').style.display = 'none';
   }
 
   // Make an AJAX request to the Django view
@@ -662,7 +664,7 @@ function renderAttendance(page) {
     html += '<tr><td>' + student[0] + '</td>';
 
     for (let i = 1; i < student.length; i++) {
-      html += '<td>' + student[i] + '</td>';
+      html += '<td>' + student[i] + String('%') + '</td>';
     }
 
     html += '</tr>';

@@ -41,7 +41,8 @@
     <div class="btn-cont">
       <div class="tabletitle">
         <h2>
-          <select class="" id="all-details" name="details" onchange="changeDetails()" style="background-color: transparent; width: 12rem;">
+          <select class="" id="all-details" name="details" onchange="changeDetails()"
+            style="background-color: transparent; width: 12rem;">
             <option value="0" selected>Student Details</option>
             <option value="1">Attendance Details</option>
           </select>
@@ -78,9 +79,11 @@
     </div>
   </div>
 
+  <p id="note">Note: Click on the 'Train Model' button only after registering all the students!</p>
   <div class="export_train">
-    <button id="export-btn" class="common_btn button2" onclick="downloadExcel()">Export to Excel</button>
-    <button id="train-btn" class="common_btn button2" onclick="trainModel()" title="Please proceed to train the model, after registering all students' faces.">Train Model</button>
+    <button id="export-btn" class="common_btn button2" onclick="downloadExcel()"
+      title="Download attendance sheet!">Export to Excel</button>
+    <button id="train-btn" class="common_btn button2" onclick="trainModel()">Train Model</button>
   </div>
 </div>
 
