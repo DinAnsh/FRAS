@@ -7,11 +7,9 @@ class Subjects_and_Students:
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        
         if Student.objects.exists():     # for class models
             
-            # select only those classes for which subjects are already uploaded
+            # select only those classes for which subj`ects are already uploaded
             cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
             current_year = timezone.now().strftime('%Y')
             current_month = timezone.now().strftime('%m')

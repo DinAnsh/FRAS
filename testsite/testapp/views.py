@@ -205,36 +205,38 @@ def get_student_data(request):
 
 @login_required(login_url='testapp:home')
 def get_attendance_data(request):
-    selected_class = request.GET.get('class')
-
-    # current_year = timezone.now().strftime('%Y')
-    # current_month = timezone.now().strftime('%m')
-
-    # if int(current_month) <= 6:
-    #     adm_year = str(int(current_year)-int(selected_class))
-    # else:
-    #     adm_year = str(int(current_year)+1-int(selected_class))
-    
+    selected_class = request.GET.get('class')    
 
     try:
-        # student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
         if selected_class == '2':
             fields = ['enroll_id'] + list(sub_map['Second Year'].keys())
             header = list(sub_map['Second Year'].values())
-            data = Second_Year.objects.values_list(*fields)
+            attd = Second_Year.objects.values_list(*fields)
+            data = np.array(Sub_Tracker.objects.filter(class_id_id='2').values_list(*list(sub_map['Second Year'].keys()))[0]).astype(float)
+
         elif selected_class == '3':
             fields = ['enroll_id'] + list(sub_map['Third Year'].keys())
             header = list(sub_map['Third Year'].values())
-            data = Third_Year.objects.values_list(*fields)
+            attd = Third_Year.objects.values_list(*fields)
+            data = np.array(Sub_Tracker.objects.filter(class_id_id='3').values_list(*list(sub_map['Third Year'].keys()))[0]).astype(float)
+
         elif selected_class == '4':
             fields = ['enroll_id'] + list(sub_map['Final Year'].keys())
             header = list(sub_map['Final Year'].values())
-            data = Final_Year.objects.values_list(*fields)
+            attd = Final_Year.objects.values_list(*fields)
+            data = np.array(Sub_Tracker.objects.filter(class_id_id='4').values_list(*list(sub_map['Final Year'].keys()))[0]).astype(float)
 
-        return JsonResponse({'data':list(data), 'header':header, 'success': True}, safe=False)
+        res = []
+        for student in attd:
+            arr_a = np.array(student[1:]).astype(float)
+            result = np.divide(arr_a, data, out=np.zeros_like(arr_a), where=data!=0)
+            pct = (result*100).tolist()
+            res.append([student[0]] + pct)
+        
+        return JsonResponse({'data':res, 'header':header, 'success': True}, safe=False)
     except Exception as e:
-        return JsonResponse({'success': False, 'message': f'There are no subjects for the selected class - {selected_class}'})
-    
+        print(f'There is an exception -- {e}')
+        return JsonResponse({'success': False, 'message': f'There are no subjects for the selected class - {selected_class}'})    
 
 
 @login_required(login_url='testapp:home')
@@ -481,9 +483,18 @@ def mark_attendance(data={'Second Year':['2021/CTAE/497','2021/CTAE/498']}):
     for cls, enrolls in data.items():
         cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
         
-        for k,v in sub_map[cls].items():
-            if v in current_sub[cls]:
-                cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
+        try:
+            for k,v in sub_map[cls].items():    
+                if v in current_sub[cls]:
+                    
+                    # to mark attendance of the students
+                    cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
+                    # to keep the track of the subjects
+                    Sub_Tracker.objects.filter(class_id=Class.objects.get(name=cls)).update(**{k: models.F(k) + 1})
+            
+            print('...............attendance marked successfully..................')
+        except Exception as e:
+            print(f'There is an exception -- {e}')
 
     print(current_sub)
 
@@ -495,7 +506,7 @@ def get_subjects():
     
     curr_subj = {}
     for obj in Schedule.objects.filter(class_id_id = 2):
-        if hour == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
             curr_subj['Second Year'] = obj.subject
     
     for obj in Schedule.objects.filter(class_id_id = 3):
@@ -509,12 +520,6 @@ def get_subjects():
     return curr_subj
 
 
-# <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
-# if os.path.exists('submap.json'):
-#     with open('submap.json', 'r') as json_file:
-#         map = json.load(json_file)
-
-
 def check_subMap():
     if Subject.objects.exists():
         try:
@@ -522,10 +527,11 @@ def check_subMap():
             cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
             for cls in cls_inDB:
                 if cls != 'None':
+                    
                     # for updating the map according to the current subjects
                     cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
                     subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
-                    fields = cls_model._meta.get_fields()[2:]
+                    fields = [f.name for f in cls_model._meta.get_fields()[2:]]
                     
                     # to update the sub_map with the existing map
                     global sub_map
@@ -555,12 +561,8 @@ def check_subMap():
                         sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
 
                     with open('submap.json', 'r+') as json_file:
-                        # map = json_file.read()           # Read from the file
                         json_file.truncate()
                         json.dump(sub_map, json_file)
-                        print('-=-=-=-=-=-=-')
-                        # If the new map is shorter than the old map, truncate the file to remove the extra characters
-                        # if len(str(sub_map)) < len(map):
 
             print('...........sub_map updated successfully!.........')
         except Exception as e:
