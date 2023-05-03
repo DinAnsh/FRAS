@@ -1,14 +1,9 @@
-from datetime import datetime, timedelta
-from django.conf import settings
+from datetime import datetime
 from django.contrib.auth import logout
 
 from django.apps import apps
 from django.utils import timezone
 from .models import Class, Student, Subject
-
-
-from datetime import datetime, timedelta
-from django.contrib.auth import logout
 
 class AutoLogoutMiddleware:
     def __init__(self, get_response):
@@ -18,6 +13,7 @@ class AutoLogoutMiddleware:
         if request.user.is_authenticated and request.path != '/testapp/login/':
             user = request.user
             if user.last_login:
+                #converts the datetime object to the local timezone, removes the timezone information from the datetime object, resulting in a timezone-naive datetime object 
                 last_login = user.last_login.astimezone().replace(tzinfo=None)
                 print(f">>>>>>>>>>>>>>>>>>>>>>>{last_login}<<<<<<<<<<<<<<<<<<<<<<<")
                 print(f">>>>>>>>>>>>>>>>>>>>>>>{datetime.now()}<<<<<<<<<<<<<<<<<<<<<<<")
@@ -67,7 +63,7 @@ class Subjects_and_Students:
 
 
                 except Exception as e:
-                    print(f'There is an exception -- {e}')
+                    print(f'There is an exception in Middleware -- {e}')
 
 
         response = self.get_response(request)

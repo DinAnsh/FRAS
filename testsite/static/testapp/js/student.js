@@ -1,3 +1,5 @@
+var imgnum = document.querySelector("#imgnum");
+
 function openModal() {
   document.getElementById("myModal").style.display = "block";
 }
@@ -22,7 +24,7 @@ function closeModal3() {
   });
   video.srcObject = null;
   document.getElementById("myModal3").style.display = "none";
-
+  imgnum.textContent = 0;
   captureBtn.style.display = 'block';
   retakeBtn.style.display = 'none';
   nextBtn.style.display = 'none';
@@ -108,28 +110,28 @@ retakeBtn.addEventListener("click", () => {
   retakeBtn.style.display = "none";
 });
 
-
 // ------------------------- next button ---------------------------------
 nextBtn.addEventListener("click", () => {
   imageCounter++;
-
+  imgnum.textContent = imageCounter;
   canvas.style.display = 'none';
   video.style.display = 'block';
 
   retakeBtn.style.display = 'none';
   nextBtn.style.display = 'none';
   captureBtn.style.display = 'block';
-
-  navigator.mediaDevices
-    .getUserMedia({ video: true })
-    .then((streamObj) => {
-      stream = streamObj;
-      video.srcObject = stream;
-      video.play();
-    })
-    .catch((error) => {
-      console.log("Error accessing camera", error);
-    });
+  if (imageCounter < 5){
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((streamObj) => {
+        stream = streamObj;
+        video.srcObject = stream;
+        video.play();
+      })
+      .catch((error) => {
+        console.log("Error accessing camera", error);
+      });
+  }
 
   if (imageCounter < 4) {
     finalContext.drawImage(canvas, (imageCounter - 1) * w, 0, w, h);
