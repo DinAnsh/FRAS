@@ -30,7 +30,6 @@ def extract_face(image):
     
     
 def get_embedding(year:str):
-    
     ## Need to store students year wise all 2019 in final year
     current_year = timezone.now().strftime('%Y')
     # current_month = timezone.now().strftime('%m')

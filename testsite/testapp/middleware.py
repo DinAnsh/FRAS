@@ -37,8 +37,6 @@ class Subjects_and_Students:
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        
         if Student.objects.exists():     # for class models
             
             # select only those classes for which subjects are already uploaded

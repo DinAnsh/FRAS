@@ -230,7 +230,7 @@ def face_recognize(request):
             current_min = datetime.now().strftime("%M")
         
             global year2, year3, year4
-            if int(current_min) in list(range(0,28)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,10)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -250,8 +250,6 @@ def face_recognize(request):
                         class2_enrolls = makePrediction(rgb,"2")
                         if type(class2_enrolls) != str:
                             for e in class2_enrolls:
-                            #     if e not in year2:
-                            #         year2.append(e)
                                 e = str(e)
                                 year2.add(e[:4]+"/CTAE/"+e[4:])
 
@@ -260,8 +258,6 @@ def face_recognize(request):
                         class3_enrolls = makePrediction(rgb,"3")
                         if type(class3_enrolls) != str:
                             for e in class3_enrolls:
-                            #     if e not in year3:
-                            #         year3.append(e)
                                 e = str(e)
                                 year3.add(e[:4]+"/CTAE/"+e[4:])
 
@@ -270,8 +266,6 @@ def face_recognize(request):
                         class4_enrolls = makePrediction(rgb,"4")
                         if type(class4_enrolls) != str:
                             for e in class4_enrolls:
-                            #     if e not in year4:
-                            #         year4.append(e)
                                 e = str(e)
                                 year4.add(e[:4]+"/CTAE/"+e[4:])
                     
@@ -303,17 +297,6 @@ def face_recognize(request):
         return JsonResponse({"status":"There is request error!"})
          
          
-# def markattendance(request):
-#     global year_2, year_3, year4
-#     pred = {}
-    
-#     pred["2nd year"] = str(year2)
-#     pred["3rd year"] = str(year3)
-#     pred["4th year"] = str(year4)
-        
-#     return JsonResponse(pred)
- 
-                
 def train_model(request):
     json_data = json.loads(request.body)
     year = json_data.get("year")
