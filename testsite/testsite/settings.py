@@ -141,3 +141,8 @@ CSRF_FAILURE_VIEW = 'testapp.views.user_login'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+#to logout the session after 10 hours of inactivity
+# SESSION_COOKIE_AGE = 36000            # 10 hours. "1209600(2 weeks)" by default 
+
+# SESSION_SAVE_EVERY_REQUEST = True

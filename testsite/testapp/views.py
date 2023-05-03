@@ -341,6 +341,7 @@ def get_attendance_data(request):
     
 
 
+#Called when student face is registered or saved
 @login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
