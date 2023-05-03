@@ -130,3 +130,19 @@ class Final_Year(models.Model):
     sub10 = models.IntegerField(default=0)
     def __str__(self):
         return self.enroll_id
+
+
+class Sub_Tracker(models.Model):
+    class_id = models.OneToOneField(Class, to_field='id', on_delete=models.CASCADE)
+    sub1 = models.IntegerField(default=0)
+    sub2 = models.IntegerField(default=0)
+    sub3 = models.IntegerField(default=0)
+    sub4 = models.IntegerField(default=0)
+    sub5 = models.IntegerField(default=0)
+    sub6 = models.IntegerField(default=0)
+    sub7 = models.IntegerField(default=0)
+    sub8 = models.IntegerField(default=0)
+    sub9 = models.IntegerField(default=0)
+    sub10 = models.IntegerField(default=0)
+    def __str__(self):
+        return self.class_id.name

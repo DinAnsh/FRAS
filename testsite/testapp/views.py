@@ -19,6 +19,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from django.apps import apps
+import os.path
 
 sub_map = {}
 
@@ -82,6 +83,8 @@ def user_login(request, reason=''):
                             Class(id=4, name='Final Year'),
                         ]
                         Class.objects.bulk_create(instances)
+
+                        Sub_Tracker.objects.bulk_create([Sub_Tracker(class_id_id='2'), Sub_Tracker(class_id_id='3'), Sub_Tracker(class_id_id='4')])
                     return JsonResponse({"message":"Successfully logged in", 'status':'first_time'})
             else:
                 return JsonResponse({"message":"Looks like you've entered the wrong password"}, status=401)
@@ -473,7 +476,6 @@ def clean_schedule(df):
     return db_entry
 
 
-# <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
 def mark_attendance(data={'Second Year':['2021/CTAE/497','2021/CTAE/498']}):
     current_sub = get_subjects()
     for cls, enrolls in data.items():
@@ -507,19 +509,33 @@ def get_subjects():
     return curr_subj
 
 
+# <<<<<<<<<<<<<<<<<<<<<<<TESTING>>>>>>>>>>>>>>>>>>
+# if os.path.exists('submap.json'):
+#     with open('submap.json', 'r') as json_file:
+#         map = json.load(json_file)
+
+
 def check_subMap():
     if Subject.objects.exists():
-        # select only those classes for which subjects are already uploaded
-        cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
-        
         try:
+            # select only those classes for which subjects are already uploaded
+            cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
             for cls in cls_inDB:
                 if cls != 'None':
+                    # for updating the map according to the current subjects
                     cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
                     subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
                     fields = cls_model._meta.get_fields()[2:]
                     
+                    # to update the sub_map with the existing map
                     global sub_map
+                    if os.path.exists('submap.json'):
+                        with open('submap.json', 'r') as json_file:
+                            sub_map = json.load(json_file)
+                    else:
+                        with open('submap.json', 'w') as json_file:
+                            json.dump(sub_map, json_file)
+
                     if cls in sub_map.keys():
                         # for adding new subjects in map
                         new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
@@ -537,6 +553,14 @@ def check_subMap():
 
                     else:
                         sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+
+                    with open('submap.json', 'r+') as json_file:
+                        # map = json_file.read()           # Read from the file
+                        json_file.truncate()
+                        json.dump(sub_map, json_file)
+                        print('-=-=-=-=-=-=-')
+                        # If the new map is shorter than the old map, truncate the file to remove the extra characters
+                        # if len(str(sub_map)) < len(map):
 
             print('...........sub_map updated successfully!.........')
         except Exception as e:
