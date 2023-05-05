@@ -109,8 +109,6 @@ def user_login(request, reason=''):
 def user_logout(request):
     if request.method == 'POST':
         logout(request)
-        student_data = Student.objects.all()
-        team_data = Team.objects.all()
         check_subMap()
         return redirect('testapp:home')
 
@@ -233,7 +231,7 @@ def face_recognize(request):
             current_min = datetime.now().strftime("%M")
         
             global year2, year3, year4
-            if int(current_min) in list(range(0,10)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,29)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -294,20 +292,25 @@ def face_recognize(request):
         except Exception as e:
             # return JsonResponse({"status":"We think images were not sent by cameras!"})
             print(">>>>>>>>>>>>>>>>>>>>>>>>>",e)
-            return JsonResponse({"status":"Exception got handle carefully"})
+            return JsonResponse({"status":f"Internal server error {e}"}, status=500)
             
     else:
         return JsonResponse({"status":"There is request error!"})
          
          
 def train_model(request):
-    json_data = json.loads(request.body)
-    year = json_data.get("year")
+    try:
+        json_data = json.loads(request.body)
+        year = json_data.get("year")
+        
+        X,y = get_embedding(year)
+        print("-------------------------------Embeddings Done----------------- ")
+        s = train(X,y,year)
+        return JsonResponse({"status":s}, status=200)
     
-    X,y = get_embedding(year)
-    print("-------------------------------Embeddings Done----------------- ")
-    s = train(X,y,year)
-    return JsonResponse({"status":s})
+    except Exception as e:
+        return JsonResponse({"status":f"Internal server error {e}"}, status=500)
+        
 
 
 @login_required(login_url='testapp:home')
@@ -332,7 +335,6 @@ def get_attendance_data(request):
             header = list(sub_map['Final Year'].values())
             attd = Final_Year.objects.values_list(*fields)
             data = np.array(Sub_Tracker.objects.filter(class_id_id='4').values_list(*list(sub_map['Final Year'].keys()))[0]).astype(float)
-
         res = []
         for student in attd:
             arr_a = np.array(student[1:]).astype(float)
@@ -351,51 +353,51 @@ def get_attendance_data(request):
 @login_required(login_url='testapp:home')
 def upload_image(request):
     if request.method == 'POST':
-        if request.content_type == 'application/json':
-            # Get the image data from the request
-            json_data = json.loads(request.body)
-            image_data = json_data.get('image_data')
-            enroll_id = json_data.get('enrollId')
-            # Decode the base64-encoded image data
-            decoded_image_data = base64.b64decode(image_data.split(',')[1])
-            
-            imgName = enroll_id.replace('/', '')+".png"
-            
-            # Create a ContentFile from the decoded image data
-            image_file = ContentFile(decoded_image_data, name=imgName)
-        
-        else:
-            image_file = request.FILES.get('image')
-            enroll_id = request.POST.get('enrollId')
-        
-        # year = enroll_id[0:4]
-        
-        pil_img = Image.open(image_file)
-        opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
-        
-        face_array = extract_face(opencvImage)
-      
-        #here we need to check if the extract_face returns the list having 5 faces(len(extract_face)==5)
-        if (type(face_array)!= str) and (len(face_array)==5):
-            # Save the image to a file or database
-            student = Student.objects.get(enroll=enroll_id)
-            student.img=image_file
-            flatten_arr = np.asarray(face_array).flatten()
-            flat_str = ''
-            for i in flatten_arr:
-                flat_str+=str(i) + " " 
+        try:
+            if request.content_type == 'application/json':
+                # Get the image data from the request
+                json_data = json.loads(request.body)
+                image_data = json_data.get('image_data')
+                enroll_id = json_data.get('enrollId')
+                # Decode the base64-encoded image data
+                decoded_image_data = base64.b64decode(image_data.split(',')[1])
                 
-            student.encoding = flat_str
-            student.save()
-            return JsonResponse({'status': 'Success! Faces Stored Succesfully'}, status=200)   
+                imgName = enroll_id.replace('/', '')+".png"
+                
+                # Create a ContentFile from the decoded image data
+                image_file = ContentFile(decoded_image_data, name=imgName)
+            
+            else:
+                image_file = request.FILES.get('image')
+                enroll_id = request.POST.get('enrollId')
+            
+            # year = enroll_id[0:4]
+            
+            pil_img = Image.open(image_file)
+            opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
+            
+            face_array = extract_face(opencvImage)
         
-        else:
-            return JsonResponse({"status": f"Failed to detect 5 faces or {len(face_array)} faces Found!"}, status=500) 
+            #here we need to check if the extract_face returns the list having 5 faces(len(extract_face)==5)
+            if (type(face_array)!= str) and (len(face_array)==5):
+                # Save the image to a file or database
+                student = Student.objects.get(enroll=enroll_id)
+                student.img=image_file
+                flatten_arr = np.asarray(face_array).flatten()
+                flat_str = ''
+                for i in flatten_arr:
+                    flat_str+=str(i) + " " 
+                    
+                student.encoding = flat_str
+                student.save()
+                return JsonResponse({'status': 'Success! Faces Stored Succesfully'}, status=200)   
+            
+            else:
+                return JsonResponse({"status": f"Failed to detect 5 faces or {len(face_array)} faces Found!"}, status=500) 
+        except Exception as e:
+            return JsonResponse({"status": f"Internal server error {e}"}, status=500)
     else:
         return JsonResponse({'status': 'Fail!'}, status=405)
-
-def sort(request):
-    return JsonResponse({"status":"success! sorted"})
 
 
 @login_required(login_url='testapp:home')
@@ -434,10 +436,10 @@ def teacher(request):
                         teacher.subjects = row['Subjects']
                         teacher.save()
 
-            return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.'})
+            return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.'}, status=201)
         
         except Exception as e:
-            return JsonResponse({'success': False, 'message': f'There is an exception - {e}'})
+            return JsonResponse({'success': False, 'message': f'There is an exception - {e}'}, status=500)
     
     check_subMap()
     check_subjects()
@@ -654,6 +656,7 @@ def get_subjects():
 
 
 def check_subMap():
+    # Returns True if the QuerySet contains any results, and False if not.
     if Subject.objects.exists():
         try:
             # select only those classes for which subjects are already uploaded
@@ -689,9 +692,10 @@ def check_subMap():
                             del_key += [key for key, value in sub_map[cls].items() if value == sub]
                         for key in del_key:
                             del sub_map[cls][key]            
-
+                        
                     else:
                         sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+                        
 
                     with open('submap.json', 'r+') as json_file:
                         json_file.truncate()

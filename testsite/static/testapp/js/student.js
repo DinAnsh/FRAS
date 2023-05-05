@@ -22,7 +22,7 @@ function closeModal3() {
   tracks.forEach((track) => {
     track.stop();
   });
-  video.srcObject = null;
+  // video.srcObject = null;
   document.getElementById("myModal3").style.display = "none";
   imgnum.textContent = 0;
   captureBtn.style.display = 'block';
@@ -587,7 +587,21 @@ function uploadGrid(event) {
 
 
 // ---------------------- train the model -------------------------------------
-function trainModel() { }
+function trainModel() { 
+  var year = document.querySelector("#class-dropdown").value;
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "../students/train_model/", true);
+  xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Model Trained Successfully");
+    } else {
+      console.error("Failed to Train Model");
+    }
+  };
+  xhr.send(JSON.stringify({"year":year}));
+}
 
 
 // ---------------------------- change details table --------------------------

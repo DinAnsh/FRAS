@@ -62,7 +62,7 @@ window.onclick = function (event) {
 
 
 function goDash() {
-  window.location.pathname = "testapp/dashboard";
+  window.location.pathname = "testapp/students";
 }
 
 var donthaveaccount = document.getElementById("dhaa");

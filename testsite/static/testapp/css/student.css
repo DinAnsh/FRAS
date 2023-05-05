@@ -75,6 +75,12 @@ td {
 .part2-content span {
   color: green;
   font-size: 30px;
+  cursor: pointer;
+  transition-timing-function: ease-in-out;
+}
+.part2-content span:hover{
+  font-size: 35px;
+  filter:contrast(1);
 }
 
 #student-list tr:hover{

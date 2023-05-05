@@ -78,9 +78,9 @@ def train(X,y,year):
     # encoder.fit(y)
     # Y_en = encoder.transform(y)
     
-    X_train, X_test, Y_train, Y_test = train_test_split(X,y, shuffle=True,random_state=17)
+    # X_train, X_test, Y_train, Y_test = train_test_split(X,y, shuffle=True,random_state=17)
     model = SVC(kernel='linear', probability=True)
-    model.fit(X_train,Y_train)
+    model.fit(X,y)
     
     filename = 'model'+year+'.pkl'  # Specify the filename
     with open(filename, 'wb') as file:
