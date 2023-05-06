@@ -1402,7 +1402,14 @@ nav a:is(:link, :active, :visited).active {
 
 .in_div2 a {
   margin-top: 10px;
-  color: #00816d !important;
+  color: #af2f2f  !important;
+}
+
+.input_label.message {
+  display: none;
+  text-align: center;
+  color: #026800;
+  margin-top: -12px;
 }
 
 .input_label {

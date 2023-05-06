@@ -405,36 +405,37 @@ def teacher(request):
     if request.method=='POST' and request.FILES['teacherDetails']:
         excel_file = request.FILES['teacherDetails']
 
-        skipR = [0,1,2]
-        df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5], index_col='S.N0')
-        df = df.dropna(subset=['NAME'])
-        df.index = df.index.astype(int)
-
-        dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
-        dfEmails = df['Email'].to_list()
-
         try:
-            if(len(dbEmails) > len(dfEmails)):    # to delete the missing teachers in the uploaded sheet
-                emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+            skipR = [0,1,2]
+            df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5], index_col='S.N0')
+            df = df.dropna(subset=['NAME'])
+            df.index = df.index.astype(int)
+
+            dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
+            dfEmails = df['Email'].to_list()
+            
+            # to delete the missing teachers in the uploaded sheet
+            emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+            if(len(emails_to_delete)):    
                 Teacher.objects.filter(email__in = emails_to_delete).delete()
 
-            else:       # to add or modify the present teachers in the uploaded sheet
-                for index, row in df.iterrows():
-                    teacher, created = Teacher.objects.get_or_create(
-                        email = str(row['Email']),
-                        defaults={
-                            'name': row['NAME'],
-                            'id': index,
-                            'mobile': str(int(row['Mobile'])),
-                            'subjects': row['Subjects']
-                        }
-                    )
-                    if not created:
-                        teacher.name = row['NAME']
-                        teacher.id = index
-                        teacher.mobile = str(int(row['Mobile']))
-                        teacher.subjects = row['Subjects']
-                        teacher.save()
+            # to add or modify the present teachers in the uploaded sheet
+            for index, row in df.iterrows():
+                teacher, created = Teacher.objects.get_or_create(
+                    email = str(row['Email']),
+                    defaults={
+                        'name': row['NAME'],
+                        'id': index,
+                        'mobile': str(int(row['Mobile'])),
+                        'subjects': row['Subjects']
+                    }
+                )
+                if not created:
+                    teacher.name = row['NAME']
+                    teacher.id = index
+                    teacher.mobile = str(int(row['Mobile']))
+                    teacher.subjects = row['Subjects']
+                    teacher.save()
 
             return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.'}, status=201)
         
@@ -694,9 +695,8 @@ def check_subMap():
                             del sub_map[cls][key]            
                         
                     else:
-                        sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
-                        
-
+                        sub_map[cls] = {f:s for f,s in zip(fields, subjects)}
+                    
                     with open('submap.json', 'r+') as json_file:
                         json_file.truncate()
                         json.dump(sub_map, json_file)

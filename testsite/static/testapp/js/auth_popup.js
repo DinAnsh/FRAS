@@ -106,7 +106,7 @@ register_btn.addEventListener("click", function (event) {
   };
 
   var pass2 = document.getElementById("cpassword");
-
+  //if confirm password doesn't matches
   if (formData["password"] !== pass2.value) {
     document.getElementsByClassName("warn")[0].style.display = "block";
     document.querySelector("#submitBtn").style.marginTop = "0px";
@@ -124,6 +124,7 @@ register_btn.addEventListener("click", function (event) {
         document.querySelector("#register-form").reset();
         closeModal();
         openModal2();
+        document.querySelector(".input_label.message").style.display = "block";
       } else if (xhr.status === 409) {
         // focus on email
         document.querySelector("#email").focus();
