@@ -421,11 +421,6 @@ def teacher(request):
             df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5], index_col='S.N0')
             df = df.dropna(subset=['NAME'])
             df.index = df.index.astype(int)
-        try:
-            skipR = [0,1,2]
-            df = pd.read_excel(excel_file, skiprows=skipR, usecols=[0,1,3,4,5], index_col='S.N0')
-            df = df.dropna(subset=['NAME'])
-            df.index = df.index.astype(int)
 
             dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
             dfEmails = df['Email'].to_list()

@@ -654,7 +654,7 @@ function trainModel() {
   var xhr = new XMLHttpRequest();
   globalBuffering.style.display = 'block';
   
-  const duration = (data.length + 3)*1000;
+  const duration = (data.length + 2.5)*1000;
   const interval = duration / (100 / increment);
   
   const timer = setInterval(() => {
