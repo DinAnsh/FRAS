@@ -6,6 +6,8 @@ Images/Dip
 Group_photos
 .vscode
 testsite/db.sqlite3
-students
 Dockerfile
 Demo_files
+testsite/media/students
+testsite/testapp/__pycache__
+testsite/testapp/migrations/__pycache__
