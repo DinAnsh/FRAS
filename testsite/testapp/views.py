@@ -22,6 +22,7 @@ from .face import *
 from datetime import datetime
 from django.apps import apps
 import os.path
+from django.db.models import Sum
 
 sub_map = {}
 year2 = set()
@@ -106,7 +107,6 @@ def user_login(request, reason=''):
 def user_logout(request):
     if request.method == 'POST':
         logout(request)
-        check_subMap()
         return redirect('testapp:home')
 
 
@@ -114,19 +114,37 @@ def user_logout(request):
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
-    if request.method == 'POST':
-        if request.content_type == 'application/json':
-            payload = json.loads(request.body)
-            cameras = Camera.objects.all()
-            if cameras and payload.get("get_class"):
-                cam = Camera.objects.get(camera_ip=payload.get("cam_id"))
+    try:
+        if request.method == 'POST':
+            if request.content_type == 'application/json':
+                payload = json.loads(request.body)
+                cameras = Camera.objects.all()
+
+                if cameras and payload.get("get_class"):
+                    cam = Camera.objects.get(camera_ip=payload.get("cam_id"))       
+                    return JsonResponse({"class": str(cam.class_id)}, status=200)
+                elif payload.get("get_class"):
+                    return JsonResponse({"status":"success"},status=307)
                 
-                return JsonResponse({"class": str(cam.class_id)}, status=200)
-            elif payload.get("get_class"):
-                return JsonResponse({"status":"success"},status=307)
-            
+        res_cls = {'Second Year':0,'Third Year':0,'Final Year':0}    # record of total attendance of each class
+        res_sub = {}    # record of total attendance of top three subject
+        for cls in sub_map.keys():
+            fields_to_sum = list(sub_map[cls].keys())
+            cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
+            values_list = cls_model.objects.all().values(*fields_to_sum)    # list of dicts
+            res_cls[cls] = sum([sum(dic.values()) for dic in values_list])
+
+            for sub in fields_to_sum:
+                res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
+        
+        res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
+
+    except Exception as e:
+        print(f'There is an exception --- {e}')
+    
+    reset_models()  
     check_subMap()      
-    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
+    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
 
 
 @login_required(login_url='testapp:home')
@@ -193,7 +211,7 @@ def student(request):
         
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
-
+    reset_models()
     check_subMap()
     user = User.objects.get(username=request.user)   
     return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email,})
@@ -407,33 +425,34 @@ def teacher(request):
             dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
             dfEmails = df['Email'].to_list()
 
-            if(len(dbEmails) > len(dfEmails)):    # to delete the missing teachers in the uploaded sheet
-                emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+            # to delete the missing teachers in the uploaded sheet
+            emails_to_delete = [x for x in dbEmails if x not in dfEmails]
+            if len(emails_to_delete):    
                 Teacher.objects.filter(email__in = emails_to_delete).delete()
 
-            else:       # to add or modify the present teachers in the uploaded sheet
-                for index, row in df.iterrows():
-                    teacher, created = Teacher.objects.get_or_create(
-                        email = str(row['Email']),
-                        defaults={
-                            'name': row['NAME'],
-                            'id': index,
-                            'mobile': str(int(row['Mobile'])),
-                            'subjects': row['Subjects']
-                        }
-                    )
-                    if not created:
-                        teacher.name = row['NAME']
-                        teacher.id = index
-                        teacher.mobile = str(int(row['Mobile']))
-                        teacher.subjects = row['Subjects']
-                        teacher.save()
+            # to add or modify the present teachers in the uploaded sheet
+            for index, row in df.iterrows():
+                teacher, created = Teacher.objects.get_or_create(
+                    email = str(row['Email']),
+                    defaults={
+                        'name': row['NAME'],
+                        'id': index,
+                        'mobile': str(int(row['Mobile'])),
+                        'subjects': row['Subjects']
+                    }
+                )
+                if not created:
+                    teacher.name = row['NAME']
+                    teacher.id = index
+                    teacher.mobile = str(int(row['Mobile']))
+                    teacher.subjects = row['Subjects']
+                    teacher.save()
 
             return JsonResponse({'success': True, 'message': 'Details are uploaded successfully.'}, status=201)
         
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception - {e}'}, status=500)
-    
+    reset_models()
     check_subMap()
     check_subjects()
     user = User.objects.get(username=request.user)
@@ -485,7 +504,7 @@ def schedule(request):
             return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
         else:
             return JsonResponse({'success': True})
-
+    reset_models()
     check_subMap()
     check_subjects()
     user = User.objects.get(username=request.user)
@@ -548,7 +567,7 @@ def classroom(request):
             'room': room[0],
             'camera': ', '.join([camera[0] for camera in cameras])
         }]
-    
+    reset_models()
     check_subMap()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
@@ -688,7 +707,7 @@ def check_subMap():
                             del sub_map[cls][key]            
                         
                     else:
-                        sub_map[cls] = {f.name:s for f,s in zip(fields, subjects)}
+                        sub_map[cls] = {f:s for f,s in zip(fields, subjects)}
                         
 
                     with open('submap.json', 'r+') as json_file:
@@ -737,3 +756,13 @@ def check_subjects():
         
         except Exception as e:
             print(f'There is an exception - {e}')
+
+
+def reset_models():
+    if timezone.now().strftime('%m') == '06':
+        a = Second_Year.objects.all().delete()
+        b = Third_Year.objects.all().delete()
+        c = Final_Year.objects.all().delete()
+        d = Schedule.objects.all().delete()
+        e = Sub_Tracker.objects.all().delete()
+        print("Database models are cleared: ",a[1],b[1],c[1],d[1],e[1])

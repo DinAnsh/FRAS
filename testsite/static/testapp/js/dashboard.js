@@ -8,7 +8,8 @@ $(document).ready(function () {
 });
 
 //---------------------- maxAtt-cls ------------------------------
-var data = [150, 200, 250];
+const maxCls = document.getElementById('maxCls');
+const valuesCls = JSON.parse(maxCls.textContent);
 
 // append svg to the selected element with defined attributes
 var svg = d3
@@ -24,7 +25,7 @@ var xScale = d3.scalePoint().domain(["II", "III", "Iv"]).range([20, 125]);
 // append rectangles to the svg element
 svg
   .selectAll("rect")
-  .data(data)
+  .data([valuesCls['Second Year'], valuesCls['Third Year'], valuesCls['Final Year']])
   .enter()
   .append("rect")
   // positions the rectangle horizontally & vertically
@@ -32,18 +33,18 @@ svg
     return i * 50; //with a gap of 50px between each
   })
   .attr("y", function (d) {
-    return 300 - d;
+    return 220 - d;
   })
   //sets the height & width of each rectangle
   .attr("width", 40)
   .attr("height", function (d) {
-    return d - 80;
+    return d;
   })
   .attr("fill", "#d0b49f");
 
 svg
   .selectAll("text")
-  .data(data)
+  .data([valuesCls['Second Year'], valuesCls['Third Year'], valuesCls['Final Year']])
   .enter()
   .append("text")
   .text(function (d) {
@@ -53,7 +54,7 @@ svg
     return i * 50 + 10;
   })
   .attr("y", function (d) {
-    return 300 - d - 5;
+    return 215 - d;
   });
 
 svg
@@ -63,7 +64,8 @@ svg
   .call(d3.axisBottom(xScale));
 
 //-------------------------------- maxAtt-sub -------------------------
-var data = [115, 180, 150];
+const maxSub = document.getElementById('maxSub');
+const valuesSub = JSON.parse(maxSub.textContent);
 
 // append svg to the selected element with defined attributes
 var svg = d3
@@ -76,13 +78,13 @@ var svg = d3
 
 var xScale = d3
   .scalePoint()
-  .domain(["CS471", "CS352", "CS247"])
+  .domain(Object.keys(valuesSub))
   .range([20, 125]);
 
 // append rectangles to the svg element
 svg
   .selectAll("rect")
-  .data(data)
+  .data(Object.values(valuesSub))
   .enter()
   .append("rect")
   // positions the rectangle horizontally & vertically
@@ -90,18 +92,18 @@ svg
     return i * 50; //with a gap of 50px between each
   })
   .attr("y", function (d) {
-    return 300 - d;
+    return 220 - d;
   })
   //sets the height & width of each rectangle
   .attr("width", 40)
   .attr("height", function (d) {
-    return d - 80;
+    return d;
   })
   .attr("fill", "#d0b49f");
 
 svg
   .selectAll("text")
-  .data(data)
+  .data(Object.values(valuesSub))
   .enter()
   .append("text")
   .text(function (d) {
@@ -111,7 +113,7 @@ svg
     return i * 50 + 10;
   })
   .attr("y", function (d) {
-    return 300 - d - 5;
+    return 215 - d;
   });
 
 svg

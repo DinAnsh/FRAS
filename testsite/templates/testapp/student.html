@@ -57,15 +57,7 @@
 
     <div class="part2-content">
       <table id="students-table">
-        <thead>
-          <tr>
-            <th class="tcol1">Enrollment ID</th>
-            <th class="tcol2">Name</th>
-            <th class="tcol3">Email</th>
-            <th class="tcol4">Mobile</th>
-            <th class="tcol6">Status</th>
-          </tr>
-        </thead>
+        <thead></thead>
         <tbody id='student-list'></tbody>
       </table>
     </div>
@@ -83,6 +75,7 @@
   <div class="export_train">
     <button id="export-btn" class="common_btn button2" onclick="downloadExcel()"
       title="Download attendance sheet!">Export to Excel</button>
+    <div class="buffering" id="buffer"></div>
     <button id="train-btn" class="common_btn button2" onclick="trainModel()">Train Model</button>
   </div>
 </div>
@@ -98,7 +91,7 @@
         <div id="image-container"></div>
 
         <div class="capture-window">
-          <div id="buffering"></div>
+          <div class="buffering" id="buffering"></div>
           <div id="video1">
             <video style="transform: scaleX(-1);" id="video"></video>
           </div>
@@ -116,6 +109,7 @@
           <button id="retake-btn">Retake</button>
           <button id="save-btn">Save</button>
           <button id="next-btn">Next</button>
+          <div class="buffering" id="buffer"></div>
         </div>
 
         <input type="file" name="" id="" accept="image/*" onchange="uploadGrid(event)">
@@ -139,6 +133,9 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block js %}
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script src="{% static 'testapp/js/student.js' %}"></script>
-{% endblock %}
+{% endblock js %}
