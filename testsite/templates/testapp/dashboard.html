@@ -168,13 +168,15 @@
         <div class="adminrights-stats">
 
           <div id="" class="adminrights-stat1">
-            <div id="maxAtt-cls"></div>
+            <div id="maxAtt-cls" title="Total attendance of each class"></div>
             <span class="adminrights-text23">Class-wise Attendance</span>
+            <div id="maxCls" style="display: none;">{{ maxCls }}</div>
           </div>
 
           <div id="" class="adminrights-stat2">
-            <div id="maxAtt-sub"></div>
+            <div id="maxAtt-sub" title="Top three subjects with maximum attendance"></div>
             <span class="adminrights-text23">Subject-wise Attendance</span>
+            <div id="maxSub" style="display: none;">{{ maxSub }}</div>
           </div>
         </div>
       </div>
@@ -207,7 +209,7 @@
     </div>
   </div>
 </div>
-<!-- <script src="https://docs.opencv.org/4.5.1/opencv.js" async></script> -->
+
 <script src="{% static 'testapp/js/dashboard.js' %}"></script>
 {% endblock body %}
 {% endblock %}

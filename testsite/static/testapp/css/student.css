@@ -78,12 +78,13 @@ td {
   cursor: pointer;
   transition-timing-function: ease-in-out;
 }
-.part2-content span:hover{
+
+.part2-content span:hover {
   font-size: 35px;
-  filter:contrast(1);
+  filter: contrast(1);
 }
 
-#student-list tr:hover{
+#student-list tr:hover {
   background-color: rgb(238, 236, 236);
 }
 
@@ -321,7 +322,7 @@ td {
   object-fit: cover;
 }
 
-.img_num_block{
+.img_num_block {
   margin-top: 10px;
 }
 
@@ -454,7 +455,7 @@ td {
 }
 
 /* ---------- buffering ----------- */
-#buffering {
+.buffering {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -479,19 +480,21 @@ td {
 
 /* ------------- export_train button ----------------- */
 
-.export_train{
+.export_train {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin: 2rem 0;
 }
 
-#export-btn, #train-btn {
+#export-btn,
+#train-btn {
   display: none;
   margin: 0 1rem;
   width: auto;
 }
 
-.part2-content table thead{
+.part2-content table thead {
   background-color: #201a1e;
   color: white;
 }

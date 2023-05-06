@@ -120,7 +120,7 @@ nextBtn.addEventListener("click", () => {
   retakeBtn.style.display = 'none';
   nextBtn.style.display = 'none';
   captureBtn.style.display = 'block';
-  if (imageCounter < 5){
+  if (imageCounter < 5) {
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then((streamObj) => {
@@ -199,6 +199,8 @@ function sregister() {
 // ------------------------------- Save Button ----------------------------------
 saveBtn.addEventListener("click", (event) => {
   event.preventDefault();
+  saveBtn.style.display = 'none';
+  document.querySelector('.takebtn').lastElementChild.style.display = 'block';
 
   // Convert the canvas to a base64 encoded string
   const imageData = finalCanvas.toDataURL("image/jpeg");
@@ -213,15 +215,18 @@ saveBtn.addEventListener("click", (event) => {
   xhr.onload = function () {
     if (xhr.status === 200) {
       captureBtn.style.display = "block";
-      saveBtn.style.display = "none";
       retakeBtn.style.display = "none";
+      document.querySelector('.takebtn').lastElementChild.style.display = 'none';
 
       getStudents(currentPage);
       updateStatus();
 
       alert("Image saved successfully");
-      closeModal3();
+    } else{
+      var response = JSON.parse(xhr.responseText);
+      alert(response.status);
     }
+    closeModal3();
   };
 
   xhr.send(JSON.stringify({ 'image_data': imageData, 'enrollId': enrollId }));
@@ -293,6 +298,8 @@ let data = [];
 const tableBody = document.getElementById('student-list');
 
 function getStudents(page = 1) {
+  sortBtn.style.display = '';
+
   // Get the class ID from the select box
   var classId = document.getElementById('class-dropdown').value;
   var xhr = new XMLHttpRequest();
@@ -423,7 +430,9 @@ sortBtn.addEventListener('click', () => {
 const searchInput = document.getElementById('searchId');
 searchInput.addEventListener('keyup', function () {
   var classId = document.getElementById('class-dropdown').value;
-  if (classId) {
+  var detailsVal = document.getElementById('all-details').value;
+
+  if (classId && detailsVal === '0') {
     const searchText = searchInput.value.toLowerCase();
 
     const searchData = [];
@@ -456,6 +465,39 @@ searchInput.addEventListener('keyup', function () {
       renderData(currentPage);
       document.getElementById('pagination').style.display = '';
     }
+  } else if (classId && detailsVal === '1') {
+    const searchText = searchInput.value.toLowerCase();
+
+    const searchData = [];
+    for (let i = 0; i < attd.length; i++) {
+      const enrollText = attd[i][0].toLowerCase();
+
+      if (enrollText.includes(searchText)) {
+        searchData.push(attd[i]);
+      }
+    }
+
+    tableBody.innerHTML = '';
+    let html = '';
+
+    searchData.forEach(student => {
+      html += '<tr><td>' + student[0] + '</td>';
+
+      for (let i = 1; i < student.length; i++) {
+        html += '<td>' + student[i] + String('%') + '</td>';
+      }
+
+      html += '</tr>';
+    });
+
+    tableBody.innerHTML = html;
+    document.getElementById('pagination').style.display = 'none';
+
+    // to remain on the same page after clearing the search
+    if (searchInput.value === '') {
+      renderAttendance(currentPage);
+      document.getElementById('pagination').style.display = '';
+    }
   } else {
     document.getElementById('pagination').style.display = '';
     document.getElementById('page-btn').style.display = 'none';
@@ -467,14 +509,21 @@ searchInput.addEventListener('keyup', function () {
 // to remain on the same page after clearing the search using close btn
 searchInput.addEventListener('search', (event) => {
   var classId = document.getElementById('class-dropdown').value;
-  if (classId) {
+  var detailsVal = document.getElementById('all-details').value;
+
+  if (classId && detailsVal === '0') {
     if (event.target.value === '') {
       // The close button was clicked
       renderData(currentPage);
       document.getElementById('pagination').style.display = '';
     }
-  }
-  else {
+  } else if (classId && detailsVal === '1') {
+    if (event.target.value === '') {
+      // The close button was clicked
+      renderAttendance(currentPage);
+      document.getElementById('pagination').style.display = '';
+    }
+  } else {
     document.getElementById('pagination').style.display = '';
     document.getElementById('page-btn').style.display = 'none';
     document.querySelector('.page-label').textContent = "Please select class!";
@@ -484,6 +533,7 @@ searchInput.addEventListener('search', (event) => {
 
 // -------------------------- buffering ---------------------------
 var bufferingElement = document.getElementById('buffering');
+var globalBuffering = document.querySelector('.bufferModal');
 
 
 // -------------------- export student's data to excel sheet ------------------
@@ -492,6 +542,8 @@ function downloadExcel() {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sheet1');
 
+  document.getElementById('export-btn').style.display = 'none';
+  document.getElementById('buffer').style.display = 'block';
   // to center align the text - not working
   // worksheet.properties.defaultCellStyle = {
   //   alignment: { horizontal: 'center' }
@@ -558,6 +610,8 @@ function downloadExcel() {
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = 'table.xlsx';
     downloadLink.click();
+    document.getElementById('export-btn').style.display = 'block';
+    document.getElementById('buffer').style.display = 'none';
   });
 }
 
@@ -587,20 +641,46 @@ function uploadGrid(event) {
 
 
 // ---------------------- train the model -------------------------------------
-function trainModel() { 
+const progressBar = document.querySelector('.buffer');
+const fill = progressBar.querySelector('.fill');
+const text = progressBar.querySelector('.text');
+const train = ["Fetching Images", "Calculating Embeddings", "Initializing SVM Classifier", "Model Training"];
+
+let progress = 0;
+const increment = 1;
+
+function trainModel() {
   var year = document.querySelector("#class-dropdown").value;
   var xhr = new XMLHttpRequest();
+  globalBuffering.style.display = 'block';
+  
+  const duration = (data.length + 3)*1000;
+  const interval = duration / (100 / increment);
+  
+  const timer = setInterval(() => {
+    progress += increment;
+    fill.style.width = `${progress}%`;
+    text.textContent = `${train[Math.floor(progress / 25)]}...`;
+
+    if (progress >= 100) {
+      clearInterval(timer);
+      text.textContent = "Model Training Completed!"
+    }
+  }, interval);
+
   xhr.open("POST", "../students/train_model/", true);
   xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
 
   xhr.onload = function () {
+    globalBuffering.style.display = 'none';
     if (xhr.status === 200) {
       alert("Model Trained Successfully");
     } else {
-      console.error("Failed to Train Model");
+      alert("Failed to Train Model");
+      // console.error("Failed to Train Model");
     }
   };
-  xhr.send(JSON.stringify({"year":year}));
+  xhr.send(JSON.stringify({ "year": year }));
 }
 
 
@@ -610,9 +690,9 @@ function changeDetails() {
   var detailsVal = document.getElementById('all-details').value;
 
   if (classId && detailsVal) {
-    if (detailsVal == '0') {
+    if (detailsVal === '0') {
       getStudents();
-    } else if (detailsVal == '1') {
+    } else if (detailsVal === '1') {
       getAttendance();
     }
   }
@@ -622,8 +702,10 @@ function changeDetails() {
 // --------------------------------- get attendance and pagination -----------------------------
 let attd = [];
 let header = [];
-var headers = document.querySelector('thead').firstElementChild;
+let headers = document.querySelector('thead');
 function getAttendance(page = 1) {
+  sortBtn.style.display = 'none';
+
   // Get the class ID from the select box
   var classId = document.getElementById('class-dropdown').value;
   var xhr = new XMLHttpRequest();
@@ -674,7 +756,7 @@ function renderAttendance(page) {
   tableBody.innerHTML = '';
   let html = '';
 
-  pageData.forEach(student => {     // alter this
+  pageData.forEach(student => {
     html += '<tr><td>' + student[0] + '</td>';
 
     for (let i = 1; i < student.length; i++) {
