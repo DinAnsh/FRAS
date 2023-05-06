@@ -1,0 +1,283 @@
+{% extends "testapp/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+<title>Classroom HQ | FRAS</title>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'testapp/css/student.css' %}">
+{% endblock %}
+{% block body %}
+<div class="main-container">
+  <div class="main-part1">
+    <div class="part1-content">
+      <select name="department" id="" disabled>
+        <option value="cse">Computer Science and Engineering</option>
+      </select>
+    </div>
+
+    <div class="part1-content">
+      <button class="custom-file-upload" onclick="addclass()">Assign Classroom</button>
+    </div>
+
+    <div class="part1-content">
+      <button class="custom-file-upload" onclick="addcam()">Assign Camera</button>
+    </div>
+  </div>
+  <div class="main-part2">
+    <div class="btn-cont" style="justify-content: center;">
+      <div class="tabletitle">
+        <h1>
+          Camera Details
+        </h1>
+      </div>
+    </div>
+    <div class="part2-content">
+      <table>
+        <thead>
+          <tr>
+            <th class="ctcol1">Room No.</th>
+            <th class="ctcol2">Class</th>
+            <th class="ctcol3">Camera ID</th>
+            <!-- <th class="ctcol3">Status</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          {% for camera in data %}
+          <tr>
+            <td>{{ camera.room }}</td>
+            <td>{{ camera.class }}</td>
+            <td>{{ camera.camera }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="myModal4" class="modal4">
+  <div class="modal-content4" id="content4">
+    <div class="popup4">
+      <span class="close4" id="cbtn4">&times;</span>
+      <div class="popup_title4">
+        Provide Camera Details
+      </div>
+      <div class="popup_body4">
+        <form class="popup_form2" onsubmit="assignCamera(event)">
+          <div class="in_div">
+            <label for="class" class="input_label">Class</label>
+            <select class="in_field" id="class" name="class" required>
+              <option value="" disabled selected>Select Class</option>
+              <option value="2">Second year</option>
+              <option value="3">Third year</option>
+              <option value="4">Final year</option>
+            </select>
+          </div>
+
+          <div class="in_div">
+            <label for="room_id" class="input_label">Room No.</label>
+            <select name="room_id" id="room_id" class="in_field">
+            </select>
+          </div>
+
+          <div class="in_div">
+            <label for="ip" class="input_label">Camera ID</label>
+            <select name="camera_num" id="ip" class="in_field">
+              <!-- <option value="101">101</option>
+              <option value="102">102</option>
+              <option value="103">103</option>
+              <option value="104">104</option> -->
+            </select>
+          </div>
+          <input type="submit" value="Assign" class="register_btn">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="myModal5" class="modal4">
+  <div class="modal-content4" id="content5">
+    <div class="popup4">
+      <span class="close4" id="cbtn5">&times;</span>
+      <div class="popup_title4">
+        Provide Classroom Details
+      </div>
+      <div class="popup_body4">
+        <form class="popup_form2" onsubmit="assignClass(event)">
+
+          <div class="in_div">
+            <label for="room" class="input_label">Room No.</label>
+            <input type="text" id="assign_room" name="room_no" class="in_field" required>
+          </div>
+
+          <div class="in_div">
+            <label for="assign_class" class="input_label">Class</label>
+            <select class="in_field" id="assign_class" name="class" required>
+              <option value="" disabled selected>Select Class</option>
+              <option value="2">Second year</option>
+              <option value="3">Third year</option>
+              <option value="4">Final year</option>
+            </select>
+          </div>
+
+          <input type="submit" value="Assign" class="register_btn">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function addcam() {
+    document.getElementById("myModal4").style.display = "block";
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+      let cameras = devices.filter(device => device.kind === 'videoinput');
+      console.log(cameras)
+      const selector = document.querySelector("#ip");
+      for (let i = 100; i < cameras.length + 100; i++) {
+        if (i==100) {
+          const option = document.createElement('option');
+          option.disabled = true;
+          option.value = `${i}`;
+          option.text = `${i} (Default Cam)`;
+          selector.appendChild(option);
+          continue;
+        }
+        if (cameras[i%100].label.includes("OBS")) {
+          break;
+        }
+        const option = document.createElement('option');
+        option.value = `${i}`;
+        option.text = `${i}`;
+        selector.appendChild(option);
+      }
+    });
+
+  }
+
+  function closeModal4() {
+    document.getElementById("myModal4").style.display = "none";
+  }
+
+  function addclass() {
+    document.getElementById("myModal5").style.display = "block";
+  }
+
+  function closeModal5() {
+    document.getElementById("myModal5").style.display = "none";
+  }
+
+  window.onclick = function (event) {
+    if (
+      event.target == document.getElementById("cbtn4") ||
+      event.target == document.getElementById("content4")
+    ) {
+      closeModal4();
+      const selector = document.querySelector("#ip");
+      while (selector.options.length > 1) {
+        selector.remove(1);
+      }
+    } else if (
+      event.target == document.getElementById("cbtn5") ||
+      event.target == document.getElementById("content5")
+    ) {
+      closeModal5();
+    }
+  };
+
+  function assignClass(event) {
+    event.preventDefault();
+    const cls = document.getElementById('assign_class').value;
+    const room = document.getElementById('assign_room').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../classroom/?assign_class=1&class=' + cls + '&room=' + room, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        if (response.success) {
+          //alert(response.message);
+          closeModal5();
+          location.reload();
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  function assignCamera(event) {
+    event.preventDefault();
+    const cam_ip = document.getElementById('ip').value;
+    const cls = document.getElementById('class').value;
+    const room_id = document.getElementById('room_id').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../classroom/?assign_camera=1&class=' + cls + '&cam_ip=' + cam_ip + '&room_id=' + room_id, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        if (response.success) {
+          //alert(response.message);
+          closeModal4();
+          location.reload();
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  const class_id = document.getElementById('class');
+  class_id.addEventListener('change', () => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../classroom/?class=' + class_id.value, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        console.log(response.rooms);
+        if (response.success) {
+          const selector = document.querySelector("#room_id");
+          while (selector.firstChild) {
+            selector.removeChild(selector.firstChild);
+          }
+          for (let i = 0; i < response.rooms.length; i++) {
+            const option = document.createElement('option');
+            option.value = `${response.rooms[i]}`;
+            option.text = `${response.rooms[i]}`;
+            selector.appendChild(option);
+          }
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  });
+
+  function getCSRFToken() {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        // The CSRF token cookie name may vary depending on the server-side framework
+        if (cookie.substring(0, 10) === 'csrftoken=') {
+          cookieValue = decodeURIComponent(cookie.substring(10));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "testapp/dashboard.html" %}
+{% load static %}
+
+{% block title %}
+<title>Schedule HQ | FRAS</title>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'testapp/css/student.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="main-container">
+  <div class="main-part1">
+    <div class="part1-content">
+      <select name="department" id="" disabled>
+        <option value="cse">Computer Science and Engineering</option>
+      </select>
+    </div>
+    <div class="part1-content">
+      <select class="" id="class-dropdown" name="year">
+        <option value="" selected disabled>Select Class</option>
+        <option value="2">Second year</option>
+        <option value="3">Third year</option>
+        <option value="4">Final year</option>
+      </select>
+    </div>
+    <div class="part1-content">
+      <label for="fileInput" class="custom-file-upload" title="Class Time Table">
+        Upload Schedule
+      </label>
+      <input id="fileInput" type="file" accept=".xlsx, .xls, .csv" style="display: none;" disabled>
+    </div>
+  </div>
+  <div class="main-part2">
+    <div class="btn-cont" style="justify-content: center;">
+      <div class="tabletitle">
+        <h1>
+          Time Table
+        </h1>
+      </div>
+    </div>
+    <div class="part2-content">
+      <table>
+        <thead>
+          <tr>
+            <th class="ttcol1">Day</th>
+            <th class="ttcol">9-10</th>
+            <th class="ttcol">10-11</th>
+            <th class="ttcol">11-12</th>
+            <th class="ttcol">12-1</th>
+            <th class="ttcol">1-2</th>
+            <th class="ttcol">2-3</th>
+            <th class="ttcol">3-4</th>
+            <th class="ttcol">4-5</th>
+          </tr>
+        </thead>
+        <tbody id="schedule-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  var classId = document.getElementById('class-dropdown');
+  var uploadBtn = document.getElementById('fileInput');
+
+  if (classId.value === "") {
+    uploadBtn.disabled = false;
+    uploadBtn.addEventListener('click', uploadAlert);
+    document.querySelector('.main-part2').style.display = 'none';
+  }
+
+  classId.addEventListener('change', () => {
+    uploadBtn.disabled = false;
+    uploadBtn.removeEventListener('click', uploadAlert);
+    uploadBtn.addEventListener('change', uploadSchedule);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../schedule/?class=' + classId.value, true);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+    xhr.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        var response = JSON.parse(this.responseText);
+        const data = response.schedule;
+        // console.log(data);
+        if (response.success) {
+          if (data) {
+            document.querySelector('.main-part2').style.display = '';
+            const tbody = document.getElementById('schedule-table');
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            tbody.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+              tbody.innerHTML += '<tr><td>' + days[i] + '</td><td>' + data[i][0] + '</td><td>' + data[i][1] + '</td><td>' + data[i][2] + '</td><td>' + data[i][3] + '</td><td>' + data[i][4] + '</td><td>' + data[i][5] + '</td><td>' + data[i][6] + '</td><td>' + data[i][7] + '</td></tr>';
+            }
+          }
+        } else {
+          alert(response.message);
+        }
+      }
+    };
+    xhr.send();
+  });
+
+  function uploadAlert(event) {
+    event.preventDefault();
+    alert("Please select a class first!");
+  }
+
+  function uploadSchedule(event) {
+    const files = event.target.files;
+    const file = files[0];
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../schedule/?class=' + classId.value);
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+
+    if (file.type === "application/vnd.ms-excel" ||
+      file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+
+      var formData = new FormData();
+      formData.append('timeTable', file);
+
+      xhr.onreadystatechange = function () {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+          var response = JSON.parse(this.responseText);
+
+          if (response.success) {
+            alert(response.message);
+          } else {
+            alert(response.message);
+          }
+          location.reload();
+        }
+      };
+
+      xhr.send(formData);
+    } else {
+      alert("Please select an Excel file!");
+    }
+  }
+
+  function getCSRFToken() {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        // The CSRF token cookie name may vary depending on the server-side framework
+        if (cookie.substring(0, 10) === 'csrftoken=') {
+          cookieValue = decodeURIComponent(cookie.substring(10));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}
