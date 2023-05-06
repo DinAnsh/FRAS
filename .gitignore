@@ -2,6 +2,8 @@
 venv
 __pycache__
 test
+Images/Dip
+Group_photos
 .vscode
 testsite/db.sqlite3
 students
