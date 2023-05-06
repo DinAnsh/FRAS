@@ -244,7 +244,7 @@ def face_recognize(request):
             
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,29)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,54)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3

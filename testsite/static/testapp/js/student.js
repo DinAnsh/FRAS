@@ -629,7 +629,7 @@ function uploadGrid(event) {
   xhr.open("POST", "/testapp/upload_image/", true);
   xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
 
-  xhr.onreadystatechange = function () {
+  xhr.onload = function () {
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       alert("Class Image saved successfully");
     } else {
