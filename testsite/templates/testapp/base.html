@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>FRAS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="{% static 'testapp/images/favicon.ico' %}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Gilda+Display:wght@400&amp;display=swap"
+      data-tag="font"
+    />
+    <!--This is the head section-->
+    <!-- <style> ... </style> -->
+    <style data-section-id="dropdown">
+      [data-thq="thq-dropdown"]:hover > [data-thq="thq-dropdown-list"] {
+        display: flex;
+      }
+
+      [data-thq="thq-dropdown"]:hover > div [data-thq="thq-dropdown-arrow"] {
+        transform: rotate(90deg);
+      }
+    </style>
+    <link href="{% static 'testapp/css/base.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/home.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/register.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/login.css' %}" rel="stylesheet" />
+    <link href="{% static 'testapp/css/admin.css' %}" rel="stylesheet" />
+    
+  </head>
+
+  <body>
+    <div>{% block content %} {% endblock %}</div>
+    <script src="{% static 'testapp/js/popup.js' %}"></script>
+    <script
+      data-section-id="navbar"
+      src="https://unpkg.com/@teleporthq/teleport-custom-scripts"
+    ></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  </body>
+</html>

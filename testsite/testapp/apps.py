@@ -1,0 +1,8 @@
+#Here we can place application specific configurations
+
+from django.apps import AppConfig
+
+
+class TestappConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'testapp'
