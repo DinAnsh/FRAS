@@ -241,16 +241,14 @@ def get_student_data(request):
 def face_recognize(request):
     if request.method =='POST': 
         try:
-            
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,54)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,15)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
                     print("-----------------",img)
                     class_id = img.split("_")[-1]
-                    print("-----------------",class_id)
                     
                     image_file = request.FILES[img]
                     pil_img = Image.open(image_file)
@@ -281,7 +279,8 @@ def face_recognize(request):
                         if type(class4_enrolls) != str:
                             for e in class4_enrolls:
                                 e = str(e)
-                                year4.add(e[:4]+"/CTAE/"+e[4:])
+                                if e != "Unknown":
+                                    year4.add(e[:4]+"/CTAE/"+e[4:])
                     
                 return JsonResponse({"status":"attendance recorded!"})
 
@@ -298,7 +297,7 @@ def face_recognize(request):
                 year3 = []
                 year4 = []
                 
-                print("-----------------",pred)
+                print("----------Predictions------->",pred)
                 mark_attendance(pred)
                 return JsonResponse({"status":"successfully attendance marked"})
             
@@ -318,8 +317,8 @@ def train_model(request):
         year = json_data.get("year")
         
         X,y = get_embedding(year)
-        print("-------------------------------Embeddings Done----------------- ")
         s = train(X,y,year)
+        
         return JsonResponse({"status":s}, status=200)
     
     except Exception as e:
