@@ -739,6 +739,7 @@ function getAttendance(page = 1) {
 
         renderAttendance(page);
       } else {
+        tableBody.innerHTML = "";
         alert(response.message);
       }
     }

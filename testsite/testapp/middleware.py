@@ -15,10 +15,9 @@ class AutoLogoutMiddleware:
             if user.last_login:
                 #converts the datetime object to the local timezone, removes the timezone information from the datetime object, resulting in a timezone-naive datetime object 
                 last_login = user.last_login.astimezone().replace(tzinfo=None)
-                print(f">>>>>>>>>>>>>>>>>>>>>>>{last_login}<<<<<<<<<<<<<<<<<<<<<<<")
-                print(f">>>>>>>>>>>>>>>>>>>>>>>{datetime.now()}<<<<<<<<<<<<<<<<<<<<<<<")
+                print(f">>>>>>>>>>>>>>>>>>>>>>>Last Login : {last_login}<<<<<<<<<<<<<<<<<<<<<<<")
                 days_since_last_login = (datetime.now() - last_login).days
-                print(f">>>>>>>>>>>>>>>>>>>>>>>{days_since_last_login}<<<<<<<<<<<<<<<<<<<<<<<")
+                print(f">>>>>>>>>>>>>>>>>>>>>>>Days since logged in : {days_since_last_login}<<<<<<<<<<<<<<<<<<<<<<<")
                 if days_since_last_login >= 7:
                     logout(request)
             request.session['last_activity'] = str(datetime.now())
