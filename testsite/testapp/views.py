@@ -472,6 +472,7 @@ def teacher(request):
     reset_models()
     check_subMap()
     check_subjects()
+
     user = User.objects.get(username=request.user)
     teacherData = list(Teacher.objects.all().values_list())
     teacherData.sort(key=lambda x: int(x[1]))
