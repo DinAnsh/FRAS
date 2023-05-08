@@ -330,7 +330,6 @@ function checkTime() {
   // }
   // Check if the current minute is one of the target minutes
   var minute = now.getMinutes();
-  
   // 15 30 45 50
   if (minute == 4 || minute == 5 || minute == 6 || minute == 8) {
     // Perform the desired action
