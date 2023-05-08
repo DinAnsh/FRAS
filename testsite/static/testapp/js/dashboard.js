@@ -8,6 +8,7 @@ $(document).ready(function () {
 });
 
 //---------------------- maxAtt-cls ------------------------------
+
 const maxCls = document.getElementById("maxCls");
 const valuesCls = JSON.parse(maxCls.textContent);
 
@@ -127,6 +128,7 @@ svg
   .attr("transform", "translate(0," + 230 + ")")
   .call(d3.axisBottom(xScale));
 
+
 //-------------------------------- CSRF Token-------------------------
 function getCSRFToken() {
   var cookieValue = null;
@@ -225,6 +227,7 @@ navigator.mediaDevices
     console.error(error);
   });
 
+
 // Helper function to convert dataURI to Blob object
 function dataURItoBlob(dataURI) {
   var byteString = atob(dataURI.split(",")[1]);
@@ -235,6 +238,7 @@ function dataURItoBlob(dataURI) {
   }
   return new Blob([ab], { type: "image/jpeg" });
 }
+
 
 //when click on send images all cameras images will be captured and send to server
 function sendImages(data) {
@@ -268,6 +272,7 @@ function get_classes(start) {
 
   return num;
 }
+
 
 //Capture img btn call
 function capture_images() {
@@ -313,6 +318,7 @@ function capture_images() {
   });
 }
 
+
 //send images btn call
 function sendImagesreq(event) {
   // console.log(imagesPayload);
@@ -330,6 +336,7 @@ function checkTime() {
   // }
   // Check if the current minute is one of the target minutes
   var minute = now.getMinutes();
+  
   // 15 30 45 50
   if (minute == 4 || minute == 5 || minute == 6 || minute == 8) {
     // Perform the desired action
