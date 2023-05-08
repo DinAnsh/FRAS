@@ -8,7 +8,8 @@ $(document).ready(function () {
 });
 
 //---------------------- maxAtt-cls ------------------------------
-const maxCls = document.getElementById('maxCls');
+
+const maxCls = document.getElementById("maxCls");
 const valuesCls = JSON.parse(maxCls.textContent);
 
 // append svg to the selected element with defined attributes
@@ -25,7 +26,11 @@ var xScale = d3.scalePoint().domain(["II", "III", "Iv"]).range([20, 125]);
 // append rectangles to the svg element
 svg
   .selectAll("rect")
-  .data([valuesCls['Second Year'], valuesCls['Third Year'], valuesCls['Final Year']])
+  .data([
+    valuesCls["Second Year"],
+    valuesCls["Third Year"],
+    valuesCls["Final Year"],
+  ])
   .enter()
   .append("rect")
   // positions the rectangle horizontally & vertically
@@ -44,7 +49,11 @@ svg
 
 svg
   .selectAll("text")
-  .data([valuesCls['Second Year'], valuesCls['Third Year'], valuesCls['Final Year']])
+  .data([
+    valuesCls["Second Year"],
+    valuesCls["Third Year"],
+    valuesCls["Final Year"],
+  ])
   .enter()
   .append("text")
   .text(function (d) {
@@ -64,7 +73,7 @@ svg
   .call(d3.axisBottom(xScale));
 
 //-------------------------------- maxAtt-sub -------------------------
-const maxSub = document.getElementById('maxSub');
+const maxSub = document.getElementById("maxSub");
 const valuesSub = JSON.parse(maxSub.textContent);
 
 // append svg to the selected element with defined attributes
@@ -76,10 +85,7 @@ var svg = d3
   .append("g")
   .attr("transform", "translate(" + 50 + "," + 0 + ")");
 
-var xScale = d3
-  .scalePoint()
-  .domain(Object.keys(valuesSub))
-  .range([20, 125]);
+var xScale = d3.scalePoint().domain(Object.keys(valuesSub)).range([20, 125]);
 
 // append rectangles to the svg element
 svg
@@ -122,7 +128,8 @@ svg
   .attr("transform", "translate(0," + 230 + ")")
   .call(d3.axisBottom(xScale));
 
-//-------------------------------- cctv-video -------------------------
+
+//-------------------------------- CSRF Token-------------------------
 function getCSRFToken() {
   var cookieValue = null;
   if (document.cookie && document.cookie !== "") {
@@ -164,13 +171,13 @@ navigator.mediaDevices
 
           //Video element
           const video = document.createElement("video");
-          video.style.transform = "scaleX(-1)";
+          // video.style.transform = "scaleX(-1)";
           video.id = "player" + i;
           video.style.width = "100%";
 
           //Canvas
           const canvas = document.createElement("canvas");
-          canvas.style.transform = "scaleX(-1)";
+          // canvas.style.transform = "scaleX(-1)";
           canvas.id = "can" + i;
           canvas.style.width = "0";
 
@@ -220,47 +227,6 @@ navigator.mediaDevices
     console.error(error);
   });
 
-// var imagesPayload = new FormData();
-
-// function captureImage(event, camnum) {
-//   event.preventDefault();
-//   var video = null;
-//   var canvas = null;
-
-//   if (camnum === 1) {
-//     video = video1;
-//     canvas = canvas1;
-//   } else if (camnum === 2) {
-//     video = video2;
-//     canvas = canvas2;
-//   } else if (camnum === 3) {
-//     video = video3;
-//     canvas = canvas3;
-//   }
-
-//   // #this should be deleted
-//   video.style.display = "none";
-
-//   canvas.width = video.videoWidth;
-//   canvas.height = video.videoHeight;
-
-//   const context = canvas.getContext("2d");
-//   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-//   // this should be deleted to not stop the camera after capture image
-//   const tracks = stream.getTracks();
-//   tracks.forEach((track) => {
-//     track.stop();
-//   });
-
-//   // Convert the canvas to a base64 encoded string
-//   const class_image = canvas.toDataURL("image/jpeg");
-//   imagesPayload.append(
-//     "image" + String(camnum),
-//     dataURItoBlob(class_image),
-//     "image" + String(camnum) + ".jpg"
-//   );
-// }
 
 // Helper function to convert dataURI to Blob object
 function dataURItoBlob(dataURI) {
@@ -273,27 +239,8 @@ function dataURItoBlob(dataURI) {
   return new Blob([ab], { type: "image/jpeg" });
 }
 
-// function RecogniseImage(event) {
-//   const files = event.target.files;
-//   const file = files[0];
 
-//   var formData = new FormData();
-//   formData.append("image", file);
-
-//   var xhr = new XMLHttpRequest();
-//   xhr.open("POST", "../dashboard/face_recognize/", true);
-//   xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
-
-//   xhr.onreadystatechange = function () {
-//     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-//       alert("Class Image saved successfully");
-//     } else {
-//       console.error("Failed to upload image");
-//     }
-//   };
-//   xhr.send(formData);
-// }
-
+//when click on send images all cameras images will be captured and send to server
 function sendImages(data) {
   const csrftoken = getCSRFToken();
 
@@ -305,24 +252,11 @@ function sendImages(data) {
 
   xhr.onload = function () {
     if (xhr.status === 200) {
-      alert("Class Image Captured successfully");
+      console.log(JSON.parse(xhr.response)["status"]);
     }
   };
   xhr.send(data);
 }
-
-//  for capture image using button
-// saveBtn1.addEventListener("click", function (event) {
-//   captureImage(event, 1);
-// });
-// saveBtn2.addEventListener("click", function (event) {
-//   captureImage(event, 2);
-// });
-// saveBtn3.addEventListener("click", function (event) {
-//   captureImage(event, 3);
-// });
-
-// //when click on send images all cameras images will be captured and send to server
 
 function get_classes(start) {
   var elements = document.getElementsByClassName("classes");
@@ -339,6 +273,8 @@ function get_classes(start) {
   return num;
 }
 
+
+//Capture img btn call
 function capture_images() {
   navigator.mediaDevices.enumerateDevices().then((devices) => {
     const videoDevices = devices.filter(
@@ -382,6 +318,8 @@ function capture_images() {
   });
 }
 
+
+//send images btn call
 function sendImagesreq(event) {
   // console.log(imagesPayload);
   sendImages(imagesPayload);
@@ -398,8 +336,9 @@ function checkTime() {
   // }
   // Check if the current minute is one of the target minutes
   var minute = now.getMinutes();
+  
   // 15 30 45 50
-  if (minute == 23 || minute == 25 || minute == 27 || minute == 28) {
+  if (minute == 4 || minute == 5 || minute == 6 || minute == 8) {
     // Perform the desired action
     capture_images();
     setTimeout(function () {
@@ -414,18 +353,5 @@ function checkTime() {
 var imagesPayload = new FormData(); //FormData needs some time to load the data into it
 setInterval(checkTime, 60 * 1000);
 
-// Call captureImage function every 1 minute
-
-// setInterval(function () {
-//   capture_images();
-
-//   //wait for 5 sec
-//   setTimeout(function () {
-//     sendImages(imagesPayload);
-//   }, 5000);
-
-//   // Reset the imagesPayload object for the next interval
-//   imagesPayload = new FormData();
-// }, 60000);
 
 //-------------------------------------------------END-----------------------------------------------------------

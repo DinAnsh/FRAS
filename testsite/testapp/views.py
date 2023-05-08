@@ -115,6 +115,8 @@ def user_logout(request):
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
     try:
+        check_subMap() 
+        
         if request.method == 'POST':
             if request.content_type == 'application/json':
                 payload = json.loads(request.body)
@@ -139,12 +141,11 @@ def dashboard(request, reason=''):
         
         res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
 
+        reset_models()      
+        return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
+    
     except Exception as e:
         print(f'There is an exception --- {e}')
-    
-    reset_models()  
-    check_subMap()      
-    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
 
 
 @login_required(login_url='testapp:home')
@@ -241,10 +242,10 @@ def get_student_data(request):
 def face_recognize(request):
     if request.method =='POST': 
         try:
-            
+
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,54)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,56)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -281,7 +282,8 @@ def face_recognize(request):
                         if type(class4_enrolls) != str:
                             for e in class4_enrolls:
                                 e = str(e)
-                                year4.add(e[:4]+"/CTAE/"+e[4:])
+                                if e != "Unknown":
+                                    year4.add(e[:4]+"/CTAE/"+e[4:])
                     
                 return JsonResponse({"status":"attendance recorded!"})
 
@@ -298,7 +300,7 @@ def face_recognize(request):
                 year3 = []
                 year4 = []
                 
-                print("-----------------",pred)
+                print("----------Predictions------->",pred)
                 mark_attendance(pred)
                 return JsonResponse({"status":"successfully attendance marked"})
             
@@ -318,8 +320,8 @@ def train_model(request):
         year = json_data.get("year")
         
         X,y = get_embedding(year)
-        print("-------------------------------Embeddings Done----------------- ")
         s = train(X,y,year)
+        
         return JsonResponse({"status":s}, status=200)
     
     except Exception as e:

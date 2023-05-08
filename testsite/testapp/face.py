@@ -1,5 +1,4 @@
 import cv2
-import os
 import numpy as np
 from mtcnn import MTCNN
 from keras_facenet import FaceNet
@@ -10,34 +9,46 @@ from sklearn.svm import SVC
 import pickle
 from django.utils import timezone
 
-# model = None
-# class_names = None
+detector = MTCNN()
+embedder = FaceNet()  
+
 
 def extract_face(image):
+    '''
+    the function takes an image as input, detects faces in the image, crops and resizes the detected faces, and returns a list of cropped face arrays.\n
+    image: OpenCV image array\n
+    return: array of faces
+    '''
     face_arr = []
-    detector = MTCNN()
+    # detector = MTCNN()
     try:
-        faces = detector.detect_faces(image)
+        faces = detector.detect_faces(image)    #returns a list of detected faces in the form of dictionaries
         for f in faces:
-            x,y,w,h = f['box']   #there is only face in image
+            x,y,w,h = f['box']                  #there is only face in image
             x,y = abs(x), abs(y)
+            #crops the face from the input image and resizes it to a fixed size of 160x160 pixels
             face = image[y:y+h,x:x+w]
-            crop_face_arr = cv2.resize(face,(160,160))      # 3d - (160x160x3)
+            crop_face_arr = cv2.resize(face,(160,160))      # 3d array of face - (160x160x3)
             face_arr.append(crop_face_arr)
         return face_arr
     except Exception as e:
-        return "No face Found!"
+        return f"No face Found! {e}"
     
     
 def get_embedding(year:str):
-    ## Need to store students year wise all 2019 in final year
+    '''
+    Parameter-
+    year: Class Year of the student \n
+    returns the EMBEDDED_X and y arrays.
+    '''
     current_year = timezone.now().strftime('%Y')
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(year))  #2,3
-    embedder = FaceNet()  
-    
-    # year = '2021'
+
+    # embedder = FaceNet()      
+    # fetches all the students' data from the database whose enrollment numbers start with the admission year
+
     all_students = Student.objects.filter(enroll__startswith=adm_year)
     
     X = []
@@ -64,7 +75,7 @@ def get_embedding(year:str):
         EMBEDDED_X.append(yhat[0])
         
     EMBEDDED_X= np.asarray(EMBEDDED_X)
-    # EMBEDDED_X= np.asarray(X)
+
     y = np.asarray(y,dtype=int)
     
     # global class_names              #need to store in a numpy file .npz
@@ -74,10 +85,10 @@ def get_embedding(year:str):
 
 
 def train(X,y,year):
-    # encoder = LabelEncoder()
-    # encoder.fit(y)
-    # Y_en = encoder.transform(y)
-    
+    '''
+    This function trains a Support Vector Machine (SVM) model using the provided training data X and y. It saves the trained model as a pickle file with a name specified using the year parameter.
+    '''
+
     # X_train, X_test, Y_train, Y_test = train_test_split(X,y, shuffle=True,random_state=17)
     model = SVC(kernel='linear', probability=True)
     model.fit(X,y)
@@ -88,12 +99,15 @@ def train(X,y,year):
         
     return "Training done"
 
+
 def makePrediction(image, class_year):
-    embedder = FaceNet()
-    faces =  extract_face(image)   #list of faces
+    '''
+    This function takes an image and a class year as input and returns the predicted labels of the faces in the image.
+    '''
+    # embedder = FaceNet()
+    faces =  extract_face(image)   
     year = class_year
-    # print("------------------------------------",year)
-    # print("------------------------------------",faces)
+
     EMBEDDED_X = []
     for img in faces:
         face_img = img.astype('float32')  #3D(160X160X3)
@@ -110,12 +124,13 @@ def makePrediction(image, class_year):
     # global model                #need to store using pickle
     # global class_names
     try:    
-        filename = 'model'+year+'.pkl'  # Specify the filename
 
+        filename = 'model'+year+'.pkl' 
         with open(filename, 'rb') as file:
             model = pickle.load(file)
     except Exception as e:
-        return "Model not trained"    
+        return f"Model not trained {e}"    
+
     # class_names = np.load("Classes.npz")['array1']
         
     prob_scores = model.predict_proba(EMBEDDED_X) 
@@ -132,7 +147,5 @@ def makePrediction(image, class_year):
             pred_label = "Unknown"
             
         predictions.append(pred_label)
-            
-
     return predictions
     

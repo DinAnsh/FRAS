@@ -147,6 +147,7 @@
           <a href="#members" class="home-link08">Team</a>
           <a href="#contact" class="home-link09">Contact</a>
         </nav>
+        {% if logged != 1 %}
         <div class="home-container03">
           <button class="home-login1 button" onclick="openModal2()">
             Log in
@@ -155,6 +156,7 @@
             Register
           </button>
         </div>
+        {% endif %}
       </div>
     </div>
   </header>
@@ -166,22 +168,13 @@
       <h1 class="home-text">Face Recognition Based Attendance System</h1>
       <span class="home-text01">
         <span>
-          <span>
-            Automatic face recognition technologies have made many improvements
-            in the changing world. Smart Attendance using Real-Time Face
-            Recognition is a real-world solution which comes with day to day
-            activities of handling student attendance system. Face
-            recognition-based attendance system is a process of recognizing the
-            students face for taking attendance by using face biometrics based
-            on high - definition monitor video and other information technology
-          </span>
-          <span></span>
-        </span>
-        <span>
-          <span>
-            Mauris luctus rutrum mi ut rhoncus. Integer in dignissim tortor.
-          </span>
-          <span></span>
+          Automatic face recognition technologies have made many improvements
+          in the changing world. Smart Attendance using Real-Time Face
+          Recognition is a real-world solution which comes with day to day
+          activities of handling student attendance system. <br> <br> Face
+          recognition-based attendance system is a process of recognizing the
+          students face for taking attendance by using face biometrics based
+          on high - definition monitor video and other information technology.
         </span>
       </span>
       <button class="home-button button" onclick="goDash()">Get Started</button>
