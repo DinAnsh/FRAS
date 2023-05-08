@@ -116,7 +116,6 @@ def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
     try:
         check_subMap() 
-        
         if request.method == 'POST':
             if request.content_type == 'application/json':
                 payload = json.loads(request.body)
@@ -140,8 +139,9 @@ def dashboard(request, reason=''):
                 res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
         
         res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-
-        reset_models()      
+           
+        reset_models()  
+    
         return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
     
     except Exception as e:
@@ -242,7 +242,6 @@ def get_student_data(request):
 def face_recognize(request):
     if request.method =='POST': 
         try:
-
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
             if int(current_min) in list(range(0,56)):  #this time will be 10, 50
@@ -251,7 +250,6 @@ def face_recognize(request):
                     # image_class -> image_3
                     print("-----------------",img)
                     class_id = img.split("_")[-1]
-                    print("-----------------",class_id)
                     
                     image_file = request.FILES[img]
                     pil_img = Image.open(image_file)
@@ -474,6 +472,7 @@ def teacher(request):
     reset_models()
     check_subMap()
     check_subjects()
+
     user = User.objects.get(username=request.user)
     teacherData = list(Teacher.objects.all().values_list())
     teacherData.sort(key=lambda x: int(x[1]))
