@@ -146,7 +146,7 @@ def dashboard(request, reason=''):
     
     except Exception as e:
         print(f'There is an exception --- {e}')
-    
+
 
 @login_required(login_url='testapp:home')
 def update_profile(request):
