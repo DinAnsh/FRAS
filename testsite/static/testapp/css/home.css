@@ -1283,7 +1283,7 @@ nav a:is(:link, :active, :visited).active {
   border-radius: 5px;
   width: 100%;
   background-color: #c1bebe;
-  height: 565px;
+  height: 36rem;
 }
 
 .popup_title {
