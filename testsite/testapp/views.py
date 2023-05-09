@@ -246,7 +246,7 @@ def face_recognize(request):
         try:
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,56)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,23)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -785,3 +785,10 @@ def reset_models():
         d = Schedule.objects.all().delete()
         e = Sub_Tracker.objects.all().delete()
         print("Database models are cleared: ",a[1],b[1],c[1],d[1],e[1])
+        
+        file_path = 'submap.json'
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print("Map deleted successfully.")
+        else:
+            print("Map does not exist.")

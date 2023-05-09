@@ -9,5 +9,3 @@ testsite/db.sqlite3
 Dockerfile
 Demo_files
 testsite/media/students
-testsite/testapp/__pycache__
-testsite/testapp/migrations/__pycache__
