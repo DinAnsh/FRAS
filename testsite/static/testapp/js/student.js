@@ -348,6 +348,8 @@ function renderData(page) {
   });
 
   tableBody.innerHTML = html;
+  document.getElementById('pagination').style.display = 'flex';
+  document.querySelector('.export_train').style.display = 'flex';
 
   updateStatus();
 
@@ -727,19 +729,22 @@ function getAttendance(page = 1) {
       if (response.success) {
         attd = response.data;
         header = response.header;
-
+        
         headers.innerHTML = '';
         let html = '<tr><th>Enrollment ID</th>';
-
+        
         header.forEach(heading => {
           html += '<th>' + heading + '</th>';
         });
-
         headers.innerHTML = html + '</tr>';
-
+        document.getElementById('pagination').style.display = 'flex';
+        document.querySelector('.export_train').style.display = 'flex';
         renderAttendance(page);
       } else {
+        headers.innerHTML = "";
         tableBody.innerHTML = "";
+        document.getElementById('pagination').style.display = 'none';
+        document.querySelector('.export_train').style.display = 'none';
         alert(response.message);
       }
     }

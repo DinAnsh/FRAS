@@ -138,15 +138,17 @@ def dashboard(request, reason=''):
             for sub in fields_to_sum:
                 res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
         
+        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
+        # There we got the bug!!!!!!!!!!!!!
         res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-           
+        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
         reset_models()  
     
         return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
     
     except Exception as e:
         print(f'There is an exception --- {e}')
-
+    
 
 @login_required(login_url='testapp:home')
 def update_profile(request):
