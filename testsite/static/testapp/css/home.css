@@ -172,6 +172,7 @@ nav a:is(:link, :active, :visited).active {
   width: 30vw;
   justify-content: space-between;
   flex-direction: row;
+  /* margin-left: 10vw; */
 }
 
 .home-link {

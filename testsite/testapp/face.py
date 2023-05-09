@@ -45,10 +45,9 @@ def get_embedding(year:str):
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(year))  #2,3
-
-    # embedder = FaceNet()      
+    # embedder = FaceNet()  
+    
     # fetches all the students' data from the database whose enrollment numbers start with the admission year
-
     all_students = Student.objects.filter(enroll__startswith=adm_year)
     
     X = []
@@ -75,7 +74,6 @@ def get_embedding(year:str):
         EMBEDDED_X.append(yhat[0])
         
     EMBEDDED_X= np.asarray(EMBEDDED_X)
-
     y = np.asarray(y,dtype=int)
     
     # global class_names              #need to store in a numpy file .npz
@@ -88,7 +86,6 @@ def train(X,y,year):
     '''
     This function trains a Support Vector Machine (SVM) model using the provided training data X and y. It saves the trained model as a pickle file with a name specified using the year parameter.
     '''
-
     # X_train, X_test, Y_train, Y_test = train_test_split(X,y, shuffle=True,random_state=17)
     model = SVC(kernel='linear', probability=True)
     model.fit(X,y)
@@ -124,13 +121,11 @@ def makePrediction(image, class_year):
     # global model                #need to store using pickle
     # global class_names
     try:    
-
         filename = 'model'+year+'.pkl' 
         with open(filename, 'rb') as file:
             model = pickle.load(file)
     except Exception as e:
         return f"Model not trained {e}"    
-
     # class_names = np.load("Classes.npz")['array1']
         
     prob_scores = model.predict_proba(EMBEDDED_X) 
@@ -147,5 +142,6 @@ def makePrediction(image, class_year):
             pred_label = "Unknown"
             
         predictions.append(pred_label)
+            
     return predictions
     

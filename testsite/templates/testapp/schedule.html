@@ -84,10 +84,10 @@
         var response = JSON.parse(this.responseText);
         const data = response.schedule;
         // console.log(data);
+        const tbody = document.getElementById('schedule-table');
         if (response.success) {
           if (data) {
             document.querySelector('.main-part2').style.display = '';
-            const tbody = document.getElementById('schedule-table');
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             tbody.innerHTML = '';
             for (let i = 0; i < 6; i++) {
