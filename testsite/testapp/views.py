@@ -8,21 +8,23 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
-from .models import *
-from django.http import JsonResponse
 from django.core.files.base import ContentFile
+from django.apps import apps
+from django.db.models import Sum
+from django.utils.crypto import get_random_string
 from PIL import Image
+from .models import *
+from .face import *
+from datetime import datetime
+from .helper import send_forget_password_mail 
+import os.path
 import base64
 import json
 import pandas as pd
 import numpy as np
 import cv2
 import os
-from .face import *
-from datetime import datetime
-from django.apps import apps
-import os.path
-from django.db.models import Sum
+
 
 sub_map = {}
 year2 = set()
@@ -54,7 +56,9 @@ def user_register(request):
             username = names[0].lower()+'@'+ dept[:3]
 
             User.objects.create_user(username, email, password, first_name=names[0],last_name=" ".join(names[1:]) )
-
+            pro = Profile.objects.create(user=User.objects.get(email=email))
+            pro.created_at = timezone.now()
+            pro.save()
             # database entry - Admin model
             admin = System_Admin(dept, name, email, password)
             admin.save()
@@ -109,6 +113,84 @@ def user_logout(request):
         logout(request)
         return redirect('testapp:home')
 
+
+def change_password(request, token):
+    context = {}
+    try:
+        prof_obj = Profile.objects.filter(forget_password_token = token).first()
+        #here check if the token created at and current time difference the token will only valid for 10 min
+        now = timezone.now()
+        created_at = prof_obj.created_at    
+        days_diff = (now - created_at).days
+
+        # Calculate the remaining hours and minutes difference
+        remaining_diff = (now - created_at).seconds // 60
+
+        # Calculate the hours and minutes separately
+        hours_diff = remaining_diff // 60
+        minutes_diff = remaining_diff % 60
+        
+        if days_diff==0 and hours_diff==0 and minutes_diff>2:
+            messages.warning(request,"Link expired please generate new reset password link!")
+            return redirect('forgot_password')
+    
+        context = {
+            "user_id": prof_obj.user.id
+        }
+        
+        if request.method == 'POST':
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('reconfirm_password')
+            user_id = request.POST.get('user_id')
+            if user_id is None:
+                messages.success(request, 'No user id found.')
+                return redirect(f'/change_password/{token}/')
+            
+            if new_password != confirm_password:
+                messages.warning(request,"password doesn't match")
+                return redirect(f'/change_password/{token}/')
+
+
+            user_obj = User.objects.get(id=user_id)
+            user_obj.set_password(new_password)
+            user_obj.save()
+            return redirect('home')
+        
+        
+    except Exception as e:
+        print(f"There is an exception - {e}")
+        messages.warning(request,"Bad token request, regenerate the link!")
+        return redirect('forgot_password')
+        
+    return render(request,'change_password.html', context=context)
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('user_email')
+        #first check if the email already exist or not
+        try:
+            if not User.objects.filter(email=email).exists():
+                messages.success(request, 'User with this email does not exist.')
+                return redirect('forgot_password')
+            
+            else:
+                user = User.objects.get(email=email)
+                token = get_random_string(length=32)
+                
+                profile_obj = Profile.objects.get(user= user)
+                profile_obj.forget_password_token = token
+                profile_obj.save()
+                meta = {"scheme":request.scheme, "host":request.get_host(), "token":token}
+                send_forget_password_mail(user.email, meta)
+                messages.success(request, 'An Email is Sent.')
+                return redirect('forgot_password')
+                
+        except Exception as e:
+            print(f"There is an exception - {e}")
+        
+    return render(request, 'forgot_password.html')
+ 
 
 #if we can provide other data from here to the page then we can show a message to the user 'Login first'
 @login_required(login_url='testapp:home')      

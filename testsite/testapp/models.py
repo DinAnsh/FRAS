@@ -1,9 +1,21 @@
 #Here we store the application's data models
 
 from django.db import models
-import numpy as np
-import json
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+class Profile(models.Model):
+    user = models.OneToOneField(User , on_delete=models.CASCADE)
+    forget_password_token = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+    
+    def save(self, *args, **kwargs):
+        # Set the created_at field to the current time
+        self.created_at = timezone.now()
+        super().save(*args, **kwargs)
 
 class System_Admin(models.Model):
     dpt_name = models.CharField(max_length=50)
