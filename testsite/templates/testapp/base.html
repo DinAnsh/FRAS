@@ -44,9 +44,6 @@
   <!-- FullCalendar JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.0/fullcalendar.min.js"></script>
 
-  <!-- opencv JavaScript -->
-  <!-- <script src="https://docs.opencv.org/4.5.1/opencv.js" async></script> -->
-
 
   {% block head %}
   {% comment %} Any script or css sheet will be added {% endcomment %}
@@ -108,38 +105,8 @@
   {% block js %}
 
   {% endblock js %}
-
-  {% comment %} // ------------------------ profile section ------------------------------ {% endcomment %}
-  <script>
-    function showprofile() {
-      document.getElementById("profile-popup").style.display = "block";
-    }
-
-    function closeProfile() {
-      document.getElementById("profile-popup").style.display = "none";
-    }
-
-    function handleChange() {
-      const passwordInput = document.getElementById("new-password");
-      const confirmPasswordInput = document.getElementById("confirm-password");
-      const updateBtn = document.getElementById("update-btn");
-
-
-      if (
-        passwordInput.value !== "" &&
-        confirmPasswordInput.value !== ""
-      ) {
-        if (passwordInput.value === confirmPasswordInput.value) {
-          updateBtn.style.display = "block";
-        }
-        else {
-          alert("Confirm the new password correctly!");
-          updateBtn.style.display = "none";
-        }
-      }
-    }
-
-  </script>
+  <script src="{% static 'testapp/js/common.js' %}"></script>
+  
 </body>
 
 </html>

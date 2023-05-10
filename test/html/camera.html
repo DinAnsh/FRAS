@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera</title>
+    <link
+      rel="icon"
+      href="../images/favicon.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Gilda+Display:wght@400&amp;display=swap"
+      data-tag="font"
+    />
+    <link href="../css/base.css" rel="stylesheet" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <link href="../css/home.css" rel="stylesheet" />
+    <link href="../css/student.css" rel="stylesheet" />
+    
+</head>
+
+
+<body>
+  <div class="home-container">
+    <header data-thq="thq-navbar" class="home-navbar-interactive">
+      <div class="home-container01">
+        <a href="{% url 'testapp:home' %}"
+          ><img
+            src="../images/header-logo.png"
+            alt="logo"
+            class="main_logo"
+        /></a>
+      </div>
+      <div data-thq="thq-navbar-nav" data-role="Nav" class="home-desktop-menu">
+        <nav data-thq="thq-navbar-nav-links" data-role="Nav" class="home-nav">
+          <a href="#about" class="home-link">Student</a>
+          <a href="#features" class="home-link">Teacher</a>
+          <a href="#process" class="home-link">Schedule</a>
+          <a href="#members" class="home-link">Camera</a>
+        </nav>
+      </div>
+      <div class="profile">
+        <ul>
+          <li class="dropdown">
+            <ul>
+              <a href="#">
+                <img src="../images/profile-pic.jpg" alt="Profile Picture">
+              </a>
+              <a href="">UserName</a>
+            </ul>
+            <ul class="dropdown-menu">
+              <li><a href="#">My Account</a></li>
+              <li><a href="#">Dashboard</a></li>
+              <li><a href="#">Need Help?</a></li>
+              <li><a href="#">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div data-thq="thq-burger-menu" class="home-burger-menu">
+        <svg viewBox="0 0 1024 1024" class="home-icon">
+          <path
+            d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z"
+          ></path>
+        </svg>
+      </div>
+      <div data-thq="thq-mobile-menu" class="home-mobile-menu">
+        <div data-thq="thq-mobile-menu-nav" data-role="Nav" class="home-nav1">
+          <div class="home-container02">
+            <a href="{% url 'testapp:home' %}"
+              ><img
+                src="../images/header-logo.png"
+                alt="logo"
+                class="main_logo"
+            /></a>
+            <div data-thq="thq-close-menu" class="home-menu-close">
+              <svg viewBox="0 0 1024 1024" class="home-icon02">
+                <path
+                  d="M810 274l-238 238 238 238-60 60-238-238-238 238-60-60 238-238-238-238 60-60 238 238 238-238z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <nav
+            data-thq="thq-mobile-menu-nav-links"
+            data-role="Nav"
+            class="home-nav2"
+          >
+            <a href="#about" class="home-link05">About</a>
+            <a href="#features" class="home-link06">Features</a>
+            <a href="#process" class="home-link07">Workflow</a>
+            <a href="#members" class="home-link08">Team</a>
+            <a href="#contact" class="home-link09">Contact</a>
+          </nav>
+          <div class="home-container03">
+
+            <button class="home-login1 button" onclick="openModal2()">Log in</button>
+    
+            <button class="home-register1 button" onclick="openModal()">Register</button>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <div class="main-container">
+      <div class="main-part1">
+          <div class="part1-content">
+            <select name="department" id="" disabled>
+              <option value="cse">Computer Science and Engineering</option>
+            </select>
+          </div>
+  
+          <div class="part1-content">
+            <button class="comman_btn button2" onclick="addcam()">Add Camera</button>
+          </div>
+      </div>
+      <div class="main-part2">
+        <div class="btn-cont">
+          <div class="tabletitle">
+            <h2>
+              Camera Details
+            </h2>
+          </div>
+        </div>
+        <div class="part3-content">
+          <table>
+            <thead>
+              <tr>
+                <th class="ctcol1">Room No</th>
+                <th class="ctcol2">Camera</th>
+                <th class="ctcol3">Camera IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                  <td>1</td>
+                  <td>John</td>
+                  <td>john@example.com</td>
+              </tr>
+              <tr>
+                  <td>2</td>
+                  <td>Jane</td>
+                  <td>jane@example.com</td>
+              </tr>
+              <tr>
+                  <td>3</td>
+                  <td>Bob</td>
+                  <td>bob@example.com</td>
+              </tr>
+              <tr>
+                  <td>4</td>
+                  <td>Alice</td>
+                  <td>alice@example.com</td>
+              </tr>
+
+          </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="myModal3" class="modal3">
+      <div class="modal-content3" id="content3">
+        <div class="popup3">
+          <span class="close3" id="cbtn3">&times;</span>
+          <div class="popup_title3">
+            Register Student Face
+          </div>
+          <div class="popup_body3">
+            <div class="capture-window">
+              <div id="video1"><video id="video"></video></div>
+              <div id="canvas1"><canvas id="canvas"></canvas></div>
+              
+            </div>
+            <div class="takebtn">
+              <button id="capture-btn">Capture</button>
+              <button id="retake-btn">Retake</button>
+            </div>
+          </div>
+          <button id="save-btn">Save</button>
+          <div class="popup_inst">
+            <h2>Instructions:-</h2>
+            <ul>
+              <li>Ensure that you have a stable internet connection and a webcam or a front-facing camera on your device.</li>
+              <li>Position student face in center of designated area on the screen and hold still while the camera captures several images of your face from different angles.</li>
+              <li>Once you have captured the required images, the system will analyze and process them to create a digital representation of your face. This representation will be used to match your face with the images captured during attendance recording.</li>
+  
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="myModal4" class="modal4">
+      <div class="modal-content4" id="content4">
+        <div class="popup4">
+          <span class="close4" id="cbtn4">&times;</span>
+          <div class="popup_title4">
+            Provide Camera details
+          </div>
+          <div class="popup_body4">
+            <form class="popup_form2" action="#">
+  
+              <div class="in_div">
+                <label for="department" class="input_label">Department:</label>
+                <select name="dept" id="department" disabled>
+                  <option value="1">Computer Science and Engineering</option>
+                </select>
+              </div>
+  
+              <div class="in_div">
+                <label for="room" class="input_label">Room No.:</label>
+                <input type="text" id="room" name="room_no" class="in_field" required>
+              </div>
+              <div class="in_div">
+                <label for="ip" class="input_label">Camera IP:</label>
+                <input type="text" id="ip" name="password" class="in_field" required>
+              </div>
+              
+              <input type="submit" value="Add Camera" class="register_btn">
+            </form>
+        </div>
+      </div>
+    </div>
+  
+  </div>
+  
+</body>
+<script src="../js/popup.js"></script>
+<script>
+  function handleFileSelect(event) {
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          if (file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+              // Handle the selected Excel file(s) here
+              console.log('Selected file:', file.name);
+          } else {
+              alert('Please select an Excel file');
+          }
+      }
+  }
+</script>
+</html>

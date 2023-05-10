@@ -9,13 +9,18 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib import messages
 from django.utils import timezone
-from django.db.models import Sum
-from datetime import datetime
+from django.core.files.base import ContentFile
 from django.apps import apps
+from django.db.models import Sum
+from django.utils.crypto import get_random_string
 from PIL import Image
-from .helper import *
 from .models import *
 from .face import *
+from datetime import datetime
+from .helper import send_forget_password_mail 
+import os.path
+import base64
+import json
 import pandas as pd
 import numpy as np
 import base64
@@ -52,7 +57,9 @@ def user_register(request):
             username = names[0].lower()+'@'+ dept[:3]
 
             User.objects.create_user(username, email, password, first_name=names[0],last_name=" ".join(names[1:]) )
-
+            pro = Profile.objects.create(user=User.objects.get(email=email))
+            pro.created_at = timezone.now()
+            pro.save()
             # database entry - Admin model
             admin = System_Admin(dept, name, email, password)
             admin.save()
@@ -108,11 +115,90 @@ def user_logout(request):
         return redirect('testapp:home')
 
 
+def change_password(request, token):
+    context = {}
+    try:
+        prof_obj = Profile.objects.filter(forget_password_token = token).first()
+        #here check if the token created at and current time difference the token will only valid for 10 min
+        now = timezone.now()
+        created_at = prof_obj.created_at    
+        days_diff = (now - created_at).days
+
+        # Calculate the remaining hours and minutes difference
+        remaining_diff = (now - created_at).seconds // 60
+
+        # Calculate the hours and minutes separately
+        hours_diff = remaining_diff // 60
+        minutes_diff = remaining_diff % 60
+        
+        if days_diff==0 and hours_diff==0 and minutes_diff>2:
+            messages.warning(request,"Link expired please generate new reset password link!")
+            return redirect('forgot_password')
+    
+        context = {
+            "user_id": prof_obj.user.id
+        }
+        
+        if request.method == 'POST':
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('reconfirm_password')
+            user_id = request.POST.get('user_id')
+            if user_id is None:
+                messages.success(request, 'No user id found.')
+                return redirect(f'/change_password/{token}/')
+            
+            if new_password != confirm_password:
+                messages.warning(request,"password doesn't match")
+                return redirect(f'/change_password/{token}/')
+
+
+            user_obj = User.objects.get(id=user_id)
+            user_obj.set_password(new_password)
+            user_obj.save()
+            return redirect('home')
+        
+        
+    except Exception as e:
+        print(f"There is an exception - {e}")
+        messages.warning(request,"Bad token request, regenerate the link!")
+        return redirect('forgot_password')
+        
+    return render(request,'change_password.html', context=context)
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('user_email')
+        #first check if the email already exist or not
+        try:
+            if not User.objects.filter(email=email).exists():
+                messages.success(request, 'User with this email does not exist.')
+                return redirect('forgot_password')
+            
+            else:
+                user = User.objects.get(email=email)
+                token = get_random_string(length=32)
+                
+                profile_obj = Profile.objects.get(user= user)
+                profile_obj.forget_password_token = token
+                profile_obj.save()
+                meta = {"scheme":request.scheme, "host":request.get_host(), "token":token}
+                send_forget_password_mail(user.email, meta)
+                messages.success(request, 'An Email is Sent.')
+                return redirect('forgot_password')
+                
+        except Exception as e:
+            print(f"There is an exception - {e}")
+        
+    return render(request, 'forgot_password.html')
+ 
+
 #if we can provide other data from here to the page then we can show a message to the user 'Login first'
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
     try:
+        check_subMap() 
         if request.method == 'POST':
             if request.content_type == 'application/json':
                 payload = json.loads(request.body)
@@ -135,15 +221,17 @@ def dashboard(request, reason=''):
             for sub in fields_to_sum:
                 res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
         
+        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
+        # There we got the bug!!!!!!!!!!!!!
         res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-
+        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
+        reset_models()  
+    
+        return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
+    
     except Exception as e:
         print(f'There is an exception --- {e}')
     
-    reset_models()  
-    check_subMap()      
-    return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
-
 
 @login_required(login_url='testapp:home')
 def update_profile(request):
@@ -239,16 +327,14 @@ def get_student_data(request):
 def face_recognize(request):
     if request.method =='POST': 
         try:
-            
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,29)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,23)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
                     print("-----------------",img)
                     class_id = img.split("_")[-1]
-                    print("-----------------",class_id)
                     
                     image_file = request.FILES[img]
                     pil_img = Image.open(image_file)
@@ -279,7 +365,8 @@ def face_recognize(request):
                         if type(class4_enrolls) != str:
                             for e in class4_enrolls:
                                 e = str(e)
-                                year4.add(e[:4]+"/CTAE/"+e[4:])
+                                if e != "Unknown":
+                                    year4.add(e[:4]+"/CTAE/"+e[4:])
                     
                 return JsonResponse({"status":"attendance recorded!"})
 
@@ -296,7 +383,7 @@ def face_recognize(request):
                 year3 = []
                 year4 = []
                 
-                print("-----------------",pred)
+                print("----------Predictions------->",pred)
                 mark_attendance(pred)
                 return JsonResponse({"status":"successfully attendance marked"})
             
@@ -316,8 +403,8 @@ def train_model(request):
         year = json_data.get("year")
         
         X,y = get_embedding(year)
-        print("-------------------------------Embeddings Done----------------- ")
         s = train(X,y,year)
+        
         return JsonResponse({"status":s}, status=200)
     
     except Exception as e:
@@ -422,12 +509,29 @@ def teacher(request):
 
             dbEmails = list(Teacher.objects.all().values_list('email', flat=True))
             dfEmails = df['Email'].to_list()
-
+            
             # to delete the missing teachers in the uploaded sheet
             emails_to_delete = [x for x in dbEmails if x not in dfEmails]
-            if len(emails_to_delete):    
+            if(len(emails_to_delete)):    
                 Teacher.objects.filter(email__in = emails_to_delete).delete()
 
+            # to add or modify the present teachers in the uploaded sheet
+            for index, row in df.iterrows():
+                teacher, created = Teacher.objects.get_or_create(
+                    email = str(row['Email']),
+                    defaults={
+                        'name': row['NAME'],
+                        'id': index,
+                        'mobile': str(int(row['Mobile'])),
+                        'subjects': row['Subjects']
+                    }
+                )
+                if not created:
+                    teacher.name = row['NAME']
+                    teacher.id = index
+                    teacher.mobile = str(int(row['Mobile']))
+                    teacher.subjects = row['Subjects']
+                    teacher.save()
             # to add or modify the present teachers in the uploaded sheet
             for index, row in df.iterrows():
                 teacher, created = Teacher.objects.get_or_create(
@@ -453,6 +557,7 @@ def teacher(request):
     reset_models()
     check_subMap()
     check_subjects()
+
     user = User.objects.get(username=request.user)
     teacherData = list(Teacher.objects.all().values_list())
     teacherData.sort(key=lambda x: int(x[1]))

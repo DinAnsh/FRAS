@@ -348,6 +348,8 @@ function renderData(page) {
   });
 
   tableBody.innerHTML = html;
+  document.getElementById('pagination').style.display = 'flex';
+  document.querySelector('.export_train').style.display = 'flex';
 
   updateStatus();
 
@@ -629,7 +631,7 @@ function uploadGrid(event) {
   xhr.open("POST", "/testapp/upload_image/", true);
   xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
 
-  xhr.onreadystatechange = function () {
+  xhr.onload = function () {
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       alert("Class Image saved successfully");
     } else {
@@ -654,7 +656,7 @@ function trainModel() {
   var xhr = new XMLHttpRequest();
   globalBuffering.style.display = 'block';
   
-  const duration = (data.length + 3)*1000;
+  const duration = (data.length + 2.5)*1000;
   const interval = duration / (100 / increment);
   
   const timer = setInterval(() => {
@@ -727,18 +729,22 @@ function getAttendance(page = 1) {
       if (response.success) {
         attd = response.data;
         header = response.header;
-
+        
         headers.innerHTML = '';
         let html = '<tr><th>Enrollment ID</th>';
-
+        
         header.forEach(heading => {
           html += '<th>' + heading + '</th>';
         });
-
         headers.innerHTML = html + '</tr>';
-
+        document.getElementById('pagination').style.display = 'flex';
+        document.querySelector('.export_train').style.display = 'flex';
         renderAttendance(page);
       } else {
+        headers.innerHTML = "";
+        tableBody.innerHTML = "";
+        document.getElementById('pagination').style.display = 'none';
+        document.querySelector('.export_train').style.display = 'none';
         alert(response.message);
       }
     }

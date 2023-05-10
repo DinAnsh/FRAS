@@ -200,42 +200,6 @@
     <div class="adminrights-container17">
       <h1 class="adminrights-text18">Live</h1>
       <div class="adminrights-container18">
-        {% comment %} <div class="live">
-          <!-- <video style="transform: scaleX(-1);" id="player" width="700" height="370" autoplay></video> -->
-          <div id="videodiv1"><video style="transform: scaleX(-1); width: 30vw;" id="video1"></video></div>
-          <div id="canvasdiv1"><canvas style="transform: scaleX(-1); width: 30vw;" id="canvas1"></canvas></div>
-          <h3 style="width: fit-content; margin: 0 auto;">Class: 2nd Year</h3>
-          <label for="fileInput" class="custom-file-upload" title="Students image">
-            Upload Image
-          </label>
-          <button id="switchCameraButton">Switch Camera</button>
-          <input type="file" name="" id="" accept="image/*" onchange="RecogniseImage(event)"> 
-          <button id="save-btn1">Save</button>
-        </div>
-
-        <div class="live">
-          <div id="videodiv2"><video style="transform: scaleX(-1); width: 30vw;" id="video2"></video></div>
-          <div id="canvasdiv1"><canvas style="transform: scaleX(-1); width: 30vw" id="canvas2"></canvas></div>
-          <h3 style="width: fit-content; margin: 0 auto;">Class: 3rd Year</h3>
-          <label for="fileInput" class="custom-file-upload" title="Students image">
-            Upload Image
-          </label>
-          <button id="switchCameraButton">Switch Camera</button>
-          <input type="file" name="" id="" accept="image/*" onchange="RecogniseImage(event)"> 
-          <button id="save-btn2">Save</button>
-        </div>
-
-        <div class="live">
-          <div id="videodiv3"><video style="transform: scaleX(-1); width: 30vw;" id="video3"></video></div>
-          <div id="canvasdiv1"><canvas style="transform: scaleX(-1); width: 30vw" id="canvas3"></canvas></div>
-          <h3 style="width: fit-content; margin: 0 auto;">Class: 4th Year</h3>
-          <label for="fileInput" class="custom-file-upload" title="Students image">
-            Upload Image
-          </label>
-          <button id="switchCameraButton">Switch Camera</button>
-          <input type="file" name="" id="" accept="image/*" onchange="RecogniseImage(event)"> 
-          <button id="save-btn3">Save</button>
-        </div> {% endcomment %}
       </div>
       <div id="my-data" data-my-variable="{{ cameras }}"></div>
       <div class="center">
@@ -248,5 +212,4 @@
 
 <script src="{% static 'testapp/js/dashboard.js' %}"></script>
 {% endblock body %}
-
 {% endblock %}

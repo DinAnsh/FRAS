@@ -6,6 +6,7 @@ from .models import *
 #username: admin
 #password: adminhubae
 
+admin.site.register(Profile)
 admin.site.register(System_Admin)
 admin.site.register(Student)
 admin.site.register(Team)
