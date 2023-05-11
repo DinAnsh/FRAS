@@ -1,4 +1,5 @@
-from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 from datetime import datetime
 from django.apps import apps
 from .models import *
@@ -7,7 +8,6 @@ import json
 import os
 
 sub_map = {}
-reset = 0
 
 def clean_schedule(df):
     '''
@@ -106,7 +106,7 @@ def get_subjects():
     
     curr_subj = {}
     for obj in Schedule.objects.filter(class_id_id = 2):
-        if 10 == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
+        if 10 == obj.start_time.hour and weekday_name == obj.day_of_week:
             curr_subj['Second Year'] = obj.subject
     
     for obj in Schedule.objects.filter(class_id_id = 3):
@@ -173,6 +173,7 @@ def check_subMap():
                         json.dump(sub_map, json_file)
 
             print('...........sub_map updated successfully!.........')
+            return sub_map
         except Exception as e:
             print(f'There is an exception {e}')
 
@@ -224,7 +225,7 @@ def check_subjects():
 
 def reset_models():
     '''
-    This function is used to clear the database record of
+    This function is used to clear the database records of
     all of the class models, schedule model, subject tracker model,
     and the mapping that is saved in the submap.json file.
     '''
@@ -233,8 +234,17 @@ def reset_models():
     b = Third_Year.objects.all().delete()
     c = Final_Year.objects.all().delete()
     d = Schedule.objects.all().delete()
-    e = Sub_Tracker.objects.all().delete()
-    print("Database models are cleared: ",a[1],b[1],c[1],d[1],e[1])
+
+    for i in ['2','3','4']:
+        cls_obj = Sub_Tracker.objects.get(class_id_id=i)
+        for field in cls_obj._meta.fields[2:]:
+            field_name = field.name
+            field_default = field.get_default()
+            setattr(cls_obj, field_name, field_default)
+
+        cls_obj.save()
+
+    print("Database models are cleared: ",a[1],b[1],c[1],d[1])
 
     file_path = 'submap.json'
     if os.path.exists(file_path):
@@ -242,25 +252,20 @@ def reset_models():
         print("Map deleted successfully.")
     else:
         print("Map does not exist.")
-from django.core.mail import send_mail
-from django.conf import settings
+
 
 def send_forget_password_mail(email, meta):
-    subject = "Reset your FRAS password"
-    message = f'''Hello,
-We received a request to reset the password for your account for this email address. To initiate the password reset process for your account, click the link below. 
+    subject = "Reset your FRAS password!"
+    message = f'''
+    Hello, We received a request to reset the password for your account for this email address. To initiate the password reset process for your account, click the link below. 
+    {meta["scheme"]}://{meta["host"]}/change_password/{meta["token"]}/
+    Note: the link will be validated only for 2 minutes.
+    This link can only be used once. If you need to reset your password again, please visit http://127.0.0.1:8000/ and request another reset.
+    If you did not make this request, you can simply ignore this email.
 
-{meta["scheme"]}://{meta["host"]}/change_password/{meta["token"]}/
-
-Note: the link will be validated only for 2 minutes.
-
-This link can only be used once. If you need to reset your password again, please visit http://127.0.0.1:8000/ and request another reset.
-
-If you did not make this request, you can simply ignore this email.
-
-Sincerely,
-The FRAS Team
-'''
+    Sincerely,
+    The FRAS Team
+    '''
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     send_mail(subject, message, email_from, recipient_list)

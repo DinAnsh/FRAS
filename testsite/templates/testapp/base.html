@@ -101,6 +101,27 @@
     </div>
   </div>
 
+  <div class="confirmation modal">
+    <div class="modal-content" id="content">
+      <div class="profile-popup">
+        <span class="close" id="" onclick="closeReset()">&times;</span>
+        <div class="popup_title" style="font-size: 2rem;">
+          Confirm the resetting!
+        </div>
+        <div class="popup_body" style="flex-direction: row;">
+          <form class="reset_form" method="post" action="{% url 'testapp:dashboard' %}">
+            {% csrf_token %}
+              
+            <input type="submit" name="approve" value="Yes" class="common_btn button1">
+            <input type="button" name="deny" value="No" class="common_btn button1" onclick="closeReset()">
+  
+          </form>
+          <p style="font-size: 0.8rem; margin-bottom: 1rem;">Note: Click on Yes only if you want to clear the database records of
+            all of the class models and schedule model.</p>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- for all popups and file-upload -->
   {% block js %}
 

@@ -51,6 +51,7 @@
       <li><a href="#" onclick="showprofile()">Profile</a></li>
       <li><a href="{% url 'testapp:dashboard' %}">Dashboard</a></li>
       <li><a href="#">Need Help?</a></li>
+      <li><a href="#" onclick="resetRecords()">Reset Records</a></li>
       <li>
         <form method="post" action="{% url 'testapp:logout' %}">
           {% csrf_token %}

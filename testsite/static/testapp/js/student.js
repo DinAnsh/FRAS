@@ -316,13 +316,18 @@ function getStudents(page = 1) {
   xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
 
   xhr.onload = function () {
+    var response = JSON.parse(xhr.responseText);
     if (xhr.status === 200) {
-      // currentPage = 1;
-      var response = JSON.parse(xhr.responseText);
       data = response.data;
-
       headers.innerHTML = "<th class='tcol1'>Enrollment ID</th><th class='tcol2'>Name</th><th class='tcol3'>Email</th><th class='tcol4'>Mobile</th><th class='tcol6'>Status</th>"
       renderData(page);
+    }else {
+      headers.innerHTML = "";
+      tableBody.innerHTML = "";
+      document.getElementById('pagination').style.display = 'none';
+      document.getElementById('note').style.display = 'none';
+      document.querySelector('.export_train').style.display = 'none';
+      alert(response.message);
     }
   };
   xhr.send();

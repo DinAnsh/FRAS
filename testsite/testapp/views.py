@@ -3,24 +3,20 @@
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
+from django.utils.crypto import get_random_string
 from django.core.files.base import ContentFile
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib import messages
 from django.utils import timezone
-from django.core.files.base import ContentFile
-from django.apps import apps
 from django.db.models import Sum
-from django.utils.crypto import get_random_string
+from datetime import datetime
+from django.apps import apps
 from PIL import Image
 from .models import *
+from .helper import *
 from .face import *
-from datetime import datetime
-from .helper import send_forget_password_mail 
-import os.path
-import base64
-import json
 import pandas as pd
 import numpy as np
 import base64
@@ -32,7 +28,6 @@ year2 = set()
 year3 = set()
 year4 = set()
 
-# SESSION_KEY = '_auth_user_id'
 
 def home(request):
     team_data = Team.objects.all()
@@ -115,6 +110,7 @@ def user_logout(request):
         return redirect('testapp:home')
 
 
+@never_cache
 def change_password(request, token):
     context = {}
     try:
@@ -166,6 +162,7 @@ def change_password(request, token):
     return render(request,'change_password.html', context=context)
 
 
+@never_cache
 def forgot_password(request):
     if request.method == 'POST':
         email = request.POST.get('user_email')
@@ -198,7 +195,9 @@ def forgot_password(request):
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
     try:
-        check_subMap() 
+        global sub_map
+        sub_map = check_subMap()
+
         if request.method == 'POST':
             if request.content_type == 'application/json':
                 payload = json.loads(request.body)
@@ -209,6 +208,12 @@ def dashboard(request, reason=''):
                     return JsonResponse({"class": str(cam.class_id)}, status=200)
                 elif payload.get("get_class"):
                     return JsonResponse({"status":"success"},status=307)
+
+            # handle the request to reset records
+            if request.POST.get('approve') == 'Yes':
+                reset_models()
+                referring_url = request.META.get('HTTP_REFERER')
+                return redirect(referring_url)
                 
         res_cls = {'Second Year':0,'Third Year':0,'Final Year':0}    # record of total attendance of each class
         res_sub = {}    # record of total attendance of top three subject
@@ -221,11 +226,9 @@ def dashboard(request, reason=''):
             for sub in fields_to_sum:
                 res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
         
-        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
         # There we got the bug!!!!!!!!!!!!!
         res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
-        reset_models()  
+        # print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
     
         return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
     
@@ -297,8 +300,9 @@ def student(request):
         
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     user = User.objects.get(username=request.user)   
     return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email,})
 
@@ -317,10 +321,13 @@ def get_student_data(request):
     
     try:
         student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
+        if len(student_data)>0:
+            return JsonResponse({'data':list(student_data),}, safe=False)
+        else:
+            return JsonResponse({'message': 'Student details are not uplaoded for the selected class.'}, status=500)
+
     except Exception as e:
-        return JsonResponse({'success': True, 'message': 'Student details are not uplaoded for the selected class.'})
-    
-    return JsonResponse({'data':list(student_data),}, safe=False)
+        print(f'There is an exception --- {e}')
 
 
 @login_required(login_url='testapp:home')
@@ -554,8 +561,9 @@ def teacher(request):
         
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception - {e}'}, status=500)
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     check_subjects()
 
     user = User.objects.get(username=request.user)
@@ -607,8 +615,9 @@ def schedule(request):
             return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
         else:
             return JsonResponse({'success': True})
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     check_subjects()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
@@ -670,8 +679,9 @@ def classroom(request):
             'room': room[0],
             'camera': ', '.join([camera[0] for camera in cameras])
         }]
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
 
