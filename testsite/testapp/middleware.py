@@ -15,9 +15,9 @@ class AutoLogoutMiddleware:
             if user.last_login:
                 #converts the datetime object to the local timezone, removes the timezone information from the datetime object, resulting in a timezone-naive datetime object 
                 last_login = user.last_login.astimezone().replace(tzinfo=None)
-                print(f">>>>>>>>>>>>>>>>>>>>>>>Last Login : {last_login}<<<<<<<<<<<<<<<<<<<<<<<")
+                # print(f">>>>>>>>>>>>>>>>>>>>>>>Last Login : {last_login}<<<<<<<<<<<<<<<<<<<<<<<")
                 days_since_last_login = (datetime.now() - last_login).days
-                print(f">>>>>>>>>>>>>>>>>>>>>>>Days since logged in : {days_since_last_login}<<<<<<<<<<<<<<<<<<<<<<<")
+                # print(f">>>>>>>>>>>>>>>>>>>>>>>Days since logged in : {days_since_last_login}<<<<<<<<<<<<<<<<<<<<<<<")
                 if days_since_last_login >= 7:
                     logout(request)
             request.session['last_activity'] = str(datetime.now())
@@ -33,7 +33,7 @@ class Subjects_and_Students:
     def __call__(self, request):
         if Student.objects.exists():     # for class models
             
-            # select only those classes for which subj`ects are already uploaded
+            # select only those classes for which subjects are already uploaded
             cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
             current_year = timezone.now().strftime('%Y')
             current_month = timezone.now().strftime('%m')

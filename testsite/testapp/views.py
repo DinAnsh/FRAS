@@ -1,35 +1,33 @@
 #This is where we have functions that handle requests and return responses
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
-from django.contrib import messages
-from django.http import JsonResponse
-from django.utils import timezone
-from .models import *
-from django.http import JsonResponse
+from django.utils.crypto import get_random_string
 from django.core.files.base import ContentFile
-from PIL import Image
-import base64
-import json
-import pandas as pd
-import numpy as np
-import cv2
-import os
-from .face import *
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.contrib import messages
+from django.utils import timezone
+from django.db.models import Sum
 from datetime import datetime
 from django.apps import apps
-import os.path
-from django.db.models import Sum
+from PIL import Image
+from .models import *
+from .helper import *
+from .face import *
+import pandas as pd
+import numpy as np
+import base64
+import json
+import cv2
 
-sub_map = {}
+
 year2 = set()
 year3 = set()
 year4 = set()
 
-# SESSION_KEY = '_auth_user_id'
 
 def home(request):
     team_data = Team.objects.all()
@@ -54,7 +52,9 @@ def user_register(request):
             username = names[0].lower()+'@'+ dept[:3]
 
             User.objects.create_user(username, email, password, first_name=names[0],last_name=" ".join(names[1:]) )
-
+            pro = Profile.objects.create(user=User.objects.get(email=email))
+            pro.created_at = timezone.now()
+            pro.save()
             # database entry - Admin model
             admin = System_Admin(dept, name, email, password)
             admin.save()
@@ -110,12 +110,94 @@ def user_logout(request):
         return redirect('testapp:home')
 
 
+@never_cache
+def change_password(request, token):
+    context = {}
+    try:
+        prof_obj = Profile.objects.filter(forget_password_token = token).first()
+        #here check if the token created at and current time difference the token will only valid for 10 min
+        now = timezone.now()
+        created_at = prof_obj.created_at    
+        days_diff = (now - created_at).days
+
+        # Calculate the remaining hours and minutes difference
+        remaining_diff = (now - created_at).seconds // 60
+
+        # Calculate the hours and minutes separately
+        hours_diff = remaining_diff // 60
+        minutes_diff = remaining_diff % 60
+        
+        if days_diff==0 and hours_diff==0 and minutes_diff>2:
+            messages.warning(request,"Link expired please generate new reset password link!")
+            return redirect('forgot_password')
+    
+        context = {
+            "user_id": prof_obj.user.id
+        }
+        
+        if request.method == 'POST':
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('reconfirm_password')
+            user_id = request.POST.get('user_id')
+            if user_id is None:
+                messages.success(request, 'No user id found.')
+                return redirect(f'/change_password/{token}/')
+            
+            if new_password != confirm_password:
+                messages.warning(request,"password doesn't match")
+                return redirect(f'/change_password/{token}/')
+
+
+            user_obj = User.objects.get(id=user_id)
+            user_obj.set_password(new_password)
+            user_obj.save()
+            return redirect('home')
+        
+        
+    except Exception as e:
+        print(f"There is an exception - {e}")
+        messages.warning(request,"Bad token request, regenerate the link!")
+        return redirect('forgot_password')
+        
+    return render(request,'change_password.html', context=context)
+
+
+@never_cache
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('user_email')
+        #first check if the email already exist or not
+        try:
+            if not User.objects.filter(email=email).exists():
+                messages.success(request, 'User with this email does not exist.')
+                return redirect('forgot_password')
+            
+            else:
+                user = User.objects.get(email=email)
+                token = get_random_string(length=32)
+                
+                profile_obj = Profile.objects.get(user= user)
+                profile_obj.forget_password_token = token
+                profile_obj.save()
+                meta = {"scheme":request.scheme, "host":request.get_host(), "token":token}
+                send_forget_password_mail(user.email, meta)
+                messages.success(request, 'An Email is Sent.')
+                return redirect('forgot_password')
+                
+        except Exception as e:
+            print(f"There is an exception - {e}")
+        
+    return render(request, 'forgot_password.html')
+ 
+
 #if we can provide other data from here to the page then we can show a message to the user 'Login first'
 @login_required(login_url='testapp:home')      
 def dashboard(request, reason=''):
     user = User.objects.get(username=request.user)
     try:
-        check_subMap() 
+        global sub_map
+        sub_map = check_subMap()
+
         if request.method == 'POST':
             if request.content_type == 'application/json':
                 payload = json.loads(request.body)
@@ -126,6 +208,12 @@ def dashboard(request, reason=''):
                     return JsonResponse({"class": str(cam.class_id)}, status=200)
                 elif payload.get("get_class"):
                     return JsonResponse({"status":"success"},status=307)
+
+            # handle the request to reset records
+            if request.POST.get('approve') == 'Yes':
+                reset_models()
+                referring_url = request.META.get('HTTP_REFERER')
+                return redirect(referring_url)
                 
         res_cls = {'Second Year':0,'Third Year':0,'Final Year':0}    # record of total attendance of each class
         res_sub = {}    # record of total attendance of top three subject
@@ -138,11 +226,9 @@ def dashboard(request, reason=''):
             for sub in fields_to_sum:
                 res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
         
-        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
         # There we got the bug!!!!!!!!!!!!!
         res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-        print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
-        reset_models()  
+        # print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
     
         return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
     
@@ -214,8 +300,9 @@ def student(request):
         
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception {e}'})
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     user = User.objects.get(username=request.user)   
     return render(request, 'testapp/student.html', {'UserName': user.get_full_name(), 'UserMail': user.email,})
 
@@ -234,10 +321,13 @@ def get_student_data(request):
     
     try:
         student_data = Student.objects.filter(enroll__startswith=adm_year).values().order_by('enroll')
+        if len(student_data)>0:
+            return JsonResponse({'data':list(student_data),}, safe=False)
+        else:
+            return JsonResponse({'message': 'Student details are not uplaoded for the selected class.'}, status=500)
+
     except Exception as e:
-        return JsonResponse({'success': True, 'message': 'Student details are not uplaoded for the selected class.'})
-    
-    return JsonResponse({'data':list(student_data),}, safe=False)
+        print(f'There is an exception --- {e}')
 
 
 @login_required(login_url='testapp:home')
@@ -471,8 +561,9 @@ def teacher(request):
         
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'There is an exception - {e}'}, status=500)
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     check_subjects()
 
     user = User.objects.get(username=request.user)
@@ -524,8 +615,9 @@ def schedule(request):
             return JsonResponse({'success': False, 'message': f'There is no data for the selected class!'})
         else:
             return JsonResponse({'success': True})
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     check_subjects()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/schedule.html', {'UserName': user.get_full_name(), 'UserMail': user.email})
@@ -587,208 +679,9 @@ def classroom(request):
             'room': room[0],
             'camera': ', '.join([camera[0] for camera in cameras])
         }]
-    reset_models()
-    check_subMap()
+
+    global sub_map
+    sub_map = check_subMap()
     user = User.objects.get(username=request.user)
     return render(request, 'testapp/camera.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'data':data})
 
-
-### some extra helper functions ###
-def clean_schedule(df):
-    db_entry = []
-    for i in df.index:    #each day
-        for j in df.loc[i].index:    #each period
-
-            if j != '1-2':    #not a lunch time
-                if ('\n' in df.loc[i,j]) or ('/' in df.loc[i,j]):    #for multiple items
-                    row = [i, j.split('-')[0], j.split('-')[1]]
-                
-                    if '\n' in df.loc[i,j]:    #1st hour of two subjects
-                        row.append(df.loc[i,j].replace('\n',','))
-                    
-                    if '/' in df.loc[i,j]:    #1st hour of NCC/NSS/Scout
-                        row.append(df.loc[i,j].replace('/',' or '))
-                    
-                    db_entry.append(row)
-                    
-                    #for the subjects having 2hrs assigned
-                    start = j.split('-')[1]
-                    if int(start) < 5 or int(start) > 9:
-                        end = int(start) + 1
-                        if end > 12:
-                            end %= 12
-                        
-                        #to avoid the overriding the subject presents in the next period
-                        next_period = '-'.join([start, str(end)])
-                        if df.loc[i,next_period] == '-':
-                            if '\n' in df.loc[i,j]:    #2nd hour of two subjects
-                                df.loc[i,next_period] = df.loc[i,j].replace('\n',',')
-                            if '/' in df.loc[i,j]:    #2nd hour of NCC/NSS/Scout
-                                df.loc[i,next_period] = df.loc[i,j].replace('/',' or ')
-
-                else:    #single subject or no subject
-                    db_entry.append([
-                            i,
-                            j.split('-')[0],
-                            j.split('-')[1],
-                            df.loc[i,j],
-                        ])
-                    
-            else:    #lunch time
-                db_entry.append([
-                    i,
-                    j.split('-')[0],
-                    j.split('-')[1],
-                    'LUNCH',
-                ])
-    return db_entry
-
-
-# {'Second Year':{'2021/CTAE/497','2021/CTAE/498'}, 'Third Year':set(), 'Final Year':set()}
-def mark_attendance(data):
-    current_sub = get_subjects()
-    print("XXXXXXXXXXXXXXXX",current_sub)
-    for cls, enrolls in data.items():
-        cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
-        if len(enrolls) != 0:
-            print("---------------------------",sub_map)
-            try:
-                for k,v in sub_map[cls].items():
-                    if v in current_sub[cls]:
-                        # enrolls = list(enrolls)
-                        cls_model.objects.filter(enroll_id__enroll__in=enrolls).update(**{k: models.F(k) + 1})
-                        # to keep the track of the subjects
-                        Sub_Tracker.objects.filter(class_id=Class.objects.get(name=cls)).update(**{k: models.F(k) + 1})
-                
-                print('...............attendance marked successfully..................')
-            except Exception as e:
-                print(f'There is an exception -- {e}')
-    print(sub_map)
-    print(current_sub)
-
-
-def get_subjects():
-    now = datetime.now()   #YYYY-MM-DD HH:MM:SS.ssssss
-    hour = now.hour % 12      #12 hour format
-    weekday_name = now.strftime("%A")   #output will be a string that represents the current day of the week,
-    
-    curr_subj = {}
-    for obj in Schedule.objects.filter(class_id_id = 2):
-        if 10 == obj.start_time.hour and 'Wednesday' == obj.day_of_week:         # hardcoded for testing
-            curr_subj['Second Year'] = obj.subject
-    
-    for obj in Schedule.objects.filter(class_id_id = 3):
-        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
-            curr_subj['Third Year'] = obj.subject
-
-    for obj in Schedule.objects.filter(class_id_id = 4):
-        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
-            curr_subj['Final Year'] = obj.subject
-
-    return curr_subj
-
-
-def check_subMap():
-    # Returns True if the QuerySet contains any results, and False if not.
-    if Subject.objects.exists():
-        try:
-            # select only those classes for which subjects are already uploaded
-            cls_inDB = list(Class.objects.filter(id__in=Subject.objects.values_list('class_id', flat=True)).values_list('name', flat=True))
-            for cls in cls_inDB:
-                if cls != 'None':
-                    
-                    # for updating the map according to the current subjects
-                    cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
-                    subjects = Subject.objects.filter(class_id = Class.objects.get(name=cls)).values_list('id', flat=True)
-                    fields = [f.name for f in cls_model._meta.get_fields()[2:]]
-                    
-                    # to update the sub_map with the existing map
-                    global sub_map
-                    if os.path.exists('submap.json'):
-                        with open('submap.json', 'r') as json_file:
-                            sub_map = json.load(json_file)
-                    else:
-                        with open('submap.json', 'w') as json_file:
-                            json.dump(sub_map, json_file)
-
-                    if cls in sub_map.keys():
-                        # for adding new subjects in map
-                        new_sub = [sub for sub in subjects if sub not in sub_map[cls].values()]
-                        new_key = [key for key in fields if key not in sub_map[cls].keys()]
-                        for sub,key in zip(new_sub, new_key):
-                            sub_map[cls][key] = sub
-
-                        # for deleting subjects in map
-                        del_sub = [sub for sub in sub_map[cls].values() if sub not in subjects]
-                        del_key = []
-                        for sub in del_sub:
-                            del_key += [key for key, value in sub_map[cls].items() if value == sub]
-                        for key in del_key:
-                            del sub_map[cls][key]            
-                        
-                    else:
-                        sub_map[cls] = {f:s for f,s in zip(fields, subjects)}
-                    
-                    with open('submap.json', 'r+') as json_file:
-                        json_file.truncate()
-                        json.dump(sub_map, json_file)
-
-            print('...........sub_map updated successfully!.........')
-        except Exception as e:
-            print(f'There is an exception {e}')
-
-
-def check_subjects():
-    if Schedule.objects.exists() and Teacher.objects.exists():      # for subject model
-        data = Teacher.objects.all().values_list('id','subjects')
-        
-        try:
-            res_dict = {}
-            for val in data:        # to process the text
-                if ',' in val[1]:   # for multiple subjects
-                    subj = val[1].split(',')
-                    
-                    for sub in subj:
-                        res = [i.strip(')') for i in sub.split('(')]
-                        res_dict[res[1]] = [res[0], Teacher.objects.get(id=val[0])]
-                
-                else:    #for single subject
-                    res = [i.strip(')') for i in val[1].split('(')]
-                    res_dict[res[1]] = [res[0], Teacher.objects.get(id=val[0])]
-            
-            for key, value in res_dict.items():     # to save the processed values
-                subject, created = Subject.objects.get_or_create(
-                    id = key,
-                    defaults={
-                        'name': value[0].strip(),
-                        'teacher_id': value[1],
-                        'class_id': Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
-                    }
-                )
-                if not created:
-                    subject.name = value[0].strip()
-                    subject.teacher_id = value[1]
-                    subject.class_id = Class.objects.get(name=Schedule.objects.filter(subject__icontains=key)[0]) if Schedule.objects.filter(subject__icontains=key) else Class.objects.get(id='0')
-                    subject.save()
-            
-            print("..........Successfully saved the subjects!............")
-        
-        except Exception as e:
-            print(f'There is an exception - {e}')
-
-
-def reset_models():
-    if timezone.now().strftime('%m') == '06':
-        a = Second_Year.objects.all().delete()
-        b = Third_Year.objects.all().delete()
-        c = Final_Year.objects.all().delete()
-        d = Schedule.objects.all().delete()
-        e = Sub_Tracker.objects.all().delete()
-        print("Database models are cleared: ",a[1],b[1],c[1],d[1],e[1])
-        
-        file_path = 'submap.json'
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print("Map deleted successfully.")
-        else:
-            print("Map does not exist.")

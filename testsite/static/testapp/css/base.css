@@ -337,3 +337,10 @@ header {
   transform: translate(-50%, -50%);
   font-size: smaller;
 }
+
+.reset_form{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin: 2rem;
+}

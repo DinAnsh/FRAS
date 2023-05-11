@@ -30,3 +30,12 @@ var burgerbtn = document.querySelector(".home-burger-menu");
 burgerbtn.addEventListener("click", () => {
   document.querySelector(".home-mobile-menu").style.display = "block";
 });
+
+
+function resetRecords(){
+  document.querySelector('.confirmation').style.display = 'block';
+}
+
+function closeReset(){
+  document.querySelector('.confirmation').style.display = 'none';
+}
