@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from django.core.files.base import ContentFile
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum
@@ -217,21 +217,25 @@ def dashboard(request, reason=''):
                 
         res_cls = {'Second Year':0,'Third Year':0,'Final Year':0}    # record of total attendance of each class
         res_sub = {}    # record of total attendance of top three subject
-        for cls in sub_map.keys():
-            fields_to_sum = list(sub_map[cls].keys())
-            cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
-            values_list = cls_model.objects.all().values(*fields_to_sum)    # list of dicts
-            res_cls[cls] = sum([sum(dic.values()) for dic in values_list])
+        if sub_map is not None:
+            for cls in sub_map.keys():
+                fields_to_sum = list(sub_map[cls].keys())       #[sub1,sub2,sub3,.......]
+                cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))        #get year model ex- second_year model, thirst_year...
+                values_list = cls_model.objects.all().values(*fields_to_sum)    # list of dicts
+                res_cls[cls] = sum([sum(dic.values()) for dic in values_list])
 
-            for sub in fields_to_sum:
-                res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
-        
-        # There we got the bug!!!!!!!!!!!!!
-        res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-        # print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
-    
-        return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
-    
+                for sub in fields_to_sum:
+                    res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
+            
+            try:
+                res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
+            # print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
+            except :
+                return HttpResponse("No Student Found please upload students details!") 
+            
+            return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
+        else:
+            return HttpResponse("No Subject Found please upload schedules!") 
     except Exception as e:
         print(f'There is an exception --- {e}')
     

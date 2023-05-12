@@ -458,7 +458,7 @@ nav a:is(:link, :active, :visited).active {
 .home-text11 {
   color: #201a1e;
   font-size: 1.15rem;
-  max-width: 600px;
+  max-width: 65vw;
   font-style: normal;
   margin-top: var(--dl-space-space-unit);
   text-align: center;
@@ -920,6 +920,7 @@ nav a:is(:link, :active, :visited).active {
 }
 
 .home-text41 {
+  width: 11vw;
   left: 0px;
   bottom: 0px;
   position: absolute;

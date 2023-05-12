@@ -176,6 +176,9 @@ def check_subMap():
             return sub_map
         except Exception as e:
             print(f'There is an exception {e}')
+    else:
+        print("-------------------------------Subject table is Empty!----------------------------------------")
+        return None
 
 
 def check_subjects():
