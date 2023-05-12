@@ -1,5 +1,6 @@
 from django import forms
 
+# not in use
 class UserRegistrationForm(forms.Form):
     clg_name = forms.CharField(
         label = 'College Name',
