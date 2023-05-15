@@ -106,7 +106,7 @@ def get_subjects():
     
     curr_subj = {}
     for obj in Schedule.objects.filter(class_id_id = 2):
-        if 10 == obj.start_time.hour and weekday_name == obj.day_of_week:
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
             curr_subj['Second Year'] = obj.subject
     
     for obj in Schedule.objects.filter(class_id_id = 3):
@@ -176,6 +176,9 @@ def check_subMap():
             return sub_map
         except Exception as e:
             print(f'There is an exception {e}')
+    else:
+        print("-------------------------------Subject table is Empty!----------------------------------------")
+        return None
 
 
 def check_subjects():
@@ -257,14 +260,15 @@ def reset_models():
 def send_forget_password_mail(email, meta):
     subject = "Reset your FRAS password!"
     message = f'''
-    Hello, We received a request to reset the password for your account for this email address. To initiate the password reset process for your account, click the link below. 
-    {meta["scheme"]}://{meta["host"]}/change_password/{meta["token"]}/
-    Note: the link will be validated only for 2 minutes.
-    This link can only be used once. If you need to reset your password again, please visit http://127.0.0.1:8000/ and request another reset.
-    If you did not make this request, you can simply ignore this email.
+Hello, We received a request to reset the password for your account for this email address. To initiate the password reset process for your account, click the link below. 
+{meta["scheme"]}://{meta["host"]}/change_password/{meta["token"]}/
+Note: the link will be validated only for 2 minutes.
 
-    Sincerely,
-    The FRAS Team
+This link can only be used once. If you need to reset your password again, please visit {meta["scheme"]}://{meta["host"]}/ and request another reset.
+If you did not make this request, you can simply ignore this email.
+
+Sincerely,
+The FRAS Team
     '''
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]

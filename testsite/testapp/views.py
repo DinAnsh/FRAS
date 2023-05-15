@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from django.core.files.base import ContentFile
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum
@@ -151,6 +151,8 @@ def change_password(request, token):
             user_obj = User.objects.get(id=user_id)
             user_obj.set_password(new_password)
             user_obj.save()
+            
+            messages.success(request,"Password Changed Successfully!")
             return redirect('home')
         
         
@@ -204,7 +206,10 @@ def dashboard(request, reason=''):
                 cameras = Camera.objects.all()
 
                 if cameras and payload.get("get_class"):
-                    cam = Camera.objects.get(camera_ip=payload.get("cam_id"))       
+                    try:
+                        cam = Camera.objects.get(camera_ip=payload.get("cam_id")) 
+                    except Camera.DoesNotExist:      
+                        return JsonResponse({"class": 'Not Found!'}, status=200)
                     return JsonResponse({"class": str(cam.class_id)}, status=200)
                 elif payload.get("get_class"):
                     return JsonResponse({"status":"success"},status=307)
@@ -217,21 +222,25 @@ def dashboard(request, reason=''):
                 
         res_cls = {'Second Year':0,'Third Year':0,'Final Year':0}    # record of total attendance of each class
         res_sub = {}    # record of total attendance of top three subject
-        for cls in sub_map.keys():
-            fields_to_sum = list(sub_map[cls].keys())
-            cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
-            values_list = cls_model.objects.all().values(*fields_to_sum)    # list of dicts
-            res_cls[cls] = sum([sum(dic.values()) for dic in values_list])
+        if sub_map is not None:
+            for cls in sub_map.keys():
+                fields_to_sum = list(sub_map[cls].keys())       #[sub1,sub2,sub3,.......]
+                cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))        #get year model ex- second_year model, thirst_year...
+                values_list = cls_model.objects.all().values(*fields_to_sum)    # list of dicts
+                res_cls[cls] = sum([sum(dic.values()) for dic in values_list])
 
-            for sub in fields_to_sum:
-                res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
-        
-        # There we got the bug!!!!!!!!!!!!!
-        res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
-        # print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
-    
-        return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
-    
+                for sub in fields_to_sum:
+                    res_sub[sub_map[cls][sub]] = list(cls_model.objects.aggregate(Sum(sub)).values())[0]
+            
+            try:
+                res_sub = dict(sorted(res_sub.items(), key=lambda x: x[1], reverse=True)[:3])
+            # print(">>>>>>>>>>>>>res_sub>>>>>>>>>>", res_sub)
+            except :
+                return HttpResponse("No Student Found please upload students details!") 
+            
+            return render(request, 'testapp/dashboard.html', {'UserName': user.get_full_name(), 'UserMail': user.email, 'maxCls': json.dumps(res_cls), 'maxSub': json.dumps(res_sub)})
+        else:
+            return HttpResponse("No Subject Found please upload schedules!") 
     except Exception as e:
         print(f'There is an exception --- {e}')
     
@@ -336,7 +345,7 @@ def face_recognize(request):
         try:
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,23)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,20)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -477,10 +486,10 @@ def upload_image(request):
             # year = enroll_id[0:4]
             
             pil_img = Image.open(image_file)
+            # pil_img.show()
             opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
-            
             face_array = extract_face(opencvImage)
-        
+
             #here we need to check if the extract_face returns the list having 5 faces(len(extract_face)==5)
             if (type(face_array)!= str) and (len(face_array)==5):
                 # Save the image to a file or database

@@ -344,3 +344,33 @@ header {
   justify-content: space-around;
   margin: 2rem;
 }
+
+.common_btn {
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  border-width: 1px;
+  border-radius: 5px;
+  border-color: #201a1e90;
+  margin-left: 10px;
+  width: 5rem;
+}
+
+.button1 {
+  color: #201a1e;
+  background-color: #e2e6e7;
+}
+
+.button2 {
+  background-color: #201a1e;
+  color: #e2e6e7;
+}
+
+.button1:hover {
+  background-color: #201a1e;
+  color: #e2e6e7;
+}
+
+.button2:hover {
+  color: #201a1e;
+  background-color: #e2e6e7;
+}

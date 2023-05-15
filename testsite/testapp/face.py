@@ -9,9 +9,9 @@ from sklearn.svm import SVC
 import pickle
 from django.utils import timezone
 
-detector = MTCNN()
-embedder = FaceNet()  
 
+embedder = FaceNet()
+detector = MTCNN()
 
 def extract_face(image):
     '''
@@ -20,9 +20,11 @@ def extract_face(image):
     return: array of faces
     '''
     face_arr = []
+    global detector
     # detector = MTCNN()
     try:
-        faces = detector.detect_faces(image)    #returns a list of detected faces in the form of dictionaries
+        faces = detector.detect_faces(image)
+        #returns a list of detected faces in the form of dictionaries
         for f in faces:
             x,y,w,h = f['box']                  #there is only face in image
             x,y = abs(x), abs(y)
@@ -32,7 +34,7 @@ def extract_face(image):
             face_arr.append(crop_face_arr)
         return face_arr
     except Exception as e:
-        return f"No face Found! {e}"
+        print(f"No face Found! {e}")
     
     
 def get_embedding(year:str):
@@ -45,7 +47,8 @@ def get_embedding(year:str):
     # current_month = timezone.now().strftime('%m')
 
     adm_year = str(int(current_year)-int(year))  #2,3
-    # embedder = FaceNet()  
+    # embedder = FaceNet() 
+    global embedder 
     
     # fetches all the students' data from the database whose enrollment numbers start with the admission year
     all_students = Student.objects.filter(enroll__startswith=adm_year)
@@ -101,6 +104,7 @@ def makePrediction(image, class_year):
     '''
     This function takes an image and a class year as input and returns the predicted labels of the faces in the image.
     '''
+    global embedder
     # embedder = FaceNet()
     faces =  extract_face(image)   
     year = class_year
