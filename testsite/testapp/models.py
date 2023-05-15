@@ -36,18 +36,6 @@ class Student(models.Model):
     def __str__(self):
         return self.enroll
 
-    # def save_encoding(self, float_array):
-    #     # Convert the numpy array to JSON and save to JSONField
-    #     self.encoding = json.dumps(float_array)
-    #     self.save()
-
-    # def getencoding(self):
-    #     # Retrieve the JSON from JSONField and convert to numpy array
-    #     return np.array(json.loads(self.encoding))
-    
-# need to create an attendance table having Enrll no, subjects as columns
-
-
 class Team(models.Model):
     name = models.CharField(max_length=50)
     designation = models.CharField(max_length=50)

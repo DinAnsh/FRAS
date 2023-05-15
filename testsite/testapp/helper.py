@@ -106,7 +106,7 @@ def get_subjects():
     
     curr_subj = {}
     for obj in Schedule.objects.filter(class_id_id = 2):
-        if 10 == obj.start_time.hour and weekday_name == obj.day_of_week:
+        if hour == obj.start_time.hour and weekday_name == obj.day_of_week:
             curr_subj['Second Year'] = obj.subject
     
     for obj in Schedule.objects.filter(class_id_id = 3):

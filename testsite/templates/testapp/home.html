@@ -169,13 +169,10 @@
       <h1 class="home-text">Face Recognition Based Attendance System</h1>
       <span class="home-text01">
         <span>
-          Automatic face recognition technologies have made many improvements
-          in the changing world. Smart Attendance using Real-Time Face
-          Recognition is a real-world solution which comes with day to day
-          activities of handling student attendance system. <br> <br> Face
-          recognition-based attendance system is a process of recognizing the
-          students face for taking attendance by using face biometrics based
-          on high - definition monitor video and other information technology.
+          Smart Attendance using Real-Time Face Recognition is an advanced solution that leverages automatic face recognition technology 
+          to streamline the process of taking attendance. By utilizing high-definition video and face biometrics, this system accurately 
+          identifies students and records their attendance. It offers a modern and efficient approach to attendance management, eliminating 
+          the need for manual processes and ensuring accuracy in real-time.
         </span>
       </span>
       <button class="home-button button" onclick="goDash()">Get Started</button>
@@ -217,10 +214,7 @@
           <h2 class="feature-card2-text"><span>Time-Saving</span></h2>
           <span>
             <span>
-              With this system, valuable time of both faculty and students is
-              saved as it eliminates the need for taking attendance manually.
-              This means that more time can be devoted to teaching and learning
-              activities.
+              This technology saves precious time for both professors and students by eliminating the need for manual attendance taking. This means that more time may be spent on teaching and learning activities.
             </span>
           </span>
         </div>
@@ -232,9 +226,8 @@
           </h2>
           <span>
             <span>
-              Face recognition based attendance systems come with user-friendly
-              interfaces that are easy to use and navigate. They are accessible
-              to everyone, regardless of their tech skills.
+              Face recognition based attendance system come with user-friendly
+              interfaces that are easy to operate and navigate.
             </span>
           </span>
         </div>
@@ -244,7 +237,7 @@
   <div id="process" class="home-steps">
     <h1 class="home-text09"><span>Discover Our Process</span></h1>
     <span class="home-text11">
-      <span> The face recognition-based attendance system works like magic. During class, the cctv camera captures the image of the whole class 3 times, 1st at 15th minute, 30th minute and 45th minute , which is then send to the server. At server side the faces will be detected and recognized by the machine learning model which predicts the enroll ids of the faces. Based on the enroll ids student’s attendance is marked in the system. The system is based on deep learning algorithms that recognize and match images in milliseconds.
+      <span> The face recognition-based attendance system operates seamlessly. During class, the CCTV camera captures the entire class three times at specific intervals: 15th, 30th, and 45th minutes. These images are then sent to the server, where a machine learning model detects and recognizes faces, predicting the corresponding enrollment IDs. Based on these IDs, student attendance is marked in the system. Powered by advanced deep learning algorithms, the system efficiently matches and identifies images within milliseconds.
       </span>
       <br />
     </span>
@@ -311,7 +304,7 @@
         <div class="home-container18">
           <h1 class="home-text29"><span>Attendance Marked</span></h1>
           <span class="home-text31">
-            <span> Excell sheet </span>
+            <span> Excel sheet </span>
             <br />
             <span></span>
           </span>
@@ -323,10 +316,7 @@
     <h1 class="home-text34">Who Are We?</h1>
     <span class="home-text35">
       <span>
-        We are a group of passionate and innovative new developers looking to
-        make our mark on the tech industry. we are a team of recent graduates
-        with degrees in computer science and engineering field. As a team, we bring
-        a diverse set of skills and experiences to the table.
+        We are a dynamic team of enthusiastic and forward-thinking developers aiming to leave our imprint on the tech industry. With our backgrounds in computer science and engineering, we are a group of recent graduates driven by passion and innovation. Together, we bring a rich tapestry of skills and diverse experiences to our collaborative endeavors.
       </span>
       <br />
     </span>
@@ -391,7 +381,7 @@
                 >* Looks like you've entered the wrong password!</label
               >
             </div>
-            {% comment %} {% if messages %} {% for message in messages %}
+            {% if messages %} {% for message in messages %}
             <input
               type="text"
               id="alert"
@@ -404,7 +394,7 @@
                 window.alert(msg);
               }
             </script>
-            {% endfor %} {% endif %} {% endcomment %}
+            {% endfor %} {% endif %} 
             <input
               type="submit"
               value="Log in"
@@ -517,5 +507,8 @@
 
 {% endblock content %}
  {% block js %}
+ <script>
+  var msg = 
+ </script>
 <script src="{% static 'testapp/js/auth_popup.js' %}"></script>
 {% endblock js %}

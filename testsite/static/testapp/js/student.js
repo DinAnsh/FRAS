@@ -29,6 +29,7 @@ function closeModal3() {
   retakeBtn.style.display = 'none';
   nextBtn.style.display = 'none';
   saveBtn.style.display = 'none';
+  document.querySelector('.takebtn').lastElementChild.style.display = 'none';
 }
 
 window.onclick = function (event) {

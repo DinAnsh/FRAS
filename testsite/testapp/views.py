@@ -151,6 +151,8 @@ def change_password(request, token):
             user_obj = User.objects.get(id=user_id)
             user_obj.set_password(new_password)
             user_obj.save()
+            
+            messages.success(request,"Password Changed Successfully!")
             return redirect('home')
         
         
@@ -204,7 +206,10 @@ def dashboard(request, reason=''):
                 cameras = Camera.objects.all()
 
                 if cameras and payload.get("get_class"):
-                    cam = Camera.objects.get(camera_ip=payload.get("cam_id"))       
+                    try:
+                        cam = Camera.objects.get(camera_ip=payload.get("cam_id")) 
+                    except Camera.DoesNotExist:      
+                        return JsonResponse({"class": 'Not Found!'}, status=200)
                     return JsonResponse({"class": str(cam.class_id)}, status=200)
                 elif payload.get("get_class"):
                     return JsonResponse({"status":"success"},status=307)
@@ -340,7 +345,7 @@ def face_recognize(request):
         try:
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,23)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,20)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -481,10 +486,10 @@ def upload_image(request):
             # year = enroll_id[0:4]
             
             pil_img = Image.open(image_file)
+            # pil_img.show()
             opencvImage = cv2.cvtColor(np.array(pil_img), cv2.COLOR_BGR2RGB)
-            
             face_array = extract_face(opencvImage)
-        
+
             #here we need to check if the extract_face returns the list having 5 faces(len(extract_face)==5)
             if (type(face_array)!= str) and (len(face_array)==5):
                 # Save the image to a file or database
