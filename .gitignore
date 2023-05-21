@@ -9,3 +9,4 @@ testsite/db.sqlite3
 Dockerfile
 Demo_files
 testsite/media/students
+testsite/testsite/cred.py
