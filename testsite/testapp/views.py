@@ -149,6 +149,10 @@ def change_password(request, token):
 
 
             user_obj = User.objects.get(id=user_id)
+            email = user_obj.email
+            user = System_Admin.objects.get(email=email)
+            user.password = new_password
+            user.save()
             user_obj.set_password(new_password)
             user_obj.save()
             
@@ -345,7 +349,7 @@ def face_recognize(request):
         try:
             current_min = datetime.now().strftime("%M")
             global year2, year3, year4
-            if int(current_min) in list(range(0,47)):  #this time will be 10, 50
+            if int(current_min) in list(range(0,48)):  #this time will be 10, 50
                 
                 for img in request.FILES:
                     # image_class -> image_3
@@ -365,7 +369,10 @@ def face_recognize(request):
                         if type(class2_enrolls) != str:
                             for e in class2_enrolls:
                                 e = str(e)
-                                year2.add(e[:4]+"/CTAE/"+e[4:])
+                                if e != "Unknown":
+                                    year2.add(e[:4]+"/CTAE/"+e[4:])
+                                else:
+                                    year2.add("Unknown")
 
                         
                     elif class_id == "3":
@@ -373,7 +380,10 @@ def face_recognize(request):
                         if type(class3_enrolls) != str:
                             for e in class3_enrolls:
                                 e = str(e)
-                                year3.add(e[:4]+"/CTAE/"+e[4:])
+                                if e != "Unknown":
+                                    year3.add(e[:4]+"/CTAE/"+e[4:])
+                                else:
+                                    year3.add("Unknown")
 
                         
                     elif class_id == "4":
@@ -383,8 +393,10 @@ def face_recognize(request):
                                 e = str(e)
                                 if e != "Unknown":
                                     year4.add(e[:4]+"/CTAE/"+e[4:])
+                                else:
+                                    year4.add("Unknown")
                     
-                return JsonResponse({"status":"attendance recorded!"})
+                return JsonResponse({"status":"Prediction recorded!"})
 
             else:
             # pil_img = Image.open(image_file)
@@ -494,7 +506,7 @@ def upload_image(request):
             if (type(face_array)!= str) and (len(face_array)==5):
                 # Save the image to a file or database
                 student = Student.objects.get(enroll=enroll_id)
-                student.img=image_file
+                student.img=image_file  ##This is only for Demonstration purpose
                 flatten_arr = np.asarray(face_array).flatten()
                 flat_str = ''
                 for i in flatten_arr:
