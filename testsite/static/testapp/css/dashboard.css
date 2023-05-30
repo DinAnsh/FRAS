@@ -622,7 +622,7 @@
   font-style: normal;
   font-weight: 500;
   border-bottom: 3px solid #d0b49f;
-  width: min-content;
+  width: fit-content;
 }
 
 .adminrights-stat {

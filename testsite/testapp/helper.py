@@ -73,11 +73,10 @@ def mark_attendance(data):
     '''
 
     current_sub = get_subjects()
-    print("XXXXXXXXXXXXXXXX",current_sub)
+    print("------------------Current Subject----------->",current_sub)
     for cls, enrolls in data.items():
         cls_model = apps.get_model('testapp', cls.lower().replace(" ", '_'))
         if len(enrolls) != 0:
-            print("---------------------------",sub_map)
             try:
                 for k,v in sub_map[cls].items():
                     if v in current_sub[cls]:
@@ -89,8 +88,6 @@ def mark_attendance(data):
                 print('...............attendance marked successfully..................')
             except Exception as e:
                 print(f'There is an exception -- {e}')
-    print(sub_map)
-    print(current_sub)
 
 
 def get_subjects():

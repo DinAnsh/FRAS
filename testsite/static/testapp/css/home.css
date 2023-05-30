@@ -562,6 +562,7 @@ nav a:is(:link, :active, :visited).active {
   color: var(--dl-color-gray-500);
   font-size: 0.75rem;
   text-align: center;
+  display: none;
 }
 
 .home-step1 {
@@ -649,6 +650,7 @@ nav a:is(:link, :active, :visited).active {
   color: var(--dl-color-gray-500);
   font-size: 0.75rem;
   text-align: center;
+  display: none;
 }
 
 .home-step2 {
@@ -736,6 +738,7 @@ nav a:is(:link, :active, :visited).active {
   color: var(--dl-color-gray-500);
   font-size: 0.75rem;
   text-align: center;
+  display: none;
 }
 
 .home-step3 {
@@ -823,6 +826,7 @@ nav a:is(:link, :active, :visited).active {
   color: var(--dl-color-gray-500);
   font-size: 0.75rem;
   text-align: center;
+  display: none;
 }
 
 .home-container19 {

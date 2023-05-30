@@ -323,6 +323,7 @@ function sendImagesreq(event) {
 function checkTime() {
   // Get the current time
   var now = new Date();
+  console.log(now)
   var currentHour = now.getHours();
   // if (currentHour == 19) {
   //   console.log("Current hour is 1 PM, skipping action.");
@@ -331,9 +332,10 @@ function checkTime() {
   // Check if the current minute is one of the target minutes
   var minute = now.getMinutes();
   // 15 30 45 50
-  if (minute == 4 || minute == 5 || minute == 6 || minute == 8) {
+  if (minute == 48 || minute == 49 || minute == 50 || minute == 51) {
     // Perform the desired action
     capture_images();
+    console.log("Image captured")
     setTimeout(function () {
       sendImages(imagesPayload);
     }, 5000);
