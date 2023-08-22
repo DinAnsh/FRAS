@@ -56,4 +56,6 @@ FRAS has several pages that allow users to perform various tasks. These pages in
   - The camera page provides a live video stream from the camera attached to the FRAS system. The video stream is used to capture images of the students or employees for attendance tracking.
 
 ## Thanks
-The FRAS application was developed by [Dipendra Singh](https://github.com/dipendrasingh100), [Dinansh Bhardwaj](https://github.com/DinAnsh), [Diya Goyal](), and [Aditi Singh](https://github.com/aditisingh0409). We hope that this application will be useful to various organizations, schools, and universities in tracking attendance accurately and securely.
+The FRAS application was developed by [Dipendra Singh](https://github.com/dipendrasingh100) and [Dinansh Bhardwaj](https://github.com/DinAnsh). We hope that this application will be useful to various organizations, schools, and universities in tracking attendance accurately and securely.
+
+**PS** For readers of this repo, any suggestions for the improvement of the application are welcomed. You can create a pull request or connect with us for discussion at our LinkedIn handle mentioned on the GitHub profile itself. Happy coding 📸
